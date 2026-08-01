@@ -1,4 +1,4 @@
-# repo-template
+# Repository Template
 
 A GitHub template repository for projects built with a **spec-driven TDD
 workflow**: an authoritative specification, gated behavior changes, strict
