@@ -1,0 +1,14 @@
+# Claude Code local state
+.claude/settings.local.json
+
+# Editors
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# The bootstrap adds stack-specific entries (target/, node_modules/, build/,
+# .venv/, __pycache__/, cover.out) when it knows the language.

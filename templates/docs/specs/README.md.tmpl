@@ -1,0 +1,85 @@
+# {{PROJECT_NAME}} Specs
+
+Authoritative specification of `{{PROJECT_NAME}}`'s behavior, split by capability
+area.
+
+These files are **normative**: the code is expected to conform to them, not the
+other way around. When code and spec disagree, that is a defect in one of them —
+resolve it, don't paper over it.
+
+## Areas
+
+{{AREA_TABLE}}
+
+Cross-cutting: [`non-functional-requirements.md`](./non-functional-requirements.md)
+(`NF-R-nnn`).
+
+## Rules for writing specs
+
+**1. No code pointers.** Never cite `file:line`, function names, type names, or
+internal identifiers. A spec states *what must be true*, not where it is
+implemented — code pointers rot on every refactor and turn the authoritative doc
+into a liar. The **public API is different**: exported names, signatures, error
+variants, feature flags, and configuration fields are part of the contract and
+*are* spec content. They belong in the area's `api-contract.md`.
+
+**2. Requirement IDs are stable and append-only.** Each requirement carries an ID
+from its area's prefix (see the table above). Never renumber. Never reuse a
+retired ID. A deleted requirement's ID stays dead. Reference requirements by ID
+in commits, PRs, tests, and agent instructions.
+
+**3. Owner is the behavior, not the surface.** A configuration field is specified
+with the behavior it controls, not wherever it happens to be typed in — so one
+change touches one file. If two areas must behave identically, the requirement
+belongs to the area that owns the shared behavior, stated once.
+
+**4. Requirements are testable.** Write "shall" statements with observable
+outcomes. "The client shall fail a request with a timeout error after the
+configured response timeout elapses with no matching response" is a requirement.
+"The client is robust" is not. Where a format is involved, the strongest form
+names the exact bytes.
+
+**5. Known gaps are specified, not hidden.** Behavior that is ugly but
+intentional (an unsupported case, a deliberate deviation, a missing policy)
+belongs in the area's `edge-cases.md` as a stated constraint — so it is not
+mistaken for an oversight and silently "fixed".
+
+## Per-area files
+
+Not every area needs every file; add and drop based on need.
+
+| File | Contains |
+|---|---|
+| `requirements.md` | Numbered, testable "shall" statements. Every area has one. |
+| `api-contract.md` | The area's stable public surface: exported names and signatures, error variants, configuration fields, feature flags. |
+| `data-contract.md` | Formats: wire layouts, file schemas, field widths, ordering, ranges. |
+| `edge-cases.md` | Boundary behavior, error semantics, and stated known limitations. |
+
+## Requirements intentionally not unit-tested
+
+Most requirements are pinned by a test whose doc comment cites the ID. A minority
+are **deliberately** left without a dedicated test — they are not gaps. This list
+records that decision so it is not re-discovered as one. Two kinds qualify;
+nothing else does.
+
+**1. Design-posture, platform, toolchain, and versioning statements.** These
+assert facts about the build or the design, not runtime behavior a `shall` test
+could observe. Each names its enforcement point instead (a CI job, a manifest
+field, a lint configuration).
+
+**2. Cross-cutting restatements whose behavior is asserted under the owning
+area.** The requirement is real, but its test lives with the per-area requirement
+that owns the behavior, cited by *that* ID.
+
+Anything not listed below is expected to carry a citing test.
+
+| Requirement | Kind | Enforced by / asserted under |
+|---|---|---|
+| *(none yet)* | | |
+
+## Keeping specs true
+
+Before changing code in an area, read that area's `requirements.md`. If the
+change contradicts the spec, update the spec **in the same commit**. A behavior
+change with no spec change is an incomplete change. The full gated workflow is in
+[`AGENTS.md`](../../AGENTS.md).

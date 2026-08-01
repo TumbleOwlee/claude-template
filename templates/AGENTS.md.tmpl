@@ -1,0 +1,198 @@
+# AGENTS.md
+
+Router for AI coding agents. Read first.
+
+## Repo
+
+`{{PROJECT_NAME}}` — {{ONE_LINER}}. {{PROJECT_KIND}}. Product framing:
+[`PRD.md`](./PRD.md). Structure: [`ARCHITECTURE.md`](./ARCHITECTURE.md).
+
+## Spec-driven
+
+- `docs/specs/` is authoritative. Code conforms to the spec, not the reverse.
+- Read the area's `requirements.md` **and** `edge-cases.md` before editing that area.
+  `edge-cases.md` records deliberate ugliness — check it before "fixing" something.
+- A behavior change with no spec change is incomplete.
+- `main` never holds an unfinished spec: a requirement on `main` describes code that
+  exists and is tested. A branch may hold a spec commit ahead of its code; the squash
+  merge keeps that off `main`.
+- Pre-existing spec/code disagreement that is not the task you were given: stop, raise it
+  separately. Folding it in widens already-approved work and skips its own review.
+- Specs carry no `file:line`. Locate code with search tools.
+- Requirement IDs are stable and append-only. Cite them in commits and PRs.
+
+## TDD — fixed order within every stage
+
+1. Write the test. Its doc comment cites the requirement ID ({{ID_CITATION_EXAMPLE}}).
+2. Run it, watch it fail for the right reason, report the failure. A wrong assertion, a
+   test-side compile error, or a pass before the code exists proves nothing.
+3. Minimum implementation that passes.
+4. Refactor green.
+
+- Implementation without a preceding failing test: not done. Test written afterwards to
+  fit the code: not done.
+- Derive expected values from the authoritative source — the standard, the protocol
+  document, the upstream API — never from a debug print of your own implementation.
+{{COVERAGE_LINE}}
+
+## Workflow
+
+Triggers on **behavior change, any size**: a new public function, a changed default, a
+new error variant, any observable semantics. Not a behavior change: refactor, rename,
+perf work with identical semantics, tests, docs — no gates, just do it. Size sets the
+number of stages, never whether the gates exist.
+
+- Replaces any generic workflow skill (`/workflow`); do not run one. `docs/specs/` is
+  already the PRD and the design record.
+- Branch off `main`, never commit to `main`. `<type>/<slug>`, type ∈ {`feat`, `fix`, `docs`}.
+- Delegate gates to agents. **All agents run Sonnet or better**, planning and
+  implementation alike. Weaker models stop mid-plan and call the rest future work, commit
+  a stub as a "green" checkpoint, and report a hanging test as verified.
+- **One git worktree per issue, per agent.** Two agents in one checkout interleave commits
+  and stage each other's work — a branch is not a working tree. Create before the agent
+  starts, remove after its branch merges.
+- The plan is a contract. An implementer who finds it wrong stops and reports; it does not
+  improvise a different design.
+- **An agent's report of its own verification is not verification.** Re-run the tools.
+
+Verify before every approval request:
+
+- **A plan** — quoted requirement text matches the file, appended IDs are genuinely
+  unused, nothing contradicts an existing requirement, and it proposes what was asked.
+- **An implementation** — re-run the full build/test/lint{{COVERAGE_GAUNTLET_WORD}} gauntlet
+  yourself in the agent's worktree, read the code the report describes, check ID citations
+  sit directly beside their test declarations, mutation-check any test written after its
+  implementation, diff the spec against what was approved.
+
+### Gate 1 — spec diff. Stop for approval.
+
+- Propose the normative text itself: the "shall" statements with appended IDs, plus
+  `edge-cases.md` entries. Ready to land, not prose about intent.
+- Observable design is spec: public type and function signatures, the error enum, feature
+  gating, configuration keys.
+- Bug fix where the spec is right and the code is wrong: no diff — state the violated
+  requirement and continue.
+
+### Gate 1b — tracking issue. Stop for approval.
+
+{{ISSUE_WORKFLOW}}
+
+### Write the spec into the working tree
+
+Never marked unfinished — the file holds only normative text. The plan tracks what lacks
+a passing test.
+
+### Gate 2 — implementation plan. Stop for approval.
+
+Stages; file-level steps; a table mapping each new requirement ID to the test that pins
+it; a **Verification** section naming the method (unit tests alone / an integration
+harness / a run against the real external system); expected commits{{COVERAGE_PLAN_CLAUSE}}.
+
+### Implement, stage by stage
+
+- TDD order above. A stage is a green checkpoint: it builds, tests pass, lint is
+  clean{{COVERAGE_STAGE_CLAUSE}}. Commit every green stage — that is what makes the plan
+  resumable.
+- Stage messages stay cheap; they are squashed. The squash message carries the requirement
+  IDs and the why. The spec is the first stage and the first commit.
+- Every new or changed requirement ships ≥ 1 test citing its ID.
+- Every existing test that pins observable behavior cites its requirement. Tests of pure
+  internal or helper detail may stay untagged. Behavior no requirement states means the
+  requirement is missing — add it (gate 1), never attach a loose ID.
+- The citation goes directly beside the test declaration, immediately above the function
+  body. Each ID appears at most once per test.
+- Not done until the Verification method has been run and its outcome reported. Waiving it
+  requires asking.
+
+### Reconcile the spec
+
+Behavior differing from what gate 1 approved is normative and **re-opens gate 1**: show
+the diff, state what forced it, get approval before committing. A wrong cross-reference or
+clumsy wording is editorial — no approval needed. Always report the final spec diff.
+
+### Gate 3 — review. Stop for approval.
+
+Before proposing a PR, run an independent review of the branch in a **separate agent**
+that did not write the code — a reviewer sharing the implementer's context reproduces its
+blind spots. Give it the diff, the approved spec text, and this file. It reports on:
+
+- **Spec fidelity** — every approved requirement implemented, nothing implemented that was
+  not approved (scope creep), no requirement pinned by a test that does not actually
+  exercise it.
+- **Standards** — the conventions below, test naming and ID citation, error handling.
+- **TDD honesty** — tests that could pass against an empty implementation, assertions on
+  the implementation's own output, coverage padded by tests that execute without asserting.
+
+Re-run the verification yourself, then report the findings and the fixes. Findings the
+user should decide on are raised, not silently fixed.
+
+### Gate 4 — pull request. Stop for approval.
+
+- Verification run and reported, then **ask whether to open a PR** — the user may want
+  their own manual run first; do not pre-empt it.
+- Then draft title and body, get approval of that text, then push and open the PR.
+- Title in plain language, same style as the issue. Body is the implementation: the why,
+  the requirement IDs, how the issue was resolved (the approach and structure the issue
+  omitted), the verification actually performed{{COVERAGE_PR_CLAUSE}}{{CLOSES_CLAUSE}}.
+
+### Merge
+
+Squash merge to `main`, so stage commits — including the spec commit that ran ahead of its
+code — never reach `main`. Remove the worktree after the merge.
+
+## Where to look for task X
+
+| Task touches | Read | ID prefix |
+|---|---|---|
+{{AREA_ROUTING_TABLE}}
+| Platforms, toolchain, performance posture, security, versioning, testing conventions | [`docs/specs/non-functional-requirements.md`](./docs/specs/non-functional-requirements.md) | `NF-R-*` |
+| Module graph, data flow, concurrency model | [`ARCHITECTURE.md`](./ARCHITECTURE.md) | — |
+| Contribution workflow, conventions | [`CONTRIBUTING.md`](./CONTRIBUTING.md) | — |
+
+## Build / test / lint
+
+```sh
+{{FULL_COMMANDS}}
+```
+
+Narrow the loop while iterating:
+
+```sh
+{{NARROW_COMMANDS}}
+```
+
+Run the full set before considering work done. `lefthook` enforces the fast checks
+pre-commit; CI runs the full set on every push and pull request.
+
+## Conventions
+
+<!-- PRUNE ME. The bullets between this marker and {{STACK_CONVENTIONS}} are the
+     stack-neutral core. Before writing this file: drop any that do not apply to
+     this project (the port bullet on a project with no listener; the parse bullet
+     on a project that never reads untrusted input), and merge any that the stack
+     block below restates in stack-specific terms — keep the specific wording, drop
+     the generic one. Two bullets saying the same thing in different words is how a
+     conventions section starts getting ignored. Delete this comment. -->
+- Unit tests: {{UNIT_TEST_CONVENTION}}
+- Integration tests: {{INTEGRATION_TEST_CONVENTION}}
+- Bind port 0 and read the assigned port back; never a fixed port. To test bind failure,
+  bind the occupier ephemerally first and point the server at that port.
+- Do not split a file for size alone. A split separates distinct responsibilities,
+  improves navigability, or cuts coupling. Cohesive files and flat generated data stay
+  whole.
+- Start each implementation stage by listing the functionality it needs and searching the
+  package registry. Report downloads, last release, maintenance state, and recommend — do
+  not default to hand-rolling. Adding the dependency is a scope boundary, so the finding
+  goes to the user, not to the manifest.
+- Errors are typed, never stringly. A new failure mode is a new error type, which is
+  public API, which is spec (gate 1).
+- Domain values are typed, not bare primitives, wherever mixing two of them would be a
+  bug. A new domain type is public API, which is spec (gate 1).
+- Hostile, malformed or truncated external input produces a typed error, never a crash,
+  an out-of-bounds access, or an unbounded allocation. Test every parse path with
+  truncated input.
+{{STACK_CONVENTIONS}}
+
+## Scope boundaries — ask before
+
+{{SCOPE_BOUNDARIES}}
