@@ -86,17 +86,53 @@ a passing test.
 
 ### Gate 2 — implementation plan. Stop for approval.
 
-Stages; file-level steps; a table mapping each new requirement ID to the test that pins
-it; a **Verification** section naming the method (unit tests alone / an integration
-harness / a run against the real external system); expected commits{{COVERAGE_PLAN_CLAUSE}}.
+Stages, each broken into numbered file-level steps; a table mapping each new requirement
+ID to the test that pins it; a **Verification** section naming the method (unit tests
+alone / an integration harness / a run against the real external system); expected
+commits{{COVERAGE_PLAN_CLAUSE}}.
+
+Plus a **dependency tree**: for every stage, the stages it depends on and the files it
+touches. Stages with no path between them and disjoint file sets can run in parallel;
+everything else is ordered. Read it as waves — a stage becomes runnable once all its
+dependencies are merged. Overlapping file sets are a dependency, not a race to resolve
+later. A plan whose stages are all sequential says so explicitly; that is a normal
+outcome, not a failure to decompose.
+
+The approval also settles **how it will be implemented**, and the plan is not approved
+until it is answered:
+
+- **Sequential** — one implementer agent walks every stage in order.
+- **Parallel** — the user gives a maximum number of agents running at once. Waves are
+  capped at that number; stages beyond the cap wait for a slot.
+
+Default to sequential when the user expresses no preference. Never infer a concurrency
+level from the plan's shape — a dependency tree that permits five parallel stages does
+not authorize five agents.
 
 ### Implement, stage by stage
+
+Sequential: one agent, one worktree, the stages in plan order.
+
+Parallel: one worktree and one branch per agent, `.claude/worktrees/<slug>-<n>` on
+`<type>/<slug>-<n>`, branched from the feature branch as it stands when the wave starts.
+Never two agents in one worktree. Run a wave, wait for all of it, merge each finished
+branch back into the feature branch, re-run the gauntlet on the merged result, then start
+the next wave. A merge conflict between two stages of one wave means the dependency tree
+was wrong — report it, fix the tree, do not hand-resolve it and continue. An agent that
+stops mid-wave stops its wave: the finished branches still merge, the rest is re-planned.
+
+The gates do not change under parallelism. Verification, review and the spec reconcile all
+happen once, on the merged feature branch, never per agent.
 
 - TDD order above. A stage is a green checkpoint: it builds, tests pass, lint is
   clean{{COVERAGE_STAGE_CLAUSE}}. Commit every green stage — that is what makes the plan
   resumable.
 - Stage messages stay cheap; they are squashed. The squash message carries the requirement
   IDs and the why. The spec is the first stage and the first commit.
+- **Never add `Co-Authored-By`, "Generated with", or any other tool attribution trailer**
+  to a commit message, PR body, issue or comment. It carries no information about the
+  change and it is noise in `git log` forever. This holds for every agent and every gate,
+  including the squash message and the gate 4 PR body.
 - Every new or changed requirement ships ≥ 1 test citing its ID.
 - Every existing test that pins observable behavior cites its requirement. Tests of pure
   internal or helper detail may stay untagged. Behavior no requirement states means the

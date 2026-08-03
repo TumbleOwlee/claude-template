@@ -58,10 +58,12 @@ change to observable behavior passes gates, whatever its size:
    before any code.
 2. **Gate 1b — tracking issue.** Self-contained, goal only, no implementation
    detail.
-3. **Gate 2 — implementation plan.** Stages, an ID → test table, a named
-   verification method.
+3. **Gate 2 — implementation plan.** Stages with file-level steps, a dependency
+   tree, an ID → test table, a named verification method. The same approval picks
+   sequential or parallel implementation, and how many agents run at once.
 4. **Implement** stage by stage under TDD, in a dedicated git worktree, committing
-   every green checkpoint.
+   every green checkpoint — one agent, or a worktree per agent in dependency-tree
+   waves.
 5. **Gate 3 — independent review** by an agent that did not write the code: spec
    fidelity, standards, TDD honesty.
 6. **Gate 4 — pull request**, squash-merged so `main` never carries a spec ahead

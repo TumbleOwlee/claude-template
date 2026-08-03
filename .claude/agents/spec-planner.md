@@ -26,10 +26,24 @@ Read `AGENTS.md` first, then the affected area's `requirements.md`,
   quoting the one you are changing, old → new.
 
 **Gate 2 — the implementation plan.** Stages, each a green checkpoint. For each
-stage: file-level steps, the tests it adds, and a table mapping every new
-requirement ID to the test that pins it. Then a **Verification** section naming
+stage: numbered file-level steps, the tests it adds, the **files it touches**, the
+**stages it depends on**, and a table mapping every new requirement ID to the test
+that pins it. Then a **Dependency tree** section, a **Verification** section naming
 how the change will actually be exercised beyond unit tests, and the expected
 commits.
+
+The dependency tree exists so independent stages can be implemented by parallel
+agents. It must hold under that reading:
+
+- A stage depends on every stage producing something it consumes — a type, a
+  module, a test fixture, a config key.
+- Two stages with **any** file in common are dependent, even if they touch
+  different functions in it. Concurrent agents merge whole files, not hunks.
+- State the resulting waves explicitly: which stages could run at once. Say when
+  the answer is "none, it is a chain" — a fully sequential plan is a normal
+  outcome, and inventing parallelism it does not have is worse than admitting it.
+- Do not choose whether parallelism is used or how many agents run. That is the
+  user's call at gate 2.
 
 ## Rules
 
