@@ -61,7 +61,9 @@ pre-commit hook would reject is rejected by CI too.
 
 Agents working in this repo follow the fuller gated workflow in
 [`AGENTS.md`](./AGENTS.md); human contributors are welcome to, but the checks
-above are the hard requirements.
+above are the hard requirements. `.claude/tasks/` is that workflow's execution
+state — the directories are tracked, the cards inside are local and gitignored.
+Nothing there needs maintaining by hand.
 
 ## Reporting issues
 

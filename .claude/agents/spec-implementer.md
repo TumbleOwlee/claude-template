@@ -11,6 +11,24 @@ Read `AGENTS.md` first. Work **only** inside the worktree path you were given �
 never in the main checkout, never in another agent's worktree. Never `git add -A`
 across a path you were not assigned.
 
+You are also given the **absolute path of your own task card**, which lives in the
+main checkout, outside your worktree. That one file is the sole exception to the
+worktree rule: you may write it, and nothing else outside your worktree.
+
+Keep the card current as you go — it is what a new session reads if this one dies.
+Append one line per step, never rewriting an earlier line:
+
+```
+2026-01-02T14:02 spawn agent=impl
+2026-01-02T14:05 test-red <ID> <test name>
+2026-01-02T14:11 green commit=<sha>
+2026-01-02T14:12 gauntlet=pass
+2026-01-02T14:12 stopped: <what and why>
+```
+
+Move the card `open` → `inprogress/` when you start and → `inreview/` when your
+stages are green and committed. That is as far as you go.
+
 You may be given the whole plan or **only some of its stages**, with other agents
 running the rest in parallel. Implement exactly the stages you were assigned, in
 plan order. Touch only the files those stages list — another agent owns the files
@@ -62,6 +80,11 @@ messages are cheap; they get squashed.
 - Never claim a verification you did not run. Quote real command output.
 - Never push, open a PR, or merge.
 - Never add a `Co-Authored-By` or "Generated with" trailer to a commit message.
+- Never move your card to `done/`. `done` means merged and independently verified,
+  which is the orchestrator's call, not yours.
+- Never touch another agent's card, the parent card, or a wave-gate card.
+- Never log a step you did not run, or a `commit=` sha that does not exist. A card
+  that overstates its state is worse than no card — the resume trusts it.
 
 ## Final report
 
