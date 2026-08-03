@@ -21,8 +21,12 @@ change what the software is required to do?*
 ## 0. Branch and worktree
 
 ```sh
-git worktree add ../<repo>-<slug> -b <type>/<slug> main
+git worktree add .claude/worktrees/<slug> -b <type>/<slug> main
 ```
+
+Worktrees live under `.claude/worktrees/`, inside the project directory — an agent
+confined to the project root can still reach them. That path is gitignored, so the
+worktree never shows up as untracked content in the main checkout.
 
 One worktree per issue, per agent. Two agents in one checkout interleave commits.
 Everything below happens in that worktree.
@@ -100,7 +104,7 @@ Squash merge to `main`, so the stage commits — including the spec commit that 
 ahead of its code — never reach `main`. Then:
 
 ```sh
-git worktree remove ../<repo>-<slug>
+git worktree remove .claude/worktrees/<slug>
 ```
 
 ## Standing rules
