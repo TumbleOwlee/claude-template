@@ -1,6 +1,9 @@
 # Claude Code local state
 .claude/settings.local.json
 
+# Per-issue git worktrees (one per agent, created and removed by the workflow)
+.claude/worktrees/
+
 # Editors
 .idea/
 .vscode/

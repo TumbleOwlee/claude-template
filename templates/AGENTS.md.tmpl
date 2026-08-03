@@ -48,7 +48,9 @@ number of stages, never whether the gates exist.
 - Delegate gates to agents. **All agents run Sonnet or better**, planning and
   implementation alike. Weaker models stop mid-plan and call the rest future work, commit
   a stub as a "green" checkpoint, and report a hanging test as verified.
-- **One git worktree per issue, per agent.** Two agents in one checkout interleave commits
+- **One git worktree per issue, per agent**, at `.claude/worktrees/<slug>` — inside the
+  project directory so an agent confined to the project root can reach it, and gitignored
+  so it never shows up as untracked content. Two agents in one checkout interleave commits
   and stage each other's work — a branch is not a working tree. Create before the agent
   starts, remove after its branch merges.
 - The plan is a contract. An implementer who finds it wrong stops and reports; it does not
