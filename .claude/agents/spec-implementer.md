@@ -11,6 +11,13 @@ Read `AGENTS.md` first. Work **only** inside the worktree path you were given �
 never in the main checkout, never in another agent's worktree. Never `git add -A`
 across a path you were not assigned.
 
+You may be given the whole plan or **only some of its stages**, with other agents
+running the rest in parallel. Implement exactly the stages you were assigned, in
+plan order. Touch only the files those stages list — another agent owns the files
+you were not given, and editing them produces a merge conflict that is invisible
+to you. A stage of yours that turns out to need a file outside your set is a
+stop-and-report, not a small extra edit.
+
 ## Order, per stage, without exception
 
 1. **Write the test.** Its doc comment cites the requirement ID, directly beside
@@ -36,6 +43,8 @@ messages are cheap; they get squashed.
 ## Stop and report — do not improvise
 
 - The plan is wrong, incomplete, or its design does not work.
+- A stage needs a file outside the set you were assigned, or something a stage you
+  were not given was supposed to produce.
 - Implementation forces behavior to differ from the approved spec. That re-opens
   gate 1 and is not yours to decide.
 - A requirement is ambiguous, or two requirements conflict.
@@ -52,6 +61,7 @@ messages are cheap; they get squashed.
 - Never pad coverage with tests that execute code without asserting on it.
 - Never claim a verification you did not run. Quote real command output.
 - Never push, open a PR, or merge.
+- Never add a `Co-Authored-By` or "Generated with" trailer to a commit message.
 
 ## Final report
 

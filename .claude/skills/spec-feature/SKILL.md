@@ -60,23 +60,62 @@ unfinished. This is the first stage and the first commit.
 
 ## 4. Gate 2 — implementation plan
 
-Spawn `spec-planner` again with the approved spec. It returns stages, file-level
-steps, the ID → test table, the Verification method, expected commits. Verify it
-against the approved spec, then **stop for approval**.
+Spawn `spec-planner` again with the approved spec. It returns stages, numbered
+file-level steps per stage, the dependency tree (per stage: what it depends on,
+what files it touches), the ID → test table, the Verification method, expected
+commits.
+
+Verify against the approved spec, and verify the tree itself: two stages the plan
+calls independent must not touch the same file, and every stage's dependencies
+must actually produce what it consumes. A wrong tree surfaces as a merge conflict
+three agents later.
+
+Present the plan with the waves it implies — "stages 2, 3, 4 can run at once" —
+then **ask, in the same approval, how to implement it**:
+
+- **Sequential** (default) — one agent, stages in order.
+- **Parallel** — the user names the maximum number of agents running at once.
+
+Take the number from the user; never derive it from the tree. No answer means
+sequential.
 
 ## 5. Implement
 
-Spawn `spec-implementer` with the approved spec, the approved plan, and the
-worktree path. It works stage by stage under TDD and commits every green stage.
+**Sequential.** Spawn one `spec-implementer` with the approved spec, the approved
+plan, and the worktree path. It works stage by stage under TDD and commits every
+green stage.
 
-When it reports back: **its report is not verification.** In its worktree, re-run
-the full gauntlet from `AGENTS.md` yourself, read the code it describes, check
-that ID citations sit beside their tests, and mutation-check any test that looks
-like it was written after its implementation — break the implementation, confirm
-the test fails.
+**Parallel.** Work in waves, each wave at most the approved agent count:
 
-If it stopped mid-plan, that is the plan being wrong or the spec being ambiguous.
-Resolve it with the user; do not tell the agent to "just continue".
+1. Take the runnable stages — dependencies all merged — up to the cap.
+2. Per stage, one worktree and one branch off the feature branch as it stands
+   now:
+
+   ```sh
+   git worktree add .claude/worktrees/<slug>-<n> -b <type>/<slug>-<n> <type>/<slug>
+   ```
+
+3. Spawn one `spec-implementer` per worktree, each given **only its own stages**,
+   the full approved spec, and the plan.
+4. Wait for the whole wave. Merge each branch back into the feature branch,
+   re-run the gauntlet on the merged result, remove the worktrees.
+5. Next wave.
+
+A merge conflict inside a wave means the dependency tree was wrong — stop, report
+it, re-plan. Do not hand-resolve and carry on; the tree is now lying about
+everything downstream too.
+
+When an implementer reports back: **its report is not verification.** Re-run the
+full gauntlet from `AGENTS.md` yourself — in its worktree when sequential, on the
+merged feature branch after each wave when parallel — read the code it describes,
+check that ID citations sit beside their tests, and mutation-check any test that
+looks like it was written after its implementation: break the implementation,
+confirm the test fails.
+
+If one stopped mid-plan, that is the plan being wrong or the spec being
+ambiguous. Resolve it with the user; do not tell the agent to "just continue". In
+a wave, the other agents' finished branches still merge — only the unfinished
+stages get re-planned.
 
 ## 6. Reconcile the spec
 
@@ -105,12 +144,21 @@ ahead of its code — never reach `main`. Then:
 
 ```sh
 git worktree remove .claude/worktrees/<slug>
+git worktree list   # nothing under .claude/worktrees/ should survive
 ```
+
+Per-wave worktrees are removed at the end of their wave; this is the sweep that
+catches the ones a stopped agent left behind.
 
 ## Standing rules
 
 - Never commit to `main`.
+- Never put a tool attribution trailer — `Co-Authored-By`, "Generated with" — in a
+  commit message, PR body, issue or comment.
 - Never skip a gate because the change is small.
 - Never let an agent's self-report stand as verification.
+- Never spawn more agents at once than gate 2 approved, and never run agents in
+  parallel at all when gate 2 said sequential.
+- Never let two concurrent agents share a worktree or a file.
 - Never fold an unrelated pre-existing spec/code disagreement into this work.
   Raise it as its own task.
