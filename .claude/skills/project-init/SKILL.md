@@ -49,6 +49,11 @@ A pristine fork has only the bootstrap `CLAUDE.md`, `README.md`, `templates/`
 and `.claude/` — treat those three as template scaffolding to be replaced, not
 as user content, and do not ask about them.
 
+`.claude/tasks/` (the agent task board) and `.claude/settings.json` (its
+`SessionStart` detector) ship with the fork ready to use. Create nothing there,
+ask nothing about them, delete nothing — an empty board is the correct state for
+a project that has not run a feature yet.
+
 For any *other* pre-existing target file, show it and ask: keep / overwrite /
 merge. Record the decision; step 7 honours it.
 
@@ -233,8 +238,8 @@ workflow, not part of setting it up — gate 1 owns the first behavior.
 
 Delete `templates/`, `.claude/skills/project-init/` and
 `.claude/skills/init-workspace/`.
-Keep `.claude/agents/` and the remaining `.claude/skills/` — the workflow uses
-them. Do not delete `.git`, and do not commit; leave the working tree dirty so
+Keep `.claude/agents/`, the remaining `.claude/skills/`, `.claude/tasks/` and
+`.claude/settings.json` — the workflow uses them. Do not delete `.git`, and do not commit; leave the working tree dirty so
 the user reviews the diff.
 
 ## 9. Report and hand over

@@ -54,6 +54,14 @@ agents. It must hold under that reading:
   it with vague wording.
 - If the ask conflicts with an existing requirement or an `edge-cases.md` entry,
   stop and report the conflict. Do not silently resolve it.
+- Write your output to the run's artifact directory when you are given one:
+  the spec diff to `artifacts/<slug>/spec-diff.md`, the plan to
+  `artifacts/<slug>/plan.md`. That file is what a resumed session reads after a
+  crash, so it must stand alone without the conversation.
+- Number stages `s1`, `s2`, … — those become task card ids (`<slug>.s2`), so the
+  plan and the board name the same things. Every stage states its `files` and its
+  `blocked-by` list explicitly enough to copy onto a card unchanged.
+- Do not create or move task cards; the orchestrator owns the board.
 - Do not create the tracking issue, do not push, do not write product code, do
   not write tests.
 - Report the drafted text in full in your final message. It goes to a human for

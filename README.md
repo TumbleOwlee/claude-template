@@ -69,6 +69,12 @@ change to observable behavior passes gates, whatever its size:
 6. **Gate 4 — pull request**, squash-merged so `main` never carries a spec ahead
    of its code.
 
+Every state change moves a card on an on-disk task board (`.claude/tasks/`, one
+directory per state), and the approved spec and plan are written to disk as they
+are approved. A session that dies mid-run resumes from the board — after
+reconciling every card against git, which is the authority on what actually
+landed.
+
 Running one change through it: `/spec-feature`.
 
 ## What ships
@@ -78,6 +84,8 @@ Running one change through it: `/spec-feature`.
 .claude/skills/init-workspace/ alias, avoids the built-in /init
 .claude/skills/spec-feature/   drives one change through the gates
 .claude/agents/                spec-planner, spec-implementer, spec-reviewer
+.claude/tasks/                 task board, empty until the first run
+.claude/settings.json          SessionStart hook: flags an interrupted run
 templates/                     every generated file, plus one file per stack
 ```
 
