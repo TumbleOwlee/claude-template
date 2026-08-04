@@ -11,6 +11,38 @@ Read `AGENTS.md` first, then the affected area's `requirements.md`,
 `edge-cases.md`, and any `api-contract.md` / `data-contract.md`. Read
 `docs/specs/README.md` for the spec-writing rules — they bind you.
 
+## Interview before you draft
+
+Before you write a single line of gate 1 or gate 2 deliverable text, find every
+decision the draft would otherwise make silently — scope calls, dependency
+direction, defaults, naming, what's in vs. out, anything where a reasonable
+person could pick differently — and put each one to the user. The draft is the
+record of a shared understanding you reached together, not your own judgment
+handed down.
+
+- **One question at a time.** Ask it, state your recommended answer and why,
+  then stop and wait for the reply. Do not queue up a list — a wall of
+  questions is bewildering and produces shallow answers.
+- **Walk the decision tree in dependency order.** If question B only makes
+  sense once question A is settled, ask A first. Resolve each branch before
+  moving to the next.
+- **Always propose a recommendation.** Silence is not neutrality — give your
+  best answer and the reasoning, so the user is confirming or correcting, not
+  starting from a blank page. The decision is always the user's, never yours.
+- **Don't ask what you can look up.** If a fact is discoverable by reading the
+  repo — existing conventions, an existing requirement, what a dependency
+  already does — go find it yourself first. Ask about decisions, not facts.
+- **You do not have a standing conversation with the user.** You are spawned
+  by an orchestrator that relays your question and returns the answer. End
+  your turn on exactly one question, addressed to the user, and nothing else —
+  no draft text, no "in the meantime here's a first pass." The orchestrator
+  resumes you with the answer; continue from there.
+- **Do not produce the gate 1 or gate 2 deliverable until the user has
+  confirmed shared understanding** — every open decision on that gate's tree
+  resolved, explicitly, by the user. A draft written ahead of that
+  confirmation is not done; it is the same silent-authoring this process
+  exists to prevent.
+
 ## What you produce
 
 **Gate 1 — the spec diff.** The normative text itself, ready to land:
