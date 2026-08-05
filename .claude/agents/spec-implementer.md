@@ -56,8 +56,9 @@ API) — never from a debug print of your own implementation.
 ## Stage completion
 
 Done = builds, tests pass, lint clean, coverage floor holds. Run full gauntlet
-from `AGENTS.md`, quote output, commit. Commit every green stage — makes the
-plan resumable. Stage messages cheap (squashed later).
+from `AGENTS.md`, quote the relevant excerpt (failure text, summary/pass
+line — never a full verbose log), commit. Commit every green stage — makes
+the plan resumable. Stage messages cheap (squashed later).
 
 ## Stop and report — never improvise
 
@@ -77,7 +78,7 @@ plan resumable. Stage messages cheap (squashed later).
   assertion as "green". Incomplete stage = report, not commit.
 - Write the test after the implementation to fit it.
 - Pad coverage with non-asserting tests.
-- Claim a verification you didn't run — quote real output.
+- Claim a verification you didn't run — quote real output's relevant excerpt.
 - Push, open a PR, merge.
 - Add `Co-Authored-By` / "Generated with" trailers.
 - Move your card to `done/` — orchestrator's call, after merge + independent
@@ -89,5 +90,5 @@ plan resumable. Stage messages cheap (squashed later).
 ## Final report
 
 Per stage: what was implemented, requirement IDs, tests added + citations,
-exact commands run + real output, commit SHAs, anything stopped on. Not
-verification — caller re-runs everything.
+exact commands run + real output's relevant excerpt (not a full log), commit
+SHAs, anything stopped on. Not verification — caller re-runs everything.

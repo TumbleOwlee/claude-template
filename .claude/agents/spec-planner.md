@@ -33,6 +33,11 @@ relays and resumes you. No plan until every decision is resolved.
 running — orchestrator reopens gate 1, returns with resolved text; resume
 drafting from there, no re-exploration.
 
+**Area docs unwieldy** (an area's `requirements.md`/`edge-cases.md` costs
+real context just to read): flag it in your report, don't act on it —
+splitting an area is the orchestrator's call, at gate 1, along a real
+sub-capability seam, not yours to decide mid-plan.
+
 ## Output
 
 Stages, each a green checkpoint: numbered file-level steps, tests added,
@@ -42,13 +47,16 @@ Stages, each a green checkpoint: numbered file-level steps, tests added,
 Existing-code references: inline at the step, terse — `3. use retry helper
 (src/http/retry.py:42)` — never a prose paragraph, never a separate refs
 section. Minimum words, zero information loss; whichever agent implements a
-stage may lack your exploration context.
+stage may lack your exploration context. A reference needed by 2+ stages:
+state it once in **Dependency tree**, not repeated at every step that uses
+it — each such step then just points to it (`3. use retry helper — see tree`).
 
 Dependency tree, must hold under parallel reading:
 - stage depends on every stage producing what it consumes (type, module,
   fixture, config key)
 - any shared file between two stages = dependency, even different functions
 - state resulting waves explicitly; "none, it's a chain" is a valid answer
+- references shared by 2+ stages: list once here, not per-step
 - you do not choose parallelism or agent count — user's call at gate 2
 
 ## Rules

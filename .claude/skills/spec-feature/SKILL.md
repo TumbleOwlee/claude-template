@@ -41,6 +41,12 @@ existing spec already covers the ask, no diff — name the requirement instead.
 - Draft the "shall" text + fresh IDs yourself; grep `docs/specs/` for ID
   uniqueness.
 - Flag any contradiction with an existing requirement explicitly.
+- Area's `requirements.md`/`edge-cases.md` grown large enough that reading it
+  costs real context: propose a split along a real sub-capability boundary
+  already in the area (never an arbitrary line-count cut) — new prefix for
+  the new sub-area only; moved requirements **keep their original ID**
+  (cited in tests — re-IDing breaks every citation for nothing), new
+  routing-table row, user approves same as any area addition.
 
 Present, **stop for approval**. On approval: write `artifacts/<slug>/spec-diff.md`,
 record `gate1: approved <date>` on parent card + log line. Nothing lands in

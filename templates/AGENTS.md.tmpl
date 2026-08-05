@@ -71,6 +71,18 @@ do it. Size sets stage count, never gate existence.
   the tools.
 - **Every state change moves a task-board card.** State living only in
   conversation is lost when the session is.
+- **An area whose `requirements.md`/`edge-cases.md` has grown large enough
+  that reading it costs real context: propose splitting it**, at gate 1,
+  before drafting. Split along a real sub-capability boundary already
+  present in the area (e.g. `client` → `client-transport` +
+  `client-retry`), never an arbitrary line-count cut — a split that isn't
+  along a genuine seam just adds a second file covering the same thing.
+  New prefix for the new sub-area; **moved requirements keep their original
+  ID unchanged** (old prefix and number, just relocated to the new file) —
+  IDs are cited in tests, re-IDing them breaks every citation for no reason.
+  Only requirements added after the split take the new prefix. Routing
+  table updated, same as adding any area. User approves; this doesn't fire
+  silently.
 
 Verify before every approval request:
 - **Plan** — quoted requirement text matches file, appended IDs genuinely
@@ -79,7 +91,9 @@ Verify before every approval request:
 - **Implementation** — re-run full build/test/lint{{COVERAGE_GAUNTLET_WORD}}
   gauntlet yourself in the agent's worktree, read the code described, check
   ID citations sit beside test declarations, mutation-check any
-  after-the-fact-looking test, diff spec against approved.
+  after-the-fact-looking test, diff spec against approved. Keep only the
+  relevant excerpt of any command output in context — failure text, summary
+  line — never a full verbose log.
 
 ### Task board
 
@@ -182,7 +196,8 @@ external system run); expected commits{{COVERAGE_PLAN_CLAUSE}}. Existing-code
 references are terse and inline at the step needing them —
 `(file:line)`, never a paragraph or separate section — minimum words, zero
 information loss, since whichever agent implements a stage may lack the
-planner's own exploration context.
+planner's own exploration context. A reference needed by 2+ stages is stated
+once in the dependency tree, not repeated at every step that uses it.
 
 May pause with one concise plan-scoped question — answer, it continues. If it
 reports a **spec gap** instead (approved text doesn't cover something the
