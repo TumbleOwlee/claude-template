@@ -45,16 +45,29 @@ number of stages, never whether the gates exist.
 - Replaces any generic workflow skill (`/workflow`); do not run one. `docs/specs/` is
   already the PRD and the design record.
 - Branch off `main`, never commit to `main`. `<type>/<slug>`, type ∈ {`feat`, `fix`, `docs`}.
-- Delegate gates to agents. **All agents run Sonnet or better**, planning and
+- **Gate 1 is the orchestrator's own conversation with the user, not an agent's.**
+  It is deliberately abstract — the existing spec and the current goal, nothing about
+  how the code currently works. No code is read to produce it, so nothing is
+  landed on disk yet: no worktree, no branch, until gate 2 is approved.
+- Delegate gate 2 onward to agents. **All agents run Sonnet or better**, planning and
   implementation alike. Weaker models stop mid-plan and call the rest future work, commit
   a stub as a "green" checkpoint, and report a hanging test as verified.
+- **The tracking issue and PR belong to the orchestrator alone.** Neither the planning
+  agent nor the implementing agent is ever told an issue number exists; if planning
+  surfaces a spec change that belongs in the issue, the orchestrator updates it, not
+  the agent.
 - **One git worktree per issue, per agent**, at `.claude/worktrees/<slug>` — inside the
   project directory so an agent confined to the project root can reach it, and gitignored
   so it never shows up as untracked content. Two agents in one checkout interleave commits
-  and stage each other's work — a branch is not a working tree. Create before the agent
-  starts, remove after its branch merges.
+  and stage each other's work — a branch is not a working tree. Created only once gate 2 is
+  approved — that is the first moment anything needs to exist on disk — and removed after
+  its branch merges.
 - The plan is a contract. An implementer who finds it wrong stops and reports; it does not
   improvise a different design.
+- **When gate 2 picks sequential execution, the planning agent continues as the
+  implementer** — same running agent, resumed rather than respawned, so the exploration
+  behind the plan is never re-derived. Parallel execution still spawns a fresh
+  implementer per stage, since those run concurrently in separate worktrees.
 - **An agent's report of its own verification is not verification.** Re-run the tools.
 - **Every state change moves a card on the task board** below. A run whose state lives only
   in the conversation is lost when the session is.
@@ -138,34 +151,56 @@ Rules:
 - A card is evidence of intent, never of fact. Git is the fact. See *Resume an interrupted
   run*.
 
-### Gate 1 — spec diff. Stop for approval.
+### Gate 1 — spec diff. The orchestrator runs this itself. Stop for approval.
 
+Not delegated to an agent — this is a direct, interactive conversation between the
+orchestrator and the user about the existing spec and the current goal.
+
+- **No implementation detail.** Do not read code, do not check whether the current
+  implementation matches the spec, during this step. Whether the ask needs new
+  normative text or the existing spec already covers it is what the dialog itself
+  determines — a bug fix where the spec is right and the code is wrong ends the
+  dialog with no diff: state the violated requirement and continue to gate 2.
+- Find every decision the diff would otherwise make silently — scope, defaults,
+  naming, in vs. out — and put each to the user, one at a time, with a recommended
+  answer. Reading the area's `requirements.md` and `edge-cases.md` is spec-reading,
+  not code-reading, and is expected.
 - Propose the normative text itself: the "shall" statements with appended IDs, plus
   `edge-cases.md` entries. Ready to land, not prose about intent.
 - Observable design is spec: public type and function signatures, the error enum, feature
   gating, configuration keys.
-- Bug fix where the spec is right and the code is wrong: no diff — state the violated
-  requirement and continue.
-- **Board:** create `open/<slug>.md` and `artifacts/<slug>/` before drafting. On approval,
-  write the approved text to `artifacts/<slug>/spec-diff.md` and record `gate1` on the
-  parent card. Approved text that exists only in the conversation is the thing this board
-  is for.
+- **Board:** create `open/<slug>.md` and `artifacts/<slug>/` before the dialog starts —
+  no worktree yet, there is nothing to put in one. On approval, write the approved text
+  to `artifacts/<slug>/spec-diff.md` and record `gate1` on the parent card.
 
-### Gate 1b — tracking issue. Stop for approval.
+### Gate 1b — tracking issue. The orchestrator runs this itself. Stop for approval.
 
 {{ISSUE_WORKFLOW}}
 
-### Write the spec into the working tree
-
-Never marked unfinished — the file holds only normative text. The plan tracks what lacks
-a passing test.
+Neither the planning agent nor the implementing agent is ever told this issue exists.
+The orchestrator is the sole owner of it — including updating it later if gate 2
+planning surfaces a spec change.
 
 ### Gate 2 — implementation plan. Stop for approval.
 
-Stages, each broken into numbered file-level steps; a table mapping each new requirement
-ID to the test that pins it; a **Verification** section naming the method (unit tests
-alone / an integration harness / a run against the real external system); expected
-commits{{COVERAGE_PLAN_CLAUSE}}.
+Spawn the planning agent with a brief: the approved spec text, the affected area(s),
+and anything the user volunteered during the gate 1 dialog. Nothing else — gate 1 did
+no code research, so there is none to hand over; the agent explores the repo itself.
+Never mention the issue to it.
+
+It returns stages, each broken into numbered file-level steps; a table mapping each new
+requirement ID to the test that pins it; a **Verification** section naming the method
+(unit tests alone / an integration harness / a run against the real external system);
+expected commits{{COVERAGE_PLAN_CLAUSE}}. Every reference to existing code is terse and
+inline at the step that needs it — `(file:line)`, not a paragraph and not a separate
+references section — the absolute minimum that loses no information, since whichever
+agent implements a stage may have none of the planner's own exploration context.
+
+It may stop mid-draft with one concise, plan-scoped question — answer it and let it
+continue. If instead it reports a **spec gap** — the approved text doesn't cover
+something the plan needs — it stays running, paused; the orchestrator reopens gate 1
+with the user to resolve just the gap, then resumes the *same* agent with the settled
+text rather than respawning it, and updates the issue if the gap changed it.
 
 Plus a **dependency tree**: for every stage, the stages it depends on and the files it
 touches. Stages with no path between them and disjoint file sets can run in parallel;
@@ -177,31 +212,46 @@ outcome, not a failure to decompose.
 The approval also settles **how it will be implemented**, and the plan is not approved
 until it is answered:
 
-- **Sequential** — one implementer agent walks every stage in order.
-- **Parallel** — the user gives a maximum number of agents running at once. Waves are
-  capped at that number; stages beyond the cap wait for a slot.
+- **Sequential** — the same planning agent continues as implementer, walking every
+  stage in order. Not a new agent: it is resumed, keeping the exploration context it
+  built while drafting the plan instead of a fresh agent re-deriving it.
+- **Parallel** — the user gives a maximum number of agents running at once, each a
+  fresh implementer given only its own stage. Waves are capped at that number; stages
+  beyond the cap wait for a slot.
 
 Default to sequential when the user expresses no preference. Never infer a concurrency
 level from the plan's shape — a dependency tree that permits five parallel stages does
 not authorize five agents.
 
-**Board:** on approval write `artifacts/<slug>/plan.md`, record `gate2` and `mode` on the
-parent card, move the parent to `inprogress/`, and create one `open/<slug>.s<n>.md` per
-stage with its `files` and `blocked-by` copied from the dependency tree. Parallel runs also
-get one `open/<slug>.w<n>.md` per wave; sequential runs get a single wave-gate card for the
-whole run instead. Stage cards are generated from the plan, so stage ids in the plan and on
-the board are the same ids.
+**Board and worktree, in order, on approval:**
+
+1. Create the worktree — the first thing to touch disk in this whole run:
+   `git worktree add .claude/worktrees/<slug> -b <type>/<slug> main`.
+2. Write `artifacts/<slug>/plan.md`, record `gate2` and `mode` on the parent card, move
+   the parent to `inprogress/`.
+3. Create one `open/<slug>.s<n>.md` per stage with its `files` and `blocked-by` copied
+   from the dependency tree. Parallel runs also get one `open/<slug>.w<n>.md` per wave;
+   sequential runs get a single wave-gate card for the whole run instead. Stage cards are
+   generated from the plan, so stage ids in the plan and on the board are the same ids.
+4. Land the approved spec text into the working tree, inside the new worktree — never
+   marked unfinished, only normative text. This is the first stage and the first commit.
 
 ### Implement, stage by stage
 
-Sequential: one agent, one worktree, on the feature branch, the stages in plan order. It
-moves each stage card `open` → `inprogress` when it starts and → `inreview` when the stage
-is green and committed; the orchestrator verifies and moves it to `done`. There is nothing
-to merge, so `done` here means committed and verified.
+Sequential: the same planning agent, resumed with the worktree path and the stage cards
+rather than a new agent spawned — no re-reading `AGENTS.md`, no re-exploring the codebase
+it already explored while drafting the plan. It reads the implementer rules itself and
+follows them for every stage in plan order. It moves each stage card `open` → `inprogress`
+when it starts and → `inreview` when the stage is green and committed; the orchestrator
+verifies and moves it to `done`. There is nothing to merge, so `done` here means committed
+and verified.
 
 Parallel: one worktree and one branch per agent, `.claude/worktrees/<slug>-<n>` on
-`<type>/<slug>-<n>`, branched from the feature branch as it stands when the wave starts.
-Never two agents in one worktree. Each wave runs the same cycle:
+`<type>/<slug>-<n>`, branched from the feature branch as it stands when the wave starts —
+each a **fresh** implementer, not a continuation, since concurrent agents cannot share one
+running context. This is exactly why the plan's inline references must be self-sufficient:
+these agents have none of the planning agent's own exploration. Never two agents in one
+worktree. Each wave runs the same cycle:
 
 1. Take the runnable stage cards — `blocked-by` all in `done/` — up to the approved agent
    count. Move the wave-gate card to `inprogress/`.
@@ -253,7 +303,8 @@ clumsy wording is editorial — no approval needed. Always report the final spec
 
 Before proposing a PR, run an independent review of the branch in a **separate agent**
 that did not write the code — a reviewer sharing the implementer's context reproduces its
-blind spots. Give it the diff, the approved spec text, and this file. It reports on:
+blind spots. Give it the diff, the approved spec text, and this file — never the issue
+number, same as every other agent in this workflow. It reports on:
 
 - **Spec fidelity** — every approved requirement implemented, nothing implemented that was
   not approved (scope creep), no requirement pinned by a test that does not actually
@@ -289,6 +340,14 @@ remain outside `done/`.
 
 Cards outside `open/` and `done/` when no agent is running mean a session died mid-run.
 Resuming is triggered — by the user, or by `/spec-feature` — never automatic.
+
+A card with no worktree recorded died during the gate 1 dialog or gate 2 planning —
+nothing was ever on disk, so there is nothing to reconcile against git; just resume the
+conversation from wherever `spec-diff.md` / `plan.md` got to. A card past gate 2 approval
+follows the table below. Either way, **any resumed implementation spawns a fresh agent —
+the sequential continuation only exists inside a live orchestrator session and does not
+survive a crash.** This is why the plan's inline references have to be lossless: a fresh
+implementer resuming mid-plan gets nothing but what the plan itself wrote down.
 
 **Reconcile before acting.** The card states what an agent intended; git states what
 happened, and the agent may have died between the two:

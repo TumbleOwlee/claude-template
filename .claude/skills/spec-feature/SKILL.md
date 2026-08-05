@@ -22,40 +22,42 @@ Check `.claude/tasks/` first. Cards outside `open/` and `done/` mean an earlier
 run was interrupted — go to *Resume an interrupted run* at the bottom instead of
 starting something new.
 
-## 0. Branch, worktree, parent card
+## 0. Parent card
 
-```sh
-git worktree add .claude/worktrees/<slug> -b <type>/<slug> main
+```
+.claude/tasks/open/<slug>.md
 ```
 
-Worktrees live under `.claude/worktrees/`, inside the project directory — an agent
-confined to the project root can still reach them. That path is gitignored, so the
-worktree never shows up as untracked content in the main checkout.
+No worktree, no branch, nothing on disk beyond this one card — gate 1 is a
+conversation, not code. The card exists so a session that dies mid-dialog still
+leaves a resumable trace. Create `.claude/tasks/artifacts/<slug>/` alongside it.
 
-One worktree per issue, per agent. Two agents in one checkout interleave commits.
-Everything below happens in that worktree.
+## 1. Gate 1 — spec diff. You run this yourself, not an agent.
 
-Then create the parent card `.claude/tasks/open/<slug>.md` and the artifact
-directory `.claude/tasks/artifacts/<slug>/`. The board lives in the **main
-checkout**, never in a worktree; every path you hand an agent is absolute.
+This is deliberately abstract and interactive: a dialog between you and the
+user about the existing spec and the current goal, nothing else. **Do not read
+implementation code during this step** — no grepping the codebase for how
+something currently works, no checking whether code matches spec. That
+question gets answered by the dialog outcome itself, not a pre-check: if the
+dialog concludes the existing spec already covers the ask, there is no diff —
+name the requirement instead of drafting one.
 
-## 1. Gate 1 — spec diff
+- Find every decision the diff would otherwise make silently — scope, defaults,
+  naming, what's in vs. out — and put each to the user, one at a time, with
+  your recommended answer.
+- Read the affected area's `requirements.md` and `edge-cases.md` yourself; that
+  is spec-reading, not code-reading, and is fair game here.
+- Draft the normative text yourself: "shall" statements with fresh appended
+  IDs. Verify each ID is genuinely unused — grep all of `docs/specs/`.
+- Nothing contradicts an existing requirement without saying so explicitly.
 
-Spawn `spec-planner` with: the ask, the affected area(s), and the worktree path.
+Present the drafted text and **stop for approval**.
 
-It returns the normative text. **You verify before showing it to the user:**
+On approval: write it to `artifacts/<slug>/spec-diff.md`, record `gate1:
+approved <date>` on the parent card, append the approval to its log. Nothing
+is landed in `docs/specs/` yet — that happens at worktree creation (step 5).
 
-- Quoted requirement text matches the file on disk.
-- Appended IDs are genuinely unused — grep all of `docs/specs/`.
-- Nothing contradicts an existing requirement or `edge-cases.md` entry.
-- It proposes what was actually asked, no more.
-
-Then present it and **stop for approval**.
-
-On approval: write the approved text to `artifacts/<slug>/spec-diff.md`, record
-`gate1: approved <date>` on the parent card, append the approval to its log.
-
-## 2. Gate 1b — tracking issue
+## 2. Gate 1b — tracking issue. You run this yourself; agents never see it.
 
 Search existing issues (open and closed) for the same goal. Reuse what exists;
 never open a second. Otherwise draft the issue per `AGENTS.md` — self-contained,
@@ -63,52 +65,84 @@ full normative text beside every ID, `##` sections, goal and normative changes
 only, no implementation detail — and **stop for approval** before creating it.
 
 Skip entirely if the repo has no tracker; the goal then lives in the PR body.
-Record `issue: <n>` on the parent card when there is one. The card never copies
-the goal text — the issue owns that.
+Record `issue: <n>` on the parent card when there is one. **Neither
+`spec-planner` nor `spec-implementer` is ever told this issue exists** — you
+are the only party that reads or updates it, including later if gate 2
+planning surfaces a spec change that belongs in it.
 
-## 3. Write the spec
+## 3. Gate 2 — implementation plan
 
-Land the approved text in the working tree. Normative text only — nothing marked
-unfinished. This is the first stage and the first commit.
+Spawn `spec-planner` with a brief: the approved spec text, the affected
+area(s), and anything the user volunteered during the gate 1 dialog. That's
+all it gets — you did no code research during gate 1, so there is none to hand
+over. Do not mention the issue.
 
-## 4. Gate 2 — implementation plan
+It returns stages, numbered file-level steps per stage, the dependency tree
+(per stage: what it depends on, what files it touches, terse inline
+`(file:line)` references to existing code it found), the ID → test table, the
+Verification method, expected commits. It may stop mid-draft with one concise
+plan-scoped question at a time — answer it and let it continue.
 
-Spawn `spec-planner` again with the approved spec. It returns stages, numbered
-file-level steps per stage, the dependency tree (per stage: what it depends on,
-what files it touches), the ID → test table, the Verification method, expected
-commits.
+**If it reports a spec gap instead of a question:** it stays running, paused.
+Go back to step 1 with the user to resolve the gap — same dialog, same rules,
+now scoped to just the gap. On resolution, resume the *same* `spec-planner`
+agent with the settled text; do not respawn. Update `spec-diff.md` and the
+issue yourself if the gap changed either.
 
-Verify against the approved spec, and verify the tree itself: two stages the plan
-calls independent must not touch the same file, and every stage's dependencies
-must actually produce what it consumes. A wrong tree surfaces as a merge conflict
-three agents later.
+Verify the plan against the approved spec, and verify the tree itself: two
+stages the plan calls independent must not touch the same file, and every
+stage's dependencies must actually produce what it consumes. A wrong tree
+surfaces as a merge conflict three agents later.
 
 Present the plan with the waves it implies — "stages 2, 3, 4 can run at once" —
 then **ask, in the same approval, how to implement it**:
 
-- **Sequential** (default) — one agent, stages in order.
-- **Parallel** — the user names the maximum number of agents running at once.
+- **Sequential** (default) — the same `spec-planner` agent continues as
+  implementer, stages in order. No respawn — it already holds the exploration
+  context behind the plan.
+- **Parallel** — the user names the maximum number of agents running at once;
+  each stage gets a fresh `spec-implementer`.
 
 Take the number from the user; never derive it from the tree. No answer means
 sequential.
 
-On approval, lay out the board:
+## 4. On approval — worktree, board, spec landing
+
+This is the first point anything touches disk for real. In order:
+
+```sh
+git worktree add .claude/worktrees/<slug> -b <type>/<slug> main
+```
+
+Worktrees live under `.claude/worktrees/`, inside the project directory — an
+agent confined to the project root can still reach them. That path is
+gitignored, so the worktree never shows up as untracked content in the main
+checkout. One worktree per issue, per agent — two agents in one checkout
+interleave commits.
+
+Then:
 
 - write the plan to `artifacts/<slug>/plan.md`,
-- record `gate2` and `mode: sequential | parallel(N)` on the parent card and move
-  it to `inprogress/`,
+- record `gate2` and `mode: sequential | parallel(N)` on the parent card and
+  move it to `inprogress/`,
 - create `open/<slug>.s<n>.md` per stage, copying `files` and `blocked-by`
   straight from the dependency tree,
-- parallel: create `open/<slug>.w<n>.md` per wave. Sequential: one wave-gate card
-  for the whole run.
+- parallel: create `open/<slug>.w<n>.md` per wave. Sequential: one wave-gate
+  card for the whole run.
+
+Land the approved spec text in the working tree, inside the new worktree.
+Normative text only — nothing marked unfinished. This is the first stage and
+the first commit.
 
 ## 5. Implement
 
-**Sequential.** Spawn one `spec-implementer` with the approved spec, the approved
-plan, the worktree path, and the absolute paths of its stage cards. It works stage
-by stage under TDD on the feature branch, commits every green stage, and moves
-each card `open` → `inprogress` → `inreview`. You verify and move it to `done` —
-nothing to merge, so `done` means committed and verified.
+**Sequential.** Send the worktree path and the absolute paths of the stage
+cards to the *same* `spec-planner` agent from step 3 — do not spawn a new
+`spec-implementer`. Instruct it to read `.claude/agents/spec-implementer.md`
+itself and follow it; it already has the plan's context. It works stage by
+stage under TDD on the feature branch, commits every green stage, and moves
+each card `open` → `inprogress` → `inreview`. You verify and move it to `done`
+— nothing to merge, so `done` means committed and verified.
 
 **Parallel.** Work in waves, each wave at most the approved agent count:
 
@@ -121,8 +155,10 @@ nothing to merge, so `done` means committed and verified.
    git worktree add .claude/worktrees/<slug>-<n> -b <type>/<slug>-<n> <type>/<slug>
    ```
 
-3. Spawn one `spec-implementer` per worktree, each given **only its own stages**,
-   the full approved spec, the plan, and the absolute path of its own card.
+3. Spawn one fresh `spec-implementer` per worktree, each given **only its own
+   stages**, the full approved spec, the plan, and the absolute path of its own
+   card. It has none of `spec-planner`'s exploration context — this is exactly
+   why the plan's inline references have to be self-sufficient.
 4. Wait for the whole wave; each agent leaves its card in `inreview/`. Per card:
    merge the branch into the feature branch, re-run the gauntlet on the merged
    result, move the card to `done/`, remove the worktree.
@@ -150,18 +186,20 @@ stages get re-planned.
 ## 6. Reconcile the spec
 
 Behavior that ended up differing from what gate 1 approved is normative and
-re-opens gate 1: show the diff, state what forced it, get approval. Editorial
-fixes (a wrong cross-reference, clumsy wording) need no approval. Report the
-final spec diff either way.
+re-opens gate 1: show the diff, state what forced it, get approval — you run
+this the same way as step 1, directly with the user. Editorial fixes (a wrong
+cross-reference, clumsy wording) need no approval. Update the issue yourself if
+it needs it. Report the final spec diff either way.
 
 ## 7. Gate 3 — independent review
 
 Move the parent card to `inreview/`. Spawn `spec-reviewer` — a different agent
 than the implementer, always — with the diff base, the artifact directory, and the
-worktree path. It appends findings to `artifacts/<slug>/review.md`, each keyed to a
-stage id. Report its findings, apply the fixes that are clearly fixes, and raise
-the ones that are decisions; a finding that reopens a stage moves that stage card
-back to `inprogress/`. Re-run the gauntlet after any fix. **Stop for approval.**
+worktree path. It has no knowledge of the issue either. It appends findings to
+`artifacts/<slug>/review.md`, each keyed to a stage id. Report its findings, apply
+the fixes that are clearly fixes, and raise the ones that are decisions; a
+finding that reopens a stage moves that stage card back to `inprogress/`. Re-run
+the gauntlet after any fix. **Stop for approval.**
 
 ## 8. Gate 4 — pull request
 
@@ -187,6 +225,17 @@ card for this run should be left outside `done/`.
 
 Cards outside `open/` and `done/` with no agent running mean a session died
 mid-run. Resume only when the user asks.
+
+A card that never reached `gate2` and has no worktree recorded died during the
+gate 1 dialog or gate 2 planning — there is nothing on disk to reconcile against
+git, just resume the conversation from wherever `spec-diff.md` / `plan.md` got
+to. A card past `gate2` follows the table below.
+
+**Any resumed implementation spawns a fresh agent, never a continuation** — the
+`spec-planner` continuation from step 5 only exists inside a live orchestrator
+session and does not survive a crash. This is exactly why the plan's inline
+`(file:line)` references must be lossless: a fresh implementer resuming
+mid-plan gets no exploration context except what the plan itself wrote down.
 
 **Reconcile every card against git before acting on it.** The card is what an
 agent intended; git is what happened, and the agent may have died in between:
@@ -223,3 +272,9 @@ on the parent card stay valid; do not re-ask them.
 - Never act on a card that git contradicts.
 - Never fold an unrelated pre-existing spec/code disagreement into this work.
   Raise it as its own task.
+- Never spawn `spec-planner` for gate 1 — you author spec text yourself,
+  directly with the user, so authorship never drifts through a second party.
+- Never mention an issue, PR, or any tracker to `spec-planner` or
+  `spec-implementer`. That knowledge is yours alone.
+- Never create the worktree before gate 2 is approved. Nothing is landed on
+  disk until the plan and its execution mode are settled.
