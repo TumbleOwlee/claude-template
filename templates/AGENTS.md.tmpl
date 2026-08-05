@@ -239,10 +239,11 @@ itself, follows them per stage in plan order. Moves stage card
 `open`→`inprogress` on start, →`inreview` on green+committed. Orchestrator
 verifies, moves to `done` — nothing to merge, so `done` = committed+verified.
 
-Parallel: one worktree+branch per agent, `.claude/worktrees/<slug>-<n>` on
-`<type>/<slug>-<n>`, branched off feature branch at wave start — **fresh**
-implementer, not a continuation (concurrent agents can't share a running
-context). Plan's inline refs must be self-sufficient because of this — these
+Parallel: one worktree+branch per agent, branched off the feature branch at
+wave start —
+`git worktree add .claude/worktrees/<slug>-<n> -b <type>/<slug>-<n> <type>/<slug>`
+— **fresh** implementer, not a continuation (concurrent agents can't share a
+running context). Plan's inline refs must be self-sufficient because of this — these
 agents hold none of the planner's exploration. Never two agents, one
 worktree. Each wave:
 
@@ -330,8 +331,15 @@ when review starts.
 ### Merge
 
 Squash merge to `main` — stage commits, including the ahead-of-code spec
-commit, never reach `main`. Remove the worktree after merge, parent card →
-`done/`. Nothing under `.claude/worktrees/` should remain; no card for this
+commit, never reach `main`. Then:
+
+```sh
+git worktree remove .claude/worktrees/<slug>
+git worktree list   # nothing under .claude/worktrees/ should remain
+```
+
+Per-wave worktrees are already removed at wave end; this sweep catches
+stragglers from a stopped agent. Parent card → `done/` — no card for this
 run stays outside `done/`.
 
 ### Resume an interrupted run
