@@ -1,20 +1,14 @@
 # Stack: Python
 
-Slot values for the Python ecosystem. Every fenced block is a slot; the block's
-heading names the placeholder it fills.
+Slot values, Python ecosystem. Each fenced block = one slot; heading names the placeholder it fills.
 
-**Variants to ask about:** package manager (`uv` — assumed below — vs `poetry`
-vs plain `pip`/`venv`), whether type checking is `mypy` or `pyright`, and whether
-the layout is `src/` (assumed) or flat — the hook blocks below hard-code `^src/`
-as the product-code path and must be adjusted for a flat layout.
+**Ask about:** package manager (`uv` — assumed below — vs `poetry` vs plain `pip`/`venv`); type checker `mypy` vs `pyright`; layout `src/` (assumed) vs flat — hook blocks below hard-code `^src/` as the product-code path and must be adjusted for a flat layout.
 
-> The CI block contains GitHub Actions `${{ … }}` expressions. Those are not
-> template placeholders — copy them through verbatim.
+> CI block's GitHub Actions `${{ … }}` expressions are NOT template placeholders — copy verbatim.
 
 ## `{{STACK_NAME}}`
 
-Python 3.12+ (`uv` for environments and locking, `ruff` for lint and format,
-`pytest` for tests, `mypy` for types)
+Python 3.12+ (`uv` for environments/locking, `ruff` for lint/format, `pytest` for tests, `mypy` for types)
 
 ## `{{FULL_COMMANDS}}`
 
@@ -64,15 +58,11 @@ uv sync --all-extras --dev
 
 ## `{{STACK_CONVENTIONS}}`
 
-- Full type annotations on every public function; `mypy --strict` on `src`. An
-  untyped public signature is a defect, not a style choice.
-- Errors are exception classes deriving from one package-level base, never bare
-  `Exception` and never a returned error string.
+- Full type annotations on every public function; `mypy --strict` on `src`. An untyped public signature is a defect, not a style choice.
+- Errors are exception classes deriving from one package-level base, never bare `Exception` and never a returned error string.
 - No mutable default arguments; no module-level side effects on import.
-- Domain values are `NewType` or frozen dataclasses where mixing two of them would
-  be a bug — not bare `int`/`str`.
-- Public API is what `__all__` exports; everything else is `_`-prefixed and free
-  to change.
+- Domain values are `NewType` or frozen dataclasses wherever mixing two would be a bug — not bare `int`/`str`.
+- Public API = what `__all__` exports; everything else is `_`-prefixed and free to change.
 - Prefer the standard library; a dependency is a scope boundary (see AGENTS.md).
 
 ## `ci` → `.github/workflows/check.yml`

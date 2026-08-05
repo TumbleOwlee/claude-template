@@ -1,14 +1,10 @@
 # Stack: Node / TypeScript
 
-Slot values for the Node ecosystem. Every fenced block is a slot; the block's
-heading names the placeholder it fills.
+Slot values, Node ecosystem. Each fenced block = one slot; heading names the placeholder it fills.
 
-**Variants to ask about:** package manager (`pnpm` — assumed below — vs `npm` vs
-`bun`), test runner (`vitest` — assumed — vs `jest` vs `node:test`), and whether
-the package ships ESM only.
+**Ask about:** package manager (`pnpm` — assumed below — vs `npm` vs `bun`); test runner (`vitest` — assumed — vs `jest` vs `node:test`); whether the package ships ESM only.
 
-> The CI block contains GitHub Actions `${{ … }}` expressions. Those are not
-> template placeholders — copy them through verbatim.
+> CI block's GitHub Actions `${{ … }}` expressions are NOT template placeholders — copy verbatim.
 
 ## `{{STACK_NAME}}`
 
@@ -64,18 +60,12 @@ pnpm install --frozen-lockfile
 
 ## `{{STACK_CONVENTIONS}}`
 
-- `strict: true` in `tsconfig.json`, plus `noUncheckedIndexedAccess`. `any` is a
-  defect; use `unknown` and narrow.
-- No default exports — named exports only, so renames are mechanical and the
-  public surface is greppable.
-- Errors are classes extending one package-level base `Error` with a discriminant
-  `code`; never a thrown string, never a bare `Error("...")`.
-- Domain values are branded types where mixing two of them would be a bug, not
-  bare `string`/`number`.
-- Validate external input at the boundary with a schema (zod or equivalent); the
-  parsed type is what crosses into the core.
-- The public API is what `src/index.ts` exports; everything else is internal and
-  free to change.
+- `strict: true` in `tsconfig.json`, plus `noUncheckedIndexedAccess`. `any` is a defect; use `unknown` and narrow.
+- No default exports — named exports only, so renames are mechanical and the public surface is greppable.
+- Errors are classes extending one package-level base `Error` with a discriminant `code`; never a thrown string, never a bare `Error("...")`.
+- Domain values are branded types wherever mixing two would be a bug, not bare `string`/`number`.
+- Validate external input at the boundary with a schema (zod or equivalent); the parsed type crosses into the core.
+- Public API = what `src/index.ts` exports; everything else is internal and free to change.
 
 ## `ci` → `.github/workflows/check.yml`
 

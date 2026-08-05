@@ -1,10 +1,8 @@
 # Stack: Rust
 
-Slot values for the Rust ecosystem. Every fenced block is a slot; the block's
-heading names the placeholder it fills.
+Slot values, Rust ecosystem. Each fenced block = one slot; heading names the placeholder it fills.
 
-**Variants to ask about:** workspace vs single crate (`--workspace` vs
-`--all-features`), and whether `cargo-llvm-cov` is acceptable for coverage.
+**Ask about:** workspace vs single crate (`--workspace` vs `--all-features`); whether `cargo-llvm-cov` is acceptable for coverage.
 
 ## `{{STACK_NAME}}`
 
@@ -31,8 +29,7 @@ cargo llvm-cov --all-features --html   # browsable per-line coverage
 
 ## `{{UNIT_TEST_CONVENTION}}`
 
-`#[cfg(test)] mod tests` at the bottom of the file under test, functions named
-`ut_*`.
+`#[cfg(test)] mod tests` at bottom of file under test, functions named `ut_*`.
 
 ## `{{INTEGRATION_TEST_CONVENTION}}`
 
@@ -52,13 +49,13 @@ fn ut_checksum_excludes_trailer() { /* … */ }
 
 ## `{{SETUP_STEPS}}`
 
-Install the toolchain via [rustup.rs](https://rustup.rs/), then:
+Install toolchain via [rustup.rs](https://rustup.rs/), then:
 
 ```sh
 cargo build --all-features
 ```
 
-For the coverage gate you also need `cargo-llvm-cov`:
+Coverage gate also needs `cargo-llvm-cov`:
 
 ```sh
 cargo install cargo-llvm-cov --locked
@@ -66,15 +63,11 @@ cargo install cargo-llvm-cov --locked
 
 ## `{{STACK_CONVENTIONS}}`
 
-- Edition 2024, stable toolchain (`rust-toolchain.toml`). MSRV is a non-functional
-  requirement — raising it is normative.
+- Edition 2024, stable toolchain (`rust-toolchain.toml`); MSRV bump is normative (non-functional requirement).
 - No bare `unwrap` outside tests; `expect("why this cannot fail")`.
-- Domain values are distinct transparent newtypes wrapped where they enter the API;
-  mixing two of them must not compile. Raw integers only for genuinely opaque bytes.
-- `#[non_exhaustive]` on public error enums so adding a variant is not breaking.
-- Prefer typed handling over `serde_json::Value` — the compiler must catch a wrong
-  field name, not the wire. This holds even when it forces duplication across
-  protocol versions.
+- Domain values: distinct transparent newtypes wrapped at API entry; mixing two must not compile. Raw integers only for genuinely opaque bytes.
+- `#[non_exhaustive]` on public error enums so adding a variant isn't breaking.
+- Prefer typed handling over `serde_json::Value` — compiler must catch a wrong field name, not the wire, even if it forces duplication across protocol versions.
 
 ## `ci` → `.github/workflows/check.yml`
 

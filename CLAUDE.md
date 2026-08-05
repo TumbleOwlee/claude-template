@@ -1,34 +1,30 @@
 # CLAUDE.md
 
-> **This repo is an uninitialized template.** There is no product code yet, and
-> nothing here describes a real project.
+> Uninitialized template. No product code, no real project described here.
 
-## If you were asked to initialize, init, or set up this repo
+## Asked to init/set up this repo?
 
-Do **not** write a codebase-summary `CLAUDE.md` — there is no codebase. Run the
-bootstrap instead:
+Do not write a codebase-summary CLAUDE.md — no codebase exists. Read
+[`.claude/skills/project-init/SKILL.md`](./.claude/skills/project-init/SKILL.md)
+and follow it end to end (also `/init-workspace`, `/project-init`).
 
-**Read [`.claude/skills/project-init/SKILL.md`](./.claude/skills/project-init/SKILL.md)
-and follow it end to end.** (Also reachable as `/init-workspace` or
-`/project-init`.)
+Asks: project name, purpose, stack, capability areas, coverage floor, scope
+boundaries. Generates `AGENTS.md`, `CLAUDE.md`, `PRD.md`, `ARCHITECTURE.md`,
+`CONTRIBUTING.md`, `README.md`, `docs/specs/`, CI, git hooks from
+[`templates/`](./templates/). Deletes itself after.
 
-It asks for the project name, purpose, language stack, capability areas, coverage
-floor and scope boundaries, then generates `AGENTS.md`, `CLAUDE.md`, `PRD.md`,
-`ARCHITECTURE.md`, `CONTRIBUTING.md`, `README.md`, `docs/specs/`, CI and git
-hooks from [`templates/`](./templates/) — and deletes itself afterwards.
+## What this is
 
-## What this template is
-
-A spec-driven TDD workflow: `docs/specs/` is authoritative, every behavior change
-passes gates (spec diff → tracking issue → implementation plan → implementation →
-independent review → PR), implementation runs under strict TDD in an isolated git
-worktree, and no agent's self-report counts as verification.
+Spec-driven TDD: `docs/specs/` authoritative. Gates: spec diff → tracking
+issue → implementation plan → implementation → independent review → PR.
+Implementation = strict TDD, isolated git worktree. No agent self-report
+counts as verification.
 
 | Path | Purpose |
 |---|---|
-| `.claude/skills/project-init/` | The bootstrap. Deleted once it has run. |
-| `.claude/skills/spec-feature/` | Drives one behavior change through the gates. Kept. |
+| `.claude/skills/project-init/` | Bootstrap. Deleted after run. |
+| `.claude/skills/spec-feature/` | Drives one behavior change through gates. Kept. |
 | `.claude/agents/` | `spec-planner`, `spec-implementer`, `spec-reviewer`. Kept. |
-| `templates/` | Source for every generated file. Deleted after the bootstrap. |
+| `templates/` | Source for generated files. Deleted after bootstrap. |
 
-Once initialized, this file is replaced by a thin router into `AGENTS.md`.
+Post-init: this file becomes a thin router into `AGENTS.md`.

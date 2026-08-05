@@ -1,42 +1,33 @@
 # Architecture — {{PROJECT_NAME}}
 
-How `{{PROJECT_NAME}}` is put together: the module map, how data moves through
-it, and the concurrency model. *What* it must do is in
-[`docs/specs/`](./docs/specs/); *why* it exists is in [`PRD.md`](./PRD.md).
+Module map, data flow, concurrency model of `{{PROJECT_NAME}}`. What: [`docs/specs/`](./docs/specs/). Why: [`PRD.md`](./PRD.md).
 
-This file describes structure, which changes with refactors. It carries no
-normative "shall" statements — those belong to the specs, and only the specs.
+Structure only — no normative "shall" statements (those belong to specs only). Changes with refactors.
 
 ## Layout
 
 {{PROJECT_KIND}}, stack: {{STACK_NAME}}.
 
-*(TBD — fill in as the code appears. One row per module/package/crate:)*
+*(TBD. One row per module/package/crate:)*
 
 | Module | Responsibility |
 |---|---|
 | *(TBD)* | *(TBD)* |
 
-A module maps to a spec area where it can; where it cannot, say so here, because
-a reader will otherwise assume the mapping.
+Map module→spec area where possible; state explicitly where not (else reader assumes the mapping).
 
 ## Data flow
 
-*(TBD — the path a request, message, or command takes from entry point to
-result, naming the module at each hop.)*
+*(TBD — path of a request/message/command from entry point to result, naming the module at each hop.)*
 
 ## Concurrency model
 
-*(TBD — what runs concurrently, what owns which state, where the boundaries are.
-"Single-threaded, synchronous" is a valid and useful answer — state it.)*
+*(TBD — what runs concurrently, who owns which state, boundaries. "Single-threaded, synchronous" is valid — state it.)*
 
 ## Error handling
 
-*(TBD — where errors originate, how they cross module boundaries, what the
-public error surface looks like. Typed, never stringly — see AGENTS.md.)*
+*(TBD — where errors originate, how they cross module boundaries, public error surface. Typed, never stringly — see AGENTS.md.)*
 
 ## Testing seams
 
-*(TBD — where the real external world is abstracted so tests do not need it: the
-transport trait, the clock, the filesystem. A seam that exists only for tests is
-still architecture; record it so it is not "cleaned up".)*
+*(TBD — where real external world is abstracted for tests: transport trait, clock, filesystem. Test-only seam is still architecture — record it, don't "clean up".)*

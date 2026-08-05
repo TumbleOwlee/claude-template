@@ -1,24 +1,19 @@
 # Stack: C / C++ (CMake)
 
-Slot values for a CMake project driven by Make or Ninja. Every fenced block is a
-slot; the block's heading names the placeholder it fills.
+Slot values, CMake project driven by Make or Ninja. Each fenced block = one slot; heading names the placeholder it fills.
 
-**Variants to ask about:**
+**Ask about:**
 
-- **Generator** — Ninja (assumed below, `-G Ninja`) or Unix Makefiles (`-G "Unix
-  Makefiles"`). Only the `-G` flag differs; `cmake --build` drives either.
+- **Generator** — Ninja (assumed below, `-G Ninja`) or Unix Makefiles (`-G "Unix Makefiles"`). Only the `-G` flag differs; `cmake --build` drives either.
 - **Test framework** — GoogleTest (assumed), Catch2, or doctest.
 - **Coverage tool** — `gcovr` (assumed) or `lcov`/`llvm-cov`.
-- **Preset file** — whether to generate `CMakePresets.json` (recommended; the
-  commands below assume it).
+- **Preset file** — whether to generate `CMakePresets.json` (recommended; commands below assume it).
 
-> The CI block contains GitHub Actions `${{ … }}` expressions. Those are not
-> template placeholders — copy them through verbatim.
+> CI block's GitHub Actions `${{ … }}` expressions are NOT template placeholders — copy verbatim.
 
 ## `{{STACK_NAME}}`
 
-C++20 with CMake (Ninja generator, GoogleTest, `clang-format`, `clang-tidy`,
-`gcovr`)
+C++20 with CMake (Ninja generator, GoogleTest, `clang-format`, `clang-tidy`, `gcovr`)
 
 ## `{{FULL_COMMANDS}}`
 
@@ -46,8 +41,7 @@ gcovr --root . --html-details build/coverage.html   # browsable coverage
 
 ## `{{INTEGRATION_TEST_CONVENTION}}`
 
-`tests/integration/<capability>_test.cpp`, suite named `It<Capability>`,
-registered with a `ctest` label so the set can be excluded.
+`tests/integration/<capability>_test.cpp`, suite named `It<Capability>`, registered with a `ctest` label so the set can be excluded.
 
 ## `{{ID_CITATION_EXAMPLE}}`
 
@@ -62,15 +56,14 @@ TEST(UtFrame, ChecksumExcludesTrailer) { /* … */ }
 
 ## `{{SETUP_STEPS}}`
 
-Install a C++20 compiler, CMake 3.25+, Ninja, and the test framework (fetched by
-CMake via `FetchContent`, so no manual install), then:
+Install a C++20 compiler, CMake 3.25+, Ninja, and the test framework (fetched by CMake via `FetchContent`, no manual install needed), then:
 
 ```sh
 cmake --preset dev
 cmake --build --preset dev
 ```
 
-For the coverage gate you also need `gcovr`:
+Coverage gate also needs `gcovr`:
 
 ```sh
 pipx install gcovr
@@ -78,23 +71,13 @@ pipx install gcovr
 
 ## `{{STACK_CONVENTIONS}}`
 
-- C++20, warnings-as-errors (`-Wall -Wextra -Wpedantic -Werror`) on the project's
-  own targets; third-party targets are excluded, not silenced globally.
-- No raw owning pointers. Ownership is `std::unique_ptr`/`std::shared_ptr` or a
-  value; raw pointers and references are non-owning views only.
-- No exceptions across the public API boundary if the project targets embedded
-  builds — decide once, record it as a non-functional requirement, and hold it.
-  Otherwise errors are a `std::expected`/`tl::expected` or a typed exception,
-  never an `int` return code paired with an out-parameter.
-- Headers are self-contained: each compiles alone, includes what it uses, and
-  carries `#pragma once`.
-- Public headers live under `include/<project>/`; anything under `src/` is
-  internal and free to change.
-- Sanitizers (`-fsanitize=address,undefined`) are on in the `dev` preset and in
-  the CI test job. A sanitizer finding is a failure, not a warning.
-- Every target is declared with `target_link_libraries(... PRIVATE|PUBLIC ...)`
-  and explicit `target_include_directories` — never a directory-scope
-  `include_directories`.
+- C++20, warnings-as-errors (`-Wall -Wextra -Wpedantic -Werror`) on the project's own targets; third-party targets excluded, not silenced globally.
+- No raw owning pointers. Ownership is `std::unique_ptr`/`std::shared_ptr` or a value; raw pointers/references are non-owning views only.
+- No exceptions across the public API boundary if the project targets embedded builds — decide once, record as a non-functional requirement, hold it. Otherwise errors are `std::expected`/`tl::expected` or a typed exception, never an `int` return code paired with an out-parameter.
+- Headers self-contained: each compiles alone, includes what it uses, carries `#pragma once`.
+- Public headers under `include/<project>/`; anything under `src/` is internal and free to change.
+- Sanitizers (`-fsanitize=address,undefined`) on in the `dev` preset and CI test job. A sanitizer finding is a failure, not a warning.
+- Every target declared with `target_link_libraries(... PRIVATE|PUBLIC ...)` and explicit `target_include_directories` — never a directory-scope `include_directories`.
 
 ## `ci` → `.github/workflows/check.yml`
 

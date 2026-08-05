@@ -1,13 +1,10 @@
 # Stack: Go
 
-Slot values for the Go ecosystem. Every fenced block is a slot; the block's
-heading names the placeholder it fills.
+Slot values, Go ecosystem. Each fenced block = one slot; heading names the placeholder it fills.
 
-**Variants to ask about:** whether `golangci-lint` is wanted on top of `go vet`,
-and whether the race detector runs in CI (recommended) or also locally.
+**Ask about:** whether `golangci-lint` is wanted on top of `go vet`; whether the race detector runs in CI only (recommended) or also locally.
 
-> The CI block contains GitHub Actions `${{ … }}` expressions. Those are not
-> template placeholders — copy them through verbatim.
+> CI block's GitHub Actions `${{ … }}` expressions are NOT template placeholders — copy verbatim.
 
 ## `{{STACK_NAME}}`
 
@@ -39,8 +36,7 @@ go tool cover -html=cover.out                  # browsable coverage
 
 ## `{{INTEGRATION_TEST_CONVENTION}}`
 
-`<file>_integration_test.go` behind `//go:build integration`, functions named
-`TestIt*`.
+`<file>_integration_test.go` behind `//go:build integration`, functions named `TestIt*`.
 
 ## `{{ID_CITATION_EXAMPLE}}`
 
@@ -62,7 +58,7 @@ go mod download
 go build ./...
 ```
 
-For the lint gate you also need `golangci-lint`:
+Lint gate also needs `golangci-lint`:
 
 ```sh
 go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
@@ -70,18 +66,13 @@ go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
 ## `{{STACK_CONVENTIONS}}`
 
-- Errors are typed: a package-level sentinel (`var ErrTimeout = errors.New(…)`)
-  or a struct implementing `error`, wrapped with `%w`, matched with
-  `errors.Is`/`errors.As`. Never a formatted string compared by text.
-- Exported identifiers are the public API; anything under `internal/` is free to
-  change. New exported names are spec (gate 1).
-- Domain values are defined types (`type UnitID uint8`), not bare integers, where
-  mixing two of them would be a bug.
+- Errors typed: package-level sentinel (`var ErrTimeout = errors.New(…)`) or a struct implementing `error`, wrapped with `%w`, matched with `errors.Is`/`errors.As`. Never a formatted string compared by text.
+- Exported identifiers are the public API; `internal/` is free to change. New exported names are spec (gate 1).
+- Domain values are defined types (`type UnitID uint8`), not bare integers, wherever mixing two would be a bug.
 - Every exported identifier has a doc comment starting with its name.
-- Contexts are first parameters and are honoured — no unbounded blocking call
-  without a `ctx` path to cancel it.
-- Table-driven tests with named subtests; `t.Parallel()` where the test allows it.
-- `go test -race` is the default in CI; a data race is a failure, not a flake.
+- Contexts are first parameters and honoured — no unbounded blocking call without a `ctx` cancellation path.
+- Table-driven tests, named subtests; `t.Parallel()` where the test allows it.
+- `go test -race` is default in CI; a data race is a failure, not a flake.
 
 ## `ci` → `.github/workflows/check.yml`
 

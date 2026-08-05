@@ -1,24 +1,19 @@
 # {{AREA_TITLE}} — Data Contract
 
-Formats this area owns: wire layouts, file schemas, field widths and order,
-value ranges, encodings.
+Formats this area owns: wire layouts, file schemas, field widths/order, value ranges, encodings.
 
-Normative. A format is the hardest kind of contract to change after release —
-every entry here is settled at gate 1, with the exact bytes or the exact schema,
-not a description of them.
+Normative. Formats are the hardest contract to change post-release — settle each at gate 1 with exact bytes/schema, not a description.
 
 ---
 
 ## Layout
 
-*(Empty. One table per message or record: field, offset or order, width, type,
-range.)*
+*(Empty. One table per message/record: field, offset/order, width, type, range.)*
 
 ## Encoding
 
-*(Empty. Byte order, character encoding, framing or delimiting rules.)*
+*(Empty. Byte order, character encoding, framing/delimiting rules.)*
 
 ## Ranges and limits
 
-*(Empty. Valid value ranges, maximum lengths, and what happens outside them —
-cross-reference [`edge-cases.md`](./edge-cases.md).)*
+*(Empty. Valid value ranges, max lengths, out-of-range behavior — cross-ref [`edge-cases.md`](./edge-cases.md).)*

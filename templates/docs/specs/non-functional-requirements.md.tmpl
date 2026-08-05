@@ -1,38 +1,29 @@
 # Non-Functional Requirements
 
-Cross-cutting requirements that belong to no single capability area: platforms,
-toolchain, performance posture, security, versioning, and testing conventions.
+Cross-cutting requirements belonging to no single area: platforms, toolchain, performance posture, security, versioning, testing conventions.
 
-IDs are stable and append-only (`NF-R-nnn`). See [`README.md`](./README.md).
+IDs stable, append-only (`NF-R-nnn`). See [`README.md`](./README.md).
 
-Requirements are added through the workflow in [`AGENTS.md`](../../AGENTS.md) —
-gate 1 approves the "shall" text before any code is written. Nothing here is
-fabricated ahead of that.
+Added via workflow in [`AGENTS.md`](../../AGENTS.md) — gate 1 approves "shall" text before code is written. Nothing here precedes that approval.
 
 ---
 
 ## 1. Platforms and toolchain
 
-*(Empty. The first requirement lands through gate 1 — e.g. the supported
-platforms, the minimum language version and where it is declared, the pinned
-toolchain.)*
+*(Empty. First requirement lands via gate 1 — e.g. supported platforms, minimum language version + where declared, pinned toolchain.)*
 
 ## 2. Performance
 
-*(Empty. State a posture, not a number you cannot measure: what is allowed to
-allocate, what must not block, what is explicitly not optimised.)*
+*(Empty. State a posture, not an unmeasurable number: what may allocate, what must not block, what's explicitly not optimised.)*
 
 ## 3. Security
 
-*(Empty. Input trust boundaries, what must never panic or allocate unbounded,
-dependency policy, unsafe-code policy.)*
+*(Empty. Input trust boundaries, what must never panic/allocate unbounded, dependency policy, unsafe-code policy.)*
 
 ## 4. Versioning and release
 
-*(Empty. Versioning scheme, what constitutes a breaking change, changelog
-policy.)*
+*(Empty. Versioning scheme, what constitutes a breaking change, changelog policy.)*
 
 ## 5. Testing conventions
 
-*(Empty. Test naming, coverage floor and where it is enforced, port and
-filesystem discipline, what may not run in CI.)*
+*(Empty. Test naming, coverage floor + where enforced, port/filesystem discipline, what may not run in CI.)*
