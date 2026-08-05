@@ -7,6 +7,7 @@ Router for AI coding agents. Read first.
 `{{PROJECT_NAME}}` — {{ONE_LINER}}. {{PROJECT_KIND}}. Product: [`PRD.md`](./PRD.md).
 Structure: [`ARCHITECTURE.md`](./ARCHITECTURE.md).
 
+<!-- CORE:BEGIN spec-driven -->
 ## Spec-driven
 
 - `docs/specs/` authoritative. Code conforms to spec, never reverse.
@@ -20,6 +21,7 @@ Structure: [`ARCHITECTURE.md`](./ARCHITECTURE.md).
   separately. Folding it in widens approved work, skips its own review.
 - Specs carry no `file:line`. Locate code with search tools.
 - Requirement IDs stable, append-only. Cite in commits and PRs.
+<!-- CORE:END spec-driven -->
 
 ## TDD — fixed order, every stage
 
@@ -281,8 +283,9 @@ report the final spec diff.
 
 Before proposing a PR: independent review in a **separate agent** that didn't
 write the code (a reviewer sharing the implementer's context reproduces its
-blind spots). Give it the diff, approved spec text, this file — never the
-issue number, same as every agent in this workflow. Reports:
+blind spots). Give it the diff, approved spec text, the artifact dir, the
+worktree path — never the issue number, same as every agent in this workflow.
+It reads its own rules (`.claude/AGENTS.core.md`) itself. Reports:
 
 - **Spec fidelity** — every approved requirement implemented, nothing
   unapproved implemented (scope creep is a finding even if the code is
@@ -357,6 +360,7 @@ re-ask.
 | Module graph, data flow, concurrency model | [`ARCHITECTURE.md`](./ARCHITECTURE.md) | — |
 | Contribution workflow, conventions | [`CONTRIBUTING.md`](./CONTRIBUTING.md) | — |
 
+<!-- CORE:BEGIN build -->
 ## Build / test / lint
 
 ```sh
@@ -371,7 +375,9 @@ Narrow the loop while iterating:
 
 Full set before done. `lefthook` enforces fast checks pre-commit; CI runs the
 full set on every push and PR.
+<!-- CORE:END build -->
 
+<!-- CORE:BEGIN conventions -->
 ## Conventions
 
 <!-- PRUNE ME. Bullets between this marker and {{STACK_CONVENTIONS}} are the
@@ -400,7 +406,10 @@ full set on every push and PR.
   out-of-bounds access, or unbounded allocation. Test every parse path with
   truncated input.
 {{STACK_CONVENTIONS}}
+<!-- CORE:END conventions -->
 
+<!-- CORE:BEGIN scope -->
 ## Scope boundaries — ask before
 
 {{SCOPE_BOUNDARIES}}
+<!-- CORE:END scope -->

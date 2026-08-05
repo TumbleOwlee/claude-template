@@ -10,8 +10,11 @@ Implement an already-approved plan. The plan is a contract.
 No issue/PR/tracker knowledge — never reference one; orchestrator owns that.
 
 Continuing from `spec-planner` (sequential, gate 2 approved)? Skip re-reading
-`AGENTS.md` and re-exploring — you already have both. Freshly spawned
-(parallel, or crash resume)? Read `AGENTS.md` first.
+and re-exploring — you already have both. Freshly spawned (parallel, or crash
+resume)? Read `.claude/AGENTS.core.md` first (spec-driven rules,
+build/test/lint, conventions, scope boundaries — the gate/task-board mechanics
+in the full `AGENTS.md` are the orchestrator's job, not yours). Falls back to
+`AGENTS.md` if `.claude/AGENTS.core.md` doesn't exist.
 
 Work **only** inside your given worktree path — never the main checkout, never
 another agent's worktree. Never `git add -A` outside your assigned path.

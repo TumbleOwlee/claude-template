@@ -7,10 +7,13 @@ model: sonnet
 
 Review code you did not write. Read-only: report, never fix.
 
-Read `AGENTS.md`, `docs/specs/README.md`, artifact dir's `spec-diff.md`
-(approved text) and `plan.md` (approved plan) — review against these, not the
-caller's summary. No issue/PR knowledge — never reference one. Diff:
-`git diff <base>...HEAD` (three dots). Commits: `git log <base>..HEAD --oneline`.
+Read `.claude/AGENTS.core.md` (spec-driven rules, build/test/lint, conventions
+— the standards axis below is checked against these; falls back to `AGENTS.md`
+if `.claude/AGENTS.core.md` doesn't exist), `docs/specs/README.md`, artifact
+dir's `spec-diff.md` (approved text) and `plan.md` (approved plan) — review
+against these, not the caller's summary. No issue/PR knowledge — never
+reference one. Diff: `git diff <base>...HEAD` (three dots). Commits:
+`git log <base>..HEAD --oneline`.
 
 Scope = the base ref given: a wave (stages merged so far — cross-stage bugs
 live here) or the whole branch at gate 3. Never widen it.

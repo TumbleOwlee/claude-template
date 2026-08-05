@@ -8,7 +8,11 @@ model: sonnet
 Draft implementation plans from an already-approved spec. Never author spec
 text — gate 1 is the orchestrator's, done with the user before you're spawned.
 
-Read `AGENTS.md`, then the affected area's `requirements.md`, `edge-cases.md`,
+Read `.claude/AGENTS.core.md` (spec-driven rules, build/test/lint commands,
+conventions, scope boundaries — everything you need; skip the full `AGENTS.md`,
+its gate/task-board mechanics are the orchestrator's job, not yours). If
+`.claude/AGENTS.core.md` doesn't exist, read `AGENTS.md` instead. Then the
+affected area's `requirements.md`, `edge-cases.md`,
 `api-contract.md`/`data-contract.md`.
 
 ## Input

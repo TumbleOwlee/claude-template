@@ -95,24 +95,27 @@ This is the only approval gate in this skill. After it, write everything without
 
 ## 7. Write the files
 
-Read each template, substitute every placeholder, write to the repo root. Never leave a `{{PLACEHOLDER}}` unfilled in an output file — that's a bug. Grep the written files for `{{` before reporting; a leak means a missed slot.
+`.tmpl` suffix = has `{{PLACEHOLDER}}`s, needs substitution. No suffix = static, copy byte-for-byte, no read-and-rewrite. Check which before touching a file — writing a static file through the substitution pass is harmless but wasted work; skipping substitution on a `.tmpl` ships a literal `{{PLACEHOLDER}}`.
 
-Three things substitution alone doesn't handle:
+For `.tmpl` files: read, substitute every placeholder, write to the repo root (drop the `.tmpl` suffix). Never leave a `{{PLACEHOLDER}}` unfilled — that's a bug. Grep written files for `{{` before reporting; a leak means a missed slot.
+
+Four things substitution alone doesn't handle:
 
 - **`<!-- PRUNE ME -->` blocks.** `AGENTS.md.tmpl` marks its stack-neutral conventions this way. Drop bullets that don't apply to this project, merge any the stack block restates in stack-specific terms (keep the specific wording), delete the marker comment. Two bullets saying the same thing in different words is how a conventions section starts getting ignored.
 - **Source paths in the hook blocks.** The `spec-reminder` and `test-id-reminder` hooks match product code by path (`^src/`, `^(src|include)/`, `*.go`). Point them at this project's actual source directory, or the reminder never fires.
 - **Line wrapping.** Prose templates wrap at ~80 columns. A substituted slot that runs long (coverage line, stack name, area description) gets re-wrapped to match, not left as one long line.
+- **`.claude/AGENTS.core.md`.** After `AGENTS.md` is fully substituted and pruned, extract the spans marked `<!-- CORE:BEGIN … --> … <!-- CORE:END … -->` (Spec-driven, Build/test/lint, Conventions, Scope boundaries) into a new file `.claude/AGENTS.core.md`, in that order, under a one-line header: `Excerpt of AGENTS.md — spec-driven core, build/test/lint, conventions, scope boundaries. Full gates and task board: ../AGENTS.md. Regenerate by re-copying these sections if they change.` Then strip the `CORE:BEGIN`/`CORE:END` marker comments from the copy that becomes `AGENTS.md` itself — they're authoring metadata, not part of the router. This is what lets a spawned `spec-planner`/`spec-implementer`/`spec-reviewer` read one short file instead of the whole router.
 
 | Template | Output |
 |---|---|
-| `templates/AGENTS.md.tmpl` | `AGENTS.md` |
-| `templates/CLAUDE.md.tmpl` | `CLAUDE.md` (replaces the bootstrap one) |
+| `templates/AGENTS.md.tmpl` | `AGENTS.md`, plus derived `.claude/AGENTS.core.md` (see above) |
+| `templates/CLAUDE.md` | `CLAUDE.md` (static — copy as-is, replaces the bootstrap one) |
 | `templates/PRD.md.tmpl` | `PRD.md` |
 | `templates/ARCHITECTURE.md.tmpl` | `ARCHITECTURE.md` |
 | `templates/CONTRIBUTING.md.tmpl` | `CONTRIBUTING.md` |
 | `templates/README.md.tmpl` | `README.md` (replaces the template's own) |
 | `templates/docs/specs/README.md.tmpl` | `docs/specs/README.md` |
-| `templates/docs/specs/non-functional-requirements.md.tmpl` | `docs/specs/non-functional-requirements.md` |
+| `templates/docs/specs/non-functional-requirements.md` | `docs/specs/non-functional-requirements.md` (static — copy as-is) |
 | `templates/docs/specs/area/*.tmpl` | `docs/specs/<area>/*` — once per area, per step 4 |
 | stack file's `ci` block | `.github/workflows/check.yml` |
 | stack file's `lefthook` block | `.lefthook.yml` |
