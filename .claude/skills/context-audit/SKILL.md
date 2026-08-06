@@ -1,6 +1,6 @@
 ---
 name: context-audit
-description: Analyze Claude Code session transcripts for repeated full-file reads, large re-derived tool output, and other context-cost waste; recommend small scripts (like scripts/extract-section.sh) that would cut it. Use when the user asks to "audit context cost", "reduce context bloat", "what scripts should we add", "analyze tool usage", or invokes /context-audit.
+description: Analyze Claude Code session transcripts for repeated full-file reads, large re-derived tool output, and other context-cost waste; recommend small scripts (like .claude/scripts/extract-section.sh) that would cut it. Use when the user asks to "audit context cost", "reduce context bloat", "what scripts should we add", "analyze tool usage", or invokes /context-audit.
 ---
 
 # Context cost audit
@@ -34,6 +34,6 @@ Same shape for `Bash` (`.input.command`) and `Grep` (`.input.pattern`).
 
 ## 4. Report
 
-Ranked table: file/pattern, count, rough cost (`lines × occurrences` for Reads), proposed fix. One line each — no praise, no summary paragraph. `scripts/extract-section.sh` (if the project has it) already covers markdown-heading slicing — recommend *extending its use*, never a duplicate script, when the pattern already fits it. Only propose a new script when the data shape doesn't (JSON, log tail, CSV column, etc).
+Ranked table: file/pattern, count, rough cost (`lines × occurrences` for Reads), proposed fix. One line each — no praise, no summary paragraph. `.claude/scripts/extract-section.sh` (if the project has it) already covers markdown-heading slicing — recommend *extending its use*, never a duplicate script, when the pattern already fits it. Only propose a new script when the data shape doesn't (JSON, log tail, CSV column, etc).
 
 Do not create anything here. If the user approves a specific recommendation, draft that one script the same way `extract-section.sh` was built: POSIX `sh`, single file, one clear job, tested against a real sample before reporting done.

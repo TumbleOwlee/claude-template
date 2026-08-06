@@ -41,7 +41,7 @@ and then writes:
 | `docs/specs/` | The authoritative specification, one directory per area. |
 | `.github/workflows/check.yml` or `bitbucket-pipelines.yml` | fmt / lint / types / test / coverage gates — whichever matches the detected remote host. |
 | `.lefthook.yml` | Pre-commit checks, plus spec and requirement-ID reminders. |
-| `scripts/extract-section.sh` | Prints one markdown section by heading — reads a slice of a spec file instead of the whole thing. |
+| `.claude/scripts/extract-section.sh` | Prints one markdown section by heading — reads a slice of a spec file instead of the whole thing. |
 
 Finally it deletes `templates/` and its own skill, so the fork looks like a normal project.
 

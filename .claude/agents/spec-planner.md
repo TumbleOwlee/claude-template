@@ -25,7 +25,7 @@ Surface every plan-shaped decision (stage boundaries, extend-vs-reimplement, tes
 
 ## Output
 
-`plan.md` is flat markdown sections, headed so `scripts/extract-section.sh` can pull exactly one — a later reader (implementer, reviewer, resumed session) never opens the whole file:
+`plan.md` is flat markdown sections, headed so `.claude/scripts/extract-section.sh` can pull exactly one — a later reader (implementer, reviewer, resumed session) never opens the whole file:
 
 - `## Shared` — first section. **Dependency tree** (below), verification approach if uniform across stages, any code reference cited by 2+ stages.
 - `## Stage s<n>: <short name>` — one per stage, self-contained: numbered file-level steps, tests added, `files` touched, `blocked-by`, ID→test table, **Verification** (how exercised beyond unit tests), expected commits.
