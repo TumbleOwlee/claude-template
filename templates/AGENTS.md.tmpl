@@ -323,7 +323,7 @@ when review starts.
 
 - Verification run + reported, then **ask whether to open a PR** — user may
   want a manual run first; don't pre-empt it.
-- Draft title + body, get approval of that text, push, open.
+- Draft title + body, get approval of that text, push. {{PR_OPEN_LINE}}
 - Title plain language, issue's style. Body = the implementation: why,
   requirement IDs, how the issue was resolved (approach/structure the issue
   omitted), verification actually performed{{COVERAGE_PR_CLAUSE}}{{CLOSES_CLAUSE}}.
@@ -428,6 +428,10 @@ full set on every push and PR.
 - Hostile/malformed/truncated external input → typed error, never a crash,
   out-of-bounds access, or unbounded allocation. Test every parse path with
   truncated input.
+- Specs and AI-facing files (skills, agents, `AGENTS.md`/`CLAUDE.md` itself)
+  stay concise and compact: facts only, no prose, no filler, zero information
+  loss. Every word an agent must re-read on every load; padding is recurring
+  cost, not one-time.
 {{STACK_CONVENTIONS}}
 <!-- CORE:END conventions -->
 

@@ -15,6 +15,7 @@ Source of truth: `templates/`. Read the template files — do not reproduce from
 - Never fabricate requirements: `docs/specs/*/requirements.md` ships as an empty, header-only stub. Real "shall" statements are written later through gate 1. Same for ungrounded PRD sections — `*(TBD)*`.
 - Never overwrite a file the user wants kept — step 1 settles that per file.
 - Do not start implementing the product. This skill sets up the workflow; the first feature goes through gate 1 afterwards.
+- Secrets (Jira API token, Bitbucket app password) collected via `AskUserQuestion` like everything else, written once to their `.claude/*.local.json` file, never echoed back, never left ungitignored.
 
 ## 0. Check the toolchain
 
@@ -37,6 +38,13 @@ Pristine fork = only bootstrap `CLAUDE.md`, `README.md`, `templates/`, `.claude/
 Any other pre-existing target file: show it, ask keep / overwrite / merge. Record the decision — step 7 honours it.
 
 If `AGENTS.md` already exists and looks like this workflow (contains "Gate 1"): say so, ask whether user wants a re-run (re-ask everything, rewrite) or a targeted edit. A re-run on a live project silently discards local customisation — make that explicit before proceeding.
+
+**PR host.** Read the remote: `git remote get-url origin` (fall back to `git config --get remote.origin.url`). Determines `{{PR_OPEN_LINE}}` (step 7). No remote → `{{PR_OPEN_LINE}}` = manual variant below, nothing to detect.
+- `github.com` → `{{PR_OPEN_LINE}}` = `` Open via `gh pr create`. `` — no action here; `gh` already covers it.
+- `bitbucket.org` → Bitbucket-hosted, handled in step 4c below (sets `{{PR_OPEN_LINE}}`).
+- anything else (GitLab, self-hosted, unrecognized) → `AskUserQuestion`: **set up instructions** or **skip**. Either way `{{PR_OPEN_LINE}}` = manual variant below — this skill doesn't know the host's auth/CLI shape well enough to template automation for it. Set up → additionally give the host's CLI/API setup pointer generically (its hosted CLI if one exists, else its REST API + a personal access token) in chat, not in any generated file. Skip → note in the final report that PR opening (gate 4) is manual for this host.
+
+Manual variant (no host automation): `{{PR_OPEN_LINE}}` = `No supported host automation configured — report the drafted title/body and ask the user to open the PR themselves.`
 
 ## 2. Ask the project facts
 
@@ -81,7 +89,73 @@ Also ask, same round:
 
 - **Coverage floor** (default 80, CI-gated). "None" allowed — removes the coverage line from AGENTS.md, CONTRIBUTING.md and CI.
 - **Per-area starting files** — default `requirements.md` + `edge-cases.md`; add `api-contract.md` for anything with a public surface, `data-contract.md` for anything with a wire or file format.
-- **Issue tracker** — GitHub (`gh`) or none. None → gate 1b becomes "record the goal in the PR body", every `gh` command drops out of AGENTS.md.
+
+## 4b. Issue tracker
+
+Separate `AskUserQuestion`, options **GitHub / Jira / Filesystem / None** —
+each sets `{{ISSUE_WORKFLOW}}` from a different `templates/fragments/` file,
+copy its body verbatim into AGENTS.md's gate 1b section, no paraphrasing.
+
+- **GitHub** → `templates/fragments/issue-github.md`. Then check
+  `gh auth status`. Authenticated → continue silently. Not authenticated /
+  `gh` missing → tell the user, give the exact fix (`gh auth login`, or
+  install from [cli.github.com](https://cli.github.com)); don't block the
+  rest of setup on it, gate 1b will fail loudly on its own later if unfixed.
+- **Jira** → second `AskUserQuestion`: **MCP server** or **API credentials**.
+  - MCP → `templates/fragments/issue-jira-mcp.md`. Ask the user to confirm a
+    Jira MCP server is already configured (`claude mcp list`); if not, tell
+    them to add one before running gate 1b — don't block bootstrap on it, no
+    standard install command to fall back on.
+  - Credentials → `templates/fragments/issue-jira-credentials.md`. Collect
+    **Jira base URL**, **email**, **API token** via `AskUserQuestion`, one
+    call, up to 3 questions batched — each with a best-guess option (base URL
+    from the org/repo name, email from git config) so confirming is one click
+    and the exact value always goes through `Other`. Write the answers
+    verbatim to `.claude/jira.local.json`:
+    ```json
+    { "baseUrl": "https://your-domain.atlassian.net", "email": "you@example.com", "apiToken": "..." }
+    ```
+    Never echo the token back in chat once written. `.gitignore` already
+    carries `.claude/jira.local.json` unconditionally (ships in the template
+    itself) — nothing more to do here.
+- **Filesystem** → `templates/fragments/issue-filesystem.md`. No credentials,
+  no external check. Ensure `.claude/issues/.gitkeep` gets created in step 7
+  so the empty directory is tracked.
+- **None** → `templates/fragments/issue-none.md`. `{{CLOSES_CLAUSE}}` empty.
+
+`{{CLOSES_CLAUSE}}` per choice: GitHub → `` , `Closes #<issue>` `` · Jira →
+`, references <ISSUE-KEY>` · Filesystem → empty (PR body already carries the
+goal) · None → empty.
+
+## 4c. Bitbucket credentials
+
+Only runs if step 1 detected `bitbucket.org` as the remote host — independent
+of the step 4b tracker choice (Bitbucket here is the *PR host*, gate 4; a
+project can still track issues in Jira or nowhere).
+
+`AskUserQuestion`: **set up Bitbucket credentials now** or **skip**.
+
+Skip → `{{PR_OPEN_LINE}}` = the manual variant (step 1). No file written.
+
+Set up → collect via `AskUserQuestion`, one call, batched, each with a
+best-guess option pre-filled from the remote URL / git config, exact value
+via `Other`:
+
+- **Workspace** — the segment right after `bitbucket.org/` in the remote URL.
+- **Repo slug** — the segment after the workspace.
+- **Username** or **email** (Bitbucket accepts either for app-password auth).
+- **App password** — [Bitbucket App passwords](https://bitbucket.org/account/settings/app-passwords/), `Repositories: Write` + `Pull requests: Write` scopes minimum.
+
+Write verbatim to `.claude/bitbucket.local.json`:
+```json
+{ "workspace": "...", "repoSlug": "...", "username": "...", "appPassword": "..." }
+```
+Never echo the app password back in chat once written. `.gitignore` already
+carries `.claude/bitbucket.local.json` unconditionally — nothing more to do
+here. Sets `{{PR_OPEN_LINE}}` = `` Open via the Bitbucket REST API
+(`/2.0/repositories/<workspace>/<repo>/pullrequests`), using
+`.claude/bitbucket.local.json`. `` — substitute the real `<workspace>`/`<repo>`
+values, not the literal placeholders.
 
 ## 5. Ask the scope boundaries
 
@@ -121,7 +195,18 @@ Four things substitution alone doesn't handle:
 | stack file's `lefthook` block | `.lefthook.yml` |
 | stack file's `config` blocks | stack config files (e.g. `clippy.toml`, `ruff.toml`) — only those the stack file marks as default |
 
-Also append the stack's build artifacts to `.gitignore` (`target/` for Rust, `node_modules/` and `dist/` for Node, `.venv/`, `__pycache__/`, `.pytest_cache/`, `.mypy_cache/` for Python, `cover.out` for Go, `build/` for CMake). The template `.gitignore` carries only language-agnostic entries and a comment saying so — replace that comment with the real entries.
+Also append the stack's build artifacts to `.gitignore` (`target/` for Rust, `node_modules/` and `dist/` for Node, `.venv/`, `__pycache__/`, `.pytest_cache/`, `.mypy_cache/` for Python, `cover.out` for Go, `build/` for CMake). The template `.gitignore` carries only language-agnostic entries and a comment saying so — replace that comment with the real entries. `.claude/jira.local.json` is already ignored unconditionally — no per-tracker action needed.
+
+**Jira credentials chosen (step 4b):** write `.claude/jira.local.json` with the
+three values collected, exact content, no placeholders left in it — this file
+holds a live secret, never goes through the `.tmpl` substitution pass.
+
+**Filesystem tracker chosen:** create `.claude/issues/.gitkeep` so the empty
+directory survives the initial commit.
+
+**Bitbucket credentials chosen (step 4c):** write `.claude/bitbucket.local.json`
+with the four values collected, exact content, no placeholders left in it —
+live secret, never goes through the `.tmpl` substitution pass.
 
 Placeholders used across templates:
 
@@ -132,7 +217,8 @@ Placeholders used across templates:
 | `{{AREA_ROUTING_TABLE}}` | step 4 — AGENTS.md rows, links relative to repo root (`./docs/specs/<area>/`) |
 | `{{AREA_TABLE}}` | step 4 — **link base differs per file**: `./<area>/` in `docs/specs/README.md`, `./docs/specs/<area>/` in `PRD.md`. Same rows, different hrefs; get this wrong and every link in one of the two files is dead. |
 | `{{COVERAGE_FLOOR}}`, `{{COVERAGE_LINE}}` | step 4 |
-| `{{ISSUE_WORKFLOW}}` | step 4 tracker choice |
+| `{{ISSUE_WORKFLOW}}` | step 4b tracker choice |
+| `{{PR_OPEN_LINE}}` | step 1 remote detection + step 4c (Bitbucket) |
 | `{{SCOPE_BOUNDARIES}}` | step 5 |
 | `{{AREA_TITLE}}`, `{{AREA_COVERS}}`, `{{AREA_PREFIX}}` | step 4, per area file |
 | `{{ID_CITATION_BLOCK}}`, `{{COVERAGE_CONTRIB_LINE}}` | stack file + coverage floor |
@@ -151,12 +237,14 @@ Coverage-dependent slots, all filled from the floor chosen in step 4 — and all
 | `{{COVERAGE_PR_CLAUSE}}` | `, the coverage number` | empty |
 | `{{COVERAGE_CONTRIB_LINE}}` | `Line coverage must stay at or above **N%**, enforced in CI. Coverage is a floor, not a goal — never pad it with tests that execute code without asserting on it.` | empty |
 
-Tracker-dependent slots:
+Tracker-dependent slots (choice + branch from step 4b):
 
-| Placeholder | GitHub | No tracker |
-|---|---|---|
-| `{{ISSUE_WORKFLOW}}` | gate 1b body from `templates/fragments/issue-github.md` | body from `templates/fragments/issue-none.md` |
-| `{{CLOSES_CLAUSE}}` | `, ` + `` `Closes #<issue>` `` | empty |
+| Placeholder | GitHub | Jira (MCP) | Jira (credentials) | Filesystem | None |
+|---|---|---|---|---|---|
+| `{{ISSUE_WORKFLOW}}` | `issue-github.md` | `issue-jira-mcp.md` | `issue-jira-credentials.md` | `issue-filesystem.md` | `issue-none.md` |
+| `{{CLOSES_CLAUSE}}` | `, ` + `` `Closes #<issue>` `` | `, references <ISSUE-KEY>` | `, references <ISSUE-KEY>` | empty | empty |
+
+All five fragment files live in `templates/fragments/`.
 
 **Substitute only the placeholders named above.** A GitHub Actions expression like `${{ matrix.python-version }}` inside a CI block is not a placeholder — copy it through verbatim.
 
