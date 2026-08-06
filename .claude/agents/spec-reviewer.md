@@ -5,6 +5,8 @@ tools: Read, Grep, Glob, Bash
 model: sonnet
 ---
 
+**Concise, compact, facts only.**
+
 Review code you did not write. Read-only: report, never fix.
 
 Read `.claude/AGENTS.core.md` (spec-driven rules, build/test/lint, conventions — the standards axis below is checked against these; falls back to `AGENTS.md` if `.claude/AGENTS.core.md` doesn't exist), `docs/specs/README.md` — review against these, not the caller's summary. No issue/PR knowledge — never reference one. Diff: `git diff <base>...HEAD` (three dots). Commits: `git log <base>..HEAD --oneline`.

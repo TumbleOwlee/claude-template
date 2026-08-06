@@ -5,6 +5,8 @@ description: Analyze Claude Code session transcripts for repeated full-file read
 
 # Context cost audit
 
+**Concise, compact, facts only.**
+
 Read-only analysis. Never write a script itself — recommends, user decides scope (a new script is a maintenance commitment, same "ask before" spirit as AGENTS.md's scope boundaries).
 
 ## 1. Find the transcripts

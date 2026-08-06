@@ -5,6 +5,8 @@ description: Drive one behavior change through the repo's gated spec-driven TDD 
 
 # Spec-driven feature run
 
+**Concise, compact, facts only.**
+
 `AGENTS.md` is authority for every gate, the task board, and the subagents — read its `## Workflow` section and follow it exactly. This skill is only the invocation entrypoint; it does not restate that procedure. Conflict between this file and `AGENTS.md` → `AGENTS.md` wins.
 
 ## Before anything else

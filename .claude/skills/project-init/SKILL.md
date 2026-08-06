@@ -5,6 +5,8 @@ description: Interactive one-shot bootstrap of a forked repo-template into a rea
 
 # Project init
 
+**Concise, compact, facts only.**
+
 Bootstrap forked template into a configured spec-driven TDD project. One run; then template scaffolding is gone and repo looks like a normal project.
 
 Source of truth: `templates/`. Read the template files — do not reproduce from memory, do not paraphrase workflow gate text (gate text is the product).

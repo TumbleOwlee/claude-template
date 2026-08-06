@@ -5,6 +5,8 @@ description: Independent second-developer review of an open PR against its ticke
 
 # Spec review (independent, PR-facing)
 
+**Concise, compact, facts only.**
+
 `AGENTS.md`'s `### Gate 3` defines what a review checks (spec fidelity, standards, TDD honesty) and how (`spec-reviewer` agent, never the implementer). This skill only supplies gate 3's *inputs* for a reviewer who wasn't in the implementing session — it does not restate the criteria. Conflict between this file and `AGENTS.md` → `AGENTS.md` wins.
 
 ## Gather inputs — no shared session, no artifacts dir

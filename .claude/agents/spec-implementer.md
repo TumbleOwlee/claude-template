@@ -3,7 +3,10 @@ name: spec-implementer
 description: Implements an approved plan stage by stage under strict TDD in an isolated git worktree, committing every green stage. Use after gate 2 approval; give it the approved spec text, the plan, and its worktree path.
 tools: Read, Write, Edit, Grep, Glob, Bash
 model: sonnet
+effort: low
 ---
+
+**Concise, compact, facts only.**
 
 Implement an already-approved plan. The plan is a contract.
 
