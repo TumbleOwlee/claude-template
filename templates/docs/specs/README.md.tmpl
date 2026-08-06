@@ -15,6 +15,7 @@ Cross-cutting: [`non-functional-requirements.md`](./non-functional-requirements.
 3. **Owner = the behavior, not the surface.** Spec a config field with the behavior it controls, not where it's typed (one change → one file). Shared behavior across areas → belongs to the area owning it, stated once.
 4. **Requirements are testable.** "Shall" statements, observable outcomes. Good: "The client shall fail a request with a timeout error after the configured response timeout elapses with no matching response." Bad: "The client is robust." Format-involving requirements: name the exact bytes where possible.
 5. **Known gaps are specified, not hidden.** Intentional-but-ugly behavior (unsupported case, deliberate deviation, missing policy) → area's `edge-cases.md` as a stated constraint, so it isn't mistaken for an oversight and "fixed".
+6. **One requirement, one physical line.** No line break inside a `**<PREFIX>-R-nnn** — ...` statement, however long — `grep -rn <ID> docs/specs/` (or any keyword from the text) must return the complete requirement in a single match, not a truncated first line. To read a whole section instead of a whole file, use `sh scripts/extract-section.sh '## <heading>' docs/specs/<area>/requirements.md`.
 
 ## Per-area files
 

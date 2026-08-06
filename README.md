@@ -44,8 +44,9 @@ and then writes:
 | `ARCHITECTURE.md` | Module map, data flow, concurrency, testing seams. |
 | `CONTRIBUTING.md` | The human-facing version of the same rules. |
 | `docs/specs/` | The authoritative specification, one directory per area. |
-| `.github/workflows/check.yml` | fmt / lint / types / test / coverage gates. |
+| `.github/workflows/check.yml` or `bitbucket-pipelines.yml` | fmt / lint / types / test / coverage gates — whichever matches the detected remote host. |
 | `.lefthook.yml` | Pre-commit checks, plus spec and requirement-ID reminders. |
+| `scripts/extract-section.sh` | Prints one markdown section by heading — reads a slice of a spec file instead of the whole thing. |
 
 Finally it deletes `templates/` and its own skill, so the fork looks like a normal
 project.
@@ -69,6 +70,7 @@ Running one change through it: `/spec-feature`.
 .claude/skills/project-init/   the bootstrap (self-deleting)
 .claude/skills/init-workspace/ alias, avoids the built-in /init
 .claude/skills/spec-feature/   drives one change through the gates
+.claude/skills/context-audit/  finds what's re-read a lot, suggests scripts to cut it
 .claude/agents/                spec-planner, spec-implementer, spec-reviewer
 .claude/tasks/                 task board, empty until the first run
 .claude/settings.json          SessionStart hook: flags an interrupted run

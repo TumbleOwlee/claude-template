@@ -130,6 +130,40 @@ jobs:
       - run: pnpm vitest run --coverage.enabled --coverage.thresholds.lines={{COVERAGE_FLOOR}}
 ```
 
+## `bitbucket-pipelines` → `bitbucket-pipelines.yml`
+
+```yaml
+image: node:22
+
+pipelines:
+  default:
+    - step:
+        name: lint
+        script:
+          - corepack enable
+          - pnpm install --frozen-lockfile
+          - pnpm prettier --check .
+          - pnpm eslint .
+    - step:
+        name: types
+        script:
+          - corepack enable
+          - pnpm install --frozen-lockfile
+          - pnpm tsc --noEmit
+    - step:
+        name: test
+        script:
+          - corepack enable
+          - pnpm install --frozen-lockfile
+          - pnpm vitest run
+    - step:
+        name: coverage
+        script:
+          - corepack enable
+          - pnpm install --frozen-lockfile
+          - pnpm vitest run --coverage.enabled --coverage.thresholds.lines={{COVERAGE_FLOOR}}
+```
+
 ## `lefthook` → `.lefthook.yml`
 
 ```yaml

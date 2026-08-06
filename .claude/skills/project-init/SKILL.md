@@ -29,7 +29,7 @@ Optional — don't block on it. Continue to step 1 either way.
 
 ## 1. Detect state
 
-Check what exists: `AGENTS.md`, `CLAUDE.md`, `PRD.md`, `ARCHITECTURE.md`, `CONTRIBUTING.md`, `README.md`, `docs/specs/`, `.github/workflows/`, `.lefthook.yml`, any language manifest (`Cargo.toml`, `package.json`, `pyproject.toml`, `setup.py`, `go.mod`, `CMakeLists.txt`).
+Check what exists: `AGENTS.md`, `CLAUDE.md`, `PRD.md`, `ARCHITECTURE.md`, `CONTRIBUTING.md`, `README.md`, `docs/specs/`, `.github/workflows/`, `bitbucket-pipelines.yml`, `.lefthook.yml`, any language manifest (`Cargo.toml`, `package.json`, `pyproject.toml`, `setup.py`, `go.mod`, `CMakeLists.txt`).
 
 Pristine fork = only bootstrap `CLAUDE.md`, `README.md`, `templates/`, `.claude/` — treat these as template scaffolding to replace, not user content; don't ask about them.
 
@@ -177,7 +177,7 @@ Four things substitution alone doesn't handle:
 
 - **`<!-- PRUNE ME -->` blocks.** `AGENTS.md.tmpl` marks its stack-neutral conventions this way. Drop bullets that don't apply to this project, merge any the stack block restates in stack-specific terms (keep the specific wording), delete the marker comment. Two bullets saying the same thing in different words is how a conventions section starts getting ignored.
 - **Source paths in the hook blocks.** The `spec-reminder` and `test-id-reminder` hooks match product code by path (`^src/`, `^(src|include)/`, `*.go`). Point them at this project's actual source directory, or the reminder never fires.
-- **Line wrapping.** Prose templates wrap at ~80 columns. A substituted slot that runs long (coverage line, stack name, area description) gets re-wrapped to match, not left as one long line.
+- **No line-wrapping, anywhere.** One logical statement/paragraph stays one physical line, however long a substituted slot makes it (coverage line, stack name, area description) — never hard-wrapped to a column count. Keeps every line `grep -n`-able for its full text, not just a truncated first fragment.
 - **`.claude/AGENTS.core.md`.** After `AGENTS.md` is fully substituted and pruned, extract the spans marked `<!-- CORE:BEGIN … --> … <!-- CORE:END … -->` (Spec-driven, Build/test/lint, Conventions, Scope boundaries) into a new file `.claude/AGENTS.core.md`, in that order, under a one-line header: `Excerpt of AGENTS.md — spec-driven core, build/test/lint, conventions, scope boundaries. Full gates and task board: ../AGENTS.md. Regenerate by re-copying these sections if they change.` Then strip the `CORE:BEGIN`/`CORE:END` marker comments from the copy that becomes `AGENTS.md` itself — they're authoring metadata, not part of the router. This is what lets a spawned `spec-planner`/`spec-implementer`/`spec-reviewer` read one short file instead of the whole router.
 
 | Template | Output |
@@ -191,9 +191,14 @@ Four things substitution alone doesn't handle:
 | `templates/docs/specs/README.md.tmpl` | `docs/specs/README.md` |
 | `templates/docs/specs/non-functional-requirements.md` | `docs/specs/non-functional-requirements.md` (static — copy as-is) |
 | `templates/docs/specs/area/*.tmpl` | `docs/specs/<area>/*` — once per area, per step 4 |
-| stack file's `ci` block | `.github/workflows/check.yml` |
-| stack file's `lefthook` block | `.lefthook.yml` |
+| `templates/scripts/extract-section.sh` | `scripts/extract-section.sh` (static — copy as-is, `chmod +x`) |
+| stack file's `ci` block | `.github/workflows/check.yml` — **only if step 1's remote is `github.com`** |
+| stack file's `bitbucket-pipelines` block | `bitbucket-pipelines.yml` — **only if step 1's remote is `bitbucket.org`** |
+| stack file's `lefthook` block | `.lefthook.yml` — always, host-agnostic |
 | stack file's `config` blocks | stack config files (e.g. `clippy.toml`, `ruff.toml`) — only those the stack file marks as default |
+
+Other host or no remote (step 1) → write neither CI file; note in the final
+report (step 9) that CI is unset up and must be added by hand for this host.
 
 Also append the stack's build artifacts to `.gitignore` (`target/` for Rust, `node_modules/` and `dist/` for Node, `.venv/`, `__pycache__/`, `.pytest_cache/`, `.mypy_cache/` for Python, `cover.out` for Go, `build/` for CMake). The template `.gitignore` carries only language-agnostic entries and a comment saying so — replace that comment with the real entries. `.claude/jira.local.json` is already ignored unconditionally — no per-tracker action needed.
 

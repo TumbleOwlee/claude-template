@@ -130,6 +130,39 @@ jobs:
       - run: cargo llvm-cov --all-features --fail-under-lines {{COVERAGE_FLOOR}}
 ```
 
+## `bitbucket-pipelines` → `bitbucket-pipelines.yml`
+
+```yaml
+image: rust:latest
+
+pipelines:
+  default:
+    - step:
+        name: fmt
+        script:
+          - rustup component add rustfmt
+          - cargo fmt --check
+    - step:
+        name: clippy
+        script:
+          - rustup component add clippy
+          - cargo clippy --all-features --all-targets -- -D warnings
+    - step:
+        name: check
+        script:
+          - cargo check --all-features
+    - step:
+        name: test
+        script:
+          - cargo test --all-features
+    - step:
+        name: coverage
+        script:
+          - rustup component add llvm-tools-preview
+          - cargo install cargo-llvm-cov --locked
+          - cargo llvm-cov --all-features --fail-under-lines {{COVERAGE_FLOOR}}
+```
+
 ## `lefthook` → `.lefthook.yml`
 
 ```yaml

@@ -127,6 +127,43 @@ jobs:
       - run: gcovr --root . --fail-under-line {{COVERAGE_FLOOR}}
 ```
 
+## `bitbucket-pipelines` → `bitbucket-pipelines.yml`
+
+Generator is `Ninja` here; swap to `Unix Makefiles` if the user chose Make.
+
+```yaml
+image: ubuntu:24.04
+
+pipelines:
+  default:
+    - step:
+        name: format
+        script:
+          - apt-get update && apt-get install -y clang-format
+          - clang-format --dry-run --Werror $(git ls-files '*.cpp' '*.hpp' '*.c' '*.h')
+    - step:
+        name: build-test
+        script:
+          - apt-get update && apt-get install -y ninja-build
+          - cmake --preset dev
+          - cmake --build --preset dev
+          - ctest --preset dev --output-on-failure
+    - step:
+        name: tidy
+        script:
+          - apt-get update && apt-get install -y ninja-build clang-tidy
+          - cmake --preset dev
+          - clang-tidy -p build/dev $(git ls-files '*.cpp')
+    - step:
+        name: coverage
+        script:
+          - apt-get update && apt-get install -y ninja-build gcovr
+          - cmake --preset coverage
+          - cmake --build --preset coverage
+          - ctest --preset coverage --output-on-failure
+          - gcovr --root . --fail-under-line {{COVERAGE_FLOOR}}
+```
+
 ## `lefthook` → `.lefthook.yml`
 
 ```yaml

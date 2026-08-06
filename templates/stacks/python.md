@@ -114,6 +114,40 @@ jobs:
       - run: uv run pytest --cov=src --cov-fail-under={{COVERAGE_FLOOR}}
 ```
 
+## `bitbucket-pipelines` → `bitbucket-pipelines.yml`
+
+```yaml
+image: python:3.12
+
+pipelines:
+  default:
+    - step:
+        name: lint
+        script:
+          - pip install uv
+          - uv sync --all-extras --dev
+          - uv run ruff format --check .
+          - uv run ruff check .
+    - step:
+        name: types
+        script:
+          - pip install uv
+          - uv sync --all-extras --dev
+          - uv run mypy src
+    - step:
+        name: test
+        script:
+          - pip install uv
+          - uv sync --all-extras --dev
+          - uv run pytest
+    - step:
+        name: coverage
+        script:
+          - pip install uv
+          - uv sync --all-extras --dev
+          - uv run pytest --cov=src --cov-fail-under={{COVERAGE_FLOOR}}
+```
+
 ## `lefthook` → `.lefthook.yml`
 
 ```yaml

@@ -139,6 +139,40 @@ jobs:
             || { echo "coverage ${pct}% is below the {{COVERAGE_FLOOR}}% floor"; exit 1; }
 ```
 
+## `bitbucket-pipelines` → `bitbucket-pipelines.yml`
+
+```yaml
+image: golang:1.23
+
+pipelines:
+  default:
+    - step:
+        name: fmt
+        script:
+          - test -z "$(gofmt -l .)" || { gofmt -l .; exit 1; }
+    - step:
+        name: vet
+        script:
+          - go vet ./...
+    - step:
+        name: lint
+        script:
+          - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+          - golangci-lint run
+    - step:
+        name: test
+        script:
+          - go test -race ./...
+    - step:
+        name: coverage
+        script:
+          - go test -coverprofile=cover.out ./...
+          - |
+            pct="$(go tool cover -func=cover.out | tail -1 | awk '{print $3}' | tr -d '%')"
+            awk -v p="$pct" -v f={{COVERAGE_FLOOR}} 'BEGIN { exit (p+0 >= f+0) ? 0 : 1 }' \
+              || { echo "coverage ${pct}% is below the {{COVERAGE_FLOOR}}% floor"; exit 1; }
+```
+
 ## `lefthook` → `.lefthook.yml`
 
 ```yaml

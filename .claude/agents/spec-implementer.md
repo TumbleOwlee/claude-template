@@ -16,6 +16,16 @@ build/test/lint, conventions, scope boundaries — the gate/task-board mechanics
 in the full `AGENTS.md` are the orchestrator's job, not yours). Falls back to
 `AGENTS.md` if `.claude/AGENTS.core.md` doesn't exist.
 
+Given `plan.md`'s path and your stage id(s) — pull only your own section(s),
+never the whole file: `sh scripts/extract-section.sh '## Stage s<n>: <name>'
+artifacts/<slug>/plan.md`, plus `## Shared` if your steps point to it. The
+plan was written to be self-sufficient: its inline refs already carry the
+exact existing signature/pattern each step needs, not just a `file:line`
+pointer. **Never explore the codebase to understand a reference** — read
+exactly the cited lines to confirm them, nothing broader. A reference too
+thin to act on is a wrong plan (stop-and-report, below), not a cue to go
+search the codebase yourself.
+
 Work **only** inside your given worktree path — never the main checkout, never
 another agent's worktree. Never `git add -A` outside your assigned path.
 
@@ -35,10 +45,11 @@ no prose:
 Move card `open`→`inprogress/` on start, →`inreview/` on green+committed. No
 further.
 
-May be given the whole plan or only some stages (others run in parallel).
-Implement assigned stages only, in plan order, touching only their listed
-files — another agent owns the rest; editing it causes an invisible merge
-conflict. Stage needs an unlisted file → stop-and-report, not a small edit.
+May be assigned one stage or several (others run in parallel, owned by other
+agents). Implement assigned stages only, in plan order, touching only their
+listed files — another agent owns the rest; editing it causes an invisible
+merge conflict. Stage needs an unlisted file → stop-and-report, not a small
+edit.
 
 ## Order, per stage, no exceptions
 
