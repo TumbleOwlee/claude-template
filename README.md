@@ -1,12 +1,8 @@
 # Repository Template
 
-A GitHub template repository for projects built with a **spec-driven TDD
-workflow**: an authoritative specification, gated behavior changes, strict
-test-first implementation in isolated worktrees, and an independent review before
-every PR.
+A GitHub template repository for projects built with a **spec-driven TDD workflow**: an authoritative specification, gated behavior changes, strict test-first implementation in isolated worktrees, and an independent review before every PR.
 
-Fork it, run one command, and the workflow is set up for your language and your
-project.
+Fork it, run one command, and the workflow is set up for your language and your project.
 
 ## Use it
 
@@ -27,12 +23,10 @@ If the built-in `/init` answers instead of the bootstrap, use `/init-workspace`.
 The bootstrap asks for:
 
 - project name, one-line description, and kind (library / binary / service / CLI / TUI)
-- language stack — **Rust**, **Python**, **Node/TypeScript**, **Go**, or
-  **C/C++ with CMake** (Make or Ninja) — detected from a manifest where one exists
+- language stack — **Rust**, **Python**, **Node/TypeScript**, **Go**, or **C/C++ with CMake** (Make or Ninja) — detected from a manifest where one exists
 - the exact build / test / lint / coverage commands, for confirmation
 - capability areas and their requirement-ID prefixes (`FR-R-nnn`, `CL-R-nnn`, …)
-- the coverage floor, this project's scope boundaries, and the issue tracker
-  — GitHub (`gh`), Jira (MCP server or REST credentials), local files, or none
+- the coverage floor, this project's scope boundaries, and the issue tracker — GitHub (`gh`), Jira (MCP server or REST credentials), local files, or none
 
 and then writes:
 
@@ -48,22 +42,15 @@ and then writes:
 | `.lefthook.yml` | Pre-commit checks, plus spec and requirement-ID reminders. |
 | `scripts/extract-section.sh` | Prints one markdown section by heading — reads a slice of a spec file instead of the whole thing. |
 
-Finally it deletes `templates/` and its own skill, so the fork looks like a normal
-project.
+Finally it deletes `templates/` and its own skill, so the fork looks like a normal project.
 
 ## The workflow it sets up
 
-`docs/specs/` is normative — code conforms to the spec, not the reverse. Every
-change to observable behavior passes 4 gates (spec diff → tracking issue →
-implementation plan → PR), implemented stage by stage under TDD in an
-isolated git worktree, independently reviewed before merge. Full gate text:
-generated `AGENTS.md` (source: `templates/AGENTS.md.tmpl`).
+`docs/specs/` is normative — code conforms to the spec, not the reverse. Every change to observable behavior passes 4 gates (spec diff → tracking issue → implementation plan → PR), implemented stage by stage under TDD in an isolated git worktree, independently reviewed before merge. Full gate text: generated `AGENTS.md` (source: `templates/AGENTS.md.tmpl`).
 
-State lives on an on-disk task board (`.claude/tasks/`) so an interrupted
-session resumes instead of restarting.
+State lives on an on-disk task board (`.claude/tasks/`) so an interrupted session resumes instead of restarting.
 
-Running one change through it: `/spec-feature`. Product-owner-only slice —
-requirement → spec via conversation → tracking issue, stop: `/spec-request`.
+Running one change through it: `/spec-feature`. Product-owner-only slice — requirement → spec via conversation → tracking issue, stop: `/spec-request`.
 
 ## What ships
 
@@ -82,9 +69,6 @@ templates/                     every generated file, plus one file per stack
 ## Requirements
 
 - [Claude Code](https://claude.com/claude-code)
-- `git` 2.5+ (worktrees), and `gh` (GitHub) or a Jira MCP server / API token
-  if you want the tracking-issue gate backed by a tracker
-- Optionally [lefthook](https://github.com/evilmartians/lefthook) for the
-  pre-commit checks
-- Optionally the caveman plugin for compressed agent output — install command
-  offered by the bootstrap itself (`project-init` step 0)
+- `git` 2.5+ (worktrees), and `gh` (GitHub) or a Jira MCP server / API token if you want the tracking-issue gate backed by a tracker
+- Optionally [lefthook](https://github.com/evilmartians/lefthook) for the pre-commit checks
+- Optionally the caveman plugin for compressed agent output — install command offered by the bootstrap itself (`project-init` step 0)

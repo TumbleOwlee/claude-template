@@ -5,15 +5,11 @@ description: Drive one behavior change through the repo's gated spec-driven TDD 
 
 # Spec-driven feature run
 
-`AGENTS.md` is authority for every gate, the task board, and the subagents —
-read its `## Workflow` section and follow it exactly. This skill is only the
-invocation entrypoint; it does not restate that procedure. Conflict between
-this file and `AGENTS.md` → `AGENTS.md` wins.
+`AGENTS.md` is authority for every gate, the task board, and the subagents — read its `## Workflow` section and follow it exactly. This skill is only the invocation entrypoint; it does not restate that procedure. Conflict between this file and `AGENTS.md` → `AGENTS.md` wins.
 
 ## Before anything else
 
-Check `.claude/tasks/`. Cards outside `open/`+`done/` = a run was interrupted
-→ `AGENTS.md`'s *Resume an interrupted run*, don't start fresh.
+Check `.claude/tasks/`. Cards outside `open/`+`done/` = a run was interrupted → `AGENTS.md`'s *Resume an interrupted run*, don't start fresh.
 
 ## Where each step lives
 

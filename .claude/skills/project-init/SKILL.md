@@ -92,54 +92,28 @@ Also ask, same round:
 
 ## 4b. Issue tracker
 
-Separate `AskUserQuestion`, options **GitHub / Jira / Filesystem / None** —
-each sets `{{ISSUE_WORKFLOW}}` from a different `templates/fragments/` file,
-copy its body verbatim into AGENTS.md's gate 1b section, no paraphrasing.
+Separate `AskUserQuestion`, options **GitHub / Jira / Filesystem / None** — each sets `{{ISSUE_WORKFLOW}}` from a different `templates/fragments/` file, copy its body verbatim into AGENTS.md's gate 1b section, no paraphrasing.
 
-- **GitHub** → `templates/fragments/issue-github.md`. Then check
-  `gh auth status`. Authenticated → continue silently. Not authenticated /
-  `gh` missing → tell the user, give the exact fix (`gh auth login`, or
-  install from [cli.github.com](https://cli.github.com)); don't block the
-  rest of setup on it, gate 1b will fail loudly on its own later if unfixed.
-- **Jira** → second `AskUserQuestion`: **MCP server** or **API credentials**.
-  - MCP → `templates/fragments/issue-jira-mcp.md`. Ask the user to confirm a
-    Jira MCP server is already configured (`claude mcp list`); if not, tell
-    them to add one before running gate 1b — don't block bootstrap on it, no
-    standard install command to fall back on.
-  - Credentials → `templates/fragments/issue-jira-credentials.md`. Collect
-    **Jira base URL**, **email**, **API token** via `AskUserQuestion`, one
-    call, up to 3 questions batched — each with a best-guess option (base URL
-    from the org/repo name, email from git config) so confirming is one click
-    and the exact value always goes through `Other`. Write the answers
-    verbatim to `.claude/jira.local.json`:
+- **GitHub** → `templates/fragments/issue-github.md`. Then check `gh auth status`. Authenticated → continue silently. Not authenticated / `gh` missing → tell the user, give the exact fix (`gh auth login`, or install from [cli.github.com](https://cli.github.com)); don't block the rest of setup on it, gate 1b will fail loudly on its own later if unfixed.
+- **Jira** → second `AskUserQuestion`: **MCP server** or **API credentials**. - MCP → `templates/fragments/issue-jira-mcp.md`. Ask the user to confirm a Jira MCP server is already configured (`claude mcp list`); if not, tell them to add one before running gate 1b — don't block bootstrap on it, no standard install command to fall back on. - Credentials → `templates/fragments/issue-jira-credentials.md`. Collect **Jira base URL**, **email**, **API token** via `AskUserQuestion`, one call, up to 3 questions batched — each with a best-guess option (base URL from the org/repo name, email from git config) so confirming is one click and the exact value always goes through `Other`. Write the answers verbatim to `.claude/jira.local.json`:
     ```json
     { "baseUrl": "https://your-domain.atlassian.net", "email": "you@example.com", "apiToken": "..." }
     ```
-    Never echo the token back in chat once written. `.gitignore` already
-    carries `.claude/jira.local.json` unconditionally (ships in the template
-    itself) — nothing more to do here.
-- **Filesystem** → `templates/fragments/issue-filesystem.md`. No credentials,
-  no external check. Ensure `.claude/issues/.gitkeep` gets created in step 7
-  so the empty directory is tracked.
+    Never echo the token back in chat once written. `.gitignore` already carries `.claude/jira.local.json` unconditionally (ships in the template itself) — nothing more to do here.
+- **Filesystem** → `templates/fragments/issue-filesystem.md`. No credentials, no external check. Ensure `.claude/issues/.gitkeep` gets created in step 7 so the empty directory is tracked.
 - **None** → `templates/fragments/issue-none.md`. `{{CLOSES_CLAUSE}}` empty.
 
-`{{CLOSES_CLAUSE}}` per choice: GitHub → `` , `Closes #<issue>` `` · Jira →
-`, references <ISSUE-KEY>` · Filesystem → empty (PR body already carries the
-goal) · None → empty.
+`{{CLOSES_CLAUSE}}` per choice: GitHub → `` , `Closes #<issue>` `` · Jira → `, references <ISSUE-KEY>` · Filesystem → empty (PR body already carries the goal) · None → empty.
 
 ## 4c. Bitbucket credentials
 
-Only runs if step 1 detected `bitbucket.org` as the remote host — independent
-of the step 4b tracker choice (Bitbucket here is the *PR host*, gate 4; a
-project can still track issues in Jira or nowhere).
+Only runs if step 1 detected `bitbucket.org` as the remote host — independent of the step 4b tracker choice (Bitbucket here is the *PR host*, gate 4; a project can still track issues in Jira or nowhere).
 
 `AskUserQuestion`: **set up Bitbucket credentials now** or **skip**.
 
 Skip → `{{PR_OPEN_LINE}}` = the manual variant (step 1). No file written.
 
-Set up → collect via `AskUserQuestion`, one call, batched, each with a
-best-guess option pre-filled from the remote URL / git config, exact value
-via `Other`:
+Set up → collect via `AskUserQuestion`, one call, batched, each with a best-guess option pre-filled from the remote URL / git config, exact value via `Other`:
 
 - **Workspace** — the segment right after `bitbucket.org/` in the remote URL.
 - **Repo slug** — the segment after the workspace.
@@ -150,12 +124,7 @@ Write verbatim to `.claude/bitbucket.local.json`:
 ```json
 { "workspace": "...", "repoSlug": "...", "username": "...", "appPassword": "..." }
 ```
-Never echo the app password back in chat once written. `.gitignore` already
-carries `.claude/bitbucket.local.json` unconditionally — nothing more to do
-here. Sets `{{PR_OPEN_LINE}}` = `` Open via the Bitbucket REST API
-(`/2.0/repositories/<workspace>/<repo>/pullrequests`), using
-`.claude/bitbucket.local.json`. `` — substitute the real `<workspace>`/`<repo>`
-values, not the literal placeholders.
+Never echo the app password back in chat once written. `.gitignore` already carries `.claude/bitbucket.local.json` unconditionally — nothing more to do here. Sets `{{PR_OPEN_LINE}}` = `` Open via the Bitbucket REST API (`/2.0/repositories/<workspace>/<repo>/pullrequests`), using `.claude/bitbucket.local.json`. `` — substitute the real `<workspace>`/`<repo>` values, not the literal placeholders.
 
 ## 5. Ask the scope boundaries
 
@@ -197,21 +166,15 @@ Four things substitution alone doesn't handle:
 | stack file's `lefthook` block | `.lefthook.yml` — always, host-agnostic |
 | stack file's `config` blocks | stack config files (e.g. `clippy.toml`, `ruff.toml`) — only those the stack file marks as default |
 
-Other host or no remote (step 1) → write neither CI file; note in the final
-report (step 9) that CI is unset up and must be added by hand for this host.
+Other host or no remote (step 1) → write neither CI file; note in the final report (step 9) that CI is unset up and must be added by hand for this host.
 
 Also append the stack's build artifacts to `.gitignore` (`target/` for Rust, `node_modules/` and `dist/` for Node, `.venv/`, `__pycache__/`, `.pytest_cache/`, `.mypy_cache/` for Python, `cover.out` for Go, `build/` for CMake). The template `.gitignore` carries only language-agnostic entries and a comment saying so — replace that comment with the real entries.
 
-**Jira credentials chosen (step 4b):** write `.claude/jira.local.json` with the
-three values collected, exact content, no placeholders left in it — this file
-holds a live secret, never goes through the `.tmpl` substitution pass.
+**Jira credentials chosen (step 4b):** write `.claude/jira.local.json` with the three values collected, exact content, no placeholders left in it — this file holds a live secret, never goes through the `.tmpl` substitution pass.
 
-**Filesystem tracker chosen:** create `.claude/issues/.gitkeep` so the empty
-directory survives the initial commit.
+**Filesystem tracker chosen:** create `.claude/issues/.gitkeep` so the empty directory survives the initial commit.
 
-**Bitbucket credentials chosen (step 4c):** write `.claude/bitbucket.local.json`
-with the four values collected, exact content, no placeholders left in it —
-live secret, never goes through the `.tmpl` substitution pass.
+**Bitbucket credentials chosen (step 4c):** write `.claude/bitbucket.local.json` with the four values collected, exact content, no placeholders left in it — live secret, never goes through the `.tmpl` substitution pass.
 
 Placeholders used across templates:
 
@@ -257,8 +220,7 @@ Do **not** create the language manifest (`Cargo.toml`, `package.json`, …) or a
 
 ## 8. Remove the template scaffolding
 
-Delete `templates/`, `.claude/skills/project-init/` and `.claude/skills/init-workspace/`.
-Keep `.claude/agents/`, remaining `.claude/skills/`, `.claude/tasks/` and `.claude/settings.json` — the workflow uses them. Do not delete `.git`, do not commit — leave the working tree dirty so the user reviews the diff.
+Delete `templates/`, `.claude/skills/project-init/` and `.claude/skills/init-workspace/`. Keep `.claude/agents/`, remaining `.claude/skills/`, `.claude/tasks/` and `.claude/settings.json` — the workflow uses them. Do not delete `.git`, do not commit — leave the working tree dirty so the user reviews the diff.
 
 ## 9. Report and hand over
 

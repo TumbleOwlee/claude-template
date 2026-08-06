@@ -5,16 +5,9 @@ description: PO-facing entrypoint — derive spec text from a requirement via di
 
 # Spec request (PO-facing)
 
-`AGENTS.md` is authority for gate 1 and gate 1b — read `### Gate 1` and
-`### Gate 1b` and follow them exactly. This skill is only the invocation
-entrypoint; it does not restate that procedure. Conflict between this file
-and `AGENTS.md` → `AGENTS.md` wins.
+`AGENTS.md` is authority for gate 1 and gate 1b — read `### Gate 1` and `### Gate 1b` and follow them exactly. This skill is only the invocation entrypoint; it does not restate that procedure. Conflict between this file and `AGENTS.md` → `AGENTS.md` wins.
 
-Single-session, no resume: skip gate 1's **Board** bullet entirely — no
-`open/<slug>.md`, `artifacts/<slug>/`, `spec-diff.md`, or task card. The
-ticket from gate 1b is the only artifact produced; approved spec text lives
-in its self-contained body, not `docs/specs/` (main only holds spec for code
-that already exists).
+Single-session, no resume: skip gate 1's **Board** bullet entirely — no `open/<slug>.md`, `artifacts/<slug>/`, `spec-diff.md`, or task card. The ticket from gate 1b is the only artifact produced; approved spec text lives in its self-contained body, not `docs/specs/` (main only holds spec for code that already exists).
 
 ## Where each step lives
 
@@ -25,6 +18,4 @@ that already exists).
 
 ## Stop condition
 
-Stop once the ticket exists — never gate 2, never `spec-planner`, never a
-worktree. Developer picks it up later via `/spec-feature` or `spec-planner`
-directly; out of scope here.
+Stop once the ticket exists — never gate 2, never `spec-planner`, never a worktree. Developer picks it up later via `/spec-feature` or `spec-planner` directly; out of scope here.
