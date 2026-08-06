@@ -200,7 +200,7 @@ Four things substitution alone doesn't handle:
 Other host or no remote (step 1) → write neither CI file; note in the final
 report (step 9) that CI is unset up and must be added by hand for this host.
 
-Also append the stack's build artifacts to `.gitignore` (`target/` for Rust, `node_modules/` and `dist/` for Node, `.venv/`, `__pycache__/`, `.pytest_cache/`, `.mypy_cache/` for Python, `cover.out` for Go, `build/` for CMake). The template `.gitignore` carries only language-agnostic entries and a comment saying so — replace that comment with the real entries. `.claude/jira.local.json` is already ignored unconditionally — no per-tracker action needed.
+Also append the stack's build artifacts to `.gitignore` (`target/` for Rust, `node_modules/` and `dist/` for Node, `.venv/`, `__pycache__/`, `.pytest_cache/`, `.mypy_cache/` for Python, `cover.out` for Go, `build/` for CMake). The template `.gitignore` carries only language-agnostic entries and a comment saying so — replace that comment with the real entries.
 
 **Jira credentials chosen (step 4b):** write `.claude/jira.local.json` with the
 three values collected, exact content, no placeholders left in it — this file

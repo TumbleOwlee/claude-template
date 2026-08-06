@@ -62,7 +62,8 @@ generated `AGENTS.md` (source: `templates/AGENTS.md.tmpl`).
 State lives on an on-disk task board (`.claude/tasks/`) so an interrupted
 session resumes instead of restarting.
 
-Running one change through it: `/spec-feature`.
+Running one change through it: `/spec-feature`. Product-owner-only slice —
+requirement → spec via conversation → tracking issue, stop: `/spec-request`.
 
 ## What ships
 
@@ -70,6 +71,7 @@ Running one change through it: `/spec-feature`.
 .claude/skills/project-init/   the bootstrap (self-deleting)
 .claude/skills/init-workspace/ alias, avoids the built-in /init
 .claude/skills/spec-feature/   drives one change through the gates
+.claude/skills/spec-request/   PO-only slice: requirement -> spec -> ticket, stop
 .claude/skills/context-audit/  finds what's re-read a lot, suggests scripts to cut it
 .claude/agents/                spec-planner, spec-implementer, spec-reviewer
 .claude/tasks/                 task board, empty until the first run
