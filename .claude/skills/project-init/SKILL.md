@@ -31,7 +31,7 @@ Optional — don't block on it. Continue to step 1 either way.
 
 ## 1. Detect state
 
-Check what exists: `AGENTS.md`, `CLAUDE.md`, `PRD.md`, `ARCHITECTURE.md`, `CONTRIBUTING.md`, `README.md`, `docs/specs/`, `.github/workflows/`, `bitbucket-pipelines.yml`, `.lefthook.yml`, any language manifest (`Cargo.toml`, `package.json`, `pyproject.toml`, `setup.py`, `go.mod`, `CMakeLists.txt`).
+Check what exists: `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `PRD.md`, `ARCHITECTURE.md`, `CONTRIBUTING.md`, `README.md`, `docs/specs/`, `.github/workflows/`, `bitbucket-pipelines.yml`, `.lefthook.yml`, any language manifest (`Cargo.toml`, `package.json`, `pyproject.toml`, `setup.py`, `go.mod`, `CMakeLists.txt`).
 
 Pristine fork = only bootstrap `CLAUDE.md`, `README.md`, `templates/`, `.claude/` — treat these as template scaffolding to replace, not user content; don't ask about them.
 
@@ -155,6 +155,7 @@ Four things substitution alone doesn't handle:
 |---|---|
 | `templates/AGENTS.md.tmpl` | `AGENTS.md`, plus derived `.claude/AGENTS.core.md` (see above) |
 | `templates/CLAUDE.md` | `CLAUDE.md` (static — copy as-is, replaces the bootstrap one) |
+| `templates/.github/copilot-instructions.md` | `.github/copilot-instructions.md` (static — copy as-is, same router pattern for GitHub Copilot) |
 | `templates/PRD.md.tmpl` | `PRD.md` |
 | `templates/ARCHITECTURE.md.tmpl` | `ARCHITECTURE.md` |
 | `templates/CONTRIBUTING.md.tmpl` | `CONTRIBUTING.md` |

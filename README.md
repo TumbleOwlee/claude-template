@@ -34,6 +34,7 @@ and then writes:
 |---|---|
 | `AGENTS.md` | The workflow and conventions. The file agents read first. |
 | `CLAUDE.md` | Thin router into `AGENTS.md`. |
+| `.github/copilot-instructions.md` | Same router, for GitHub Copilot. |
 | `PRD.md` | Why the project exists — goals, non-goals, users. |
 | `ARCHITECTURE.md` | Module map, data flow, concurrency, testing seams. |
 | `CONTRIBUTING.md` | The human-facing version of the same rules. |
@@ -50,7 +51,7 @@ Finally it deletes `templates/` and its own skill, so the fork looks like a norm
 
 State lives on an on-disk task board (`.claude/tasks/`) so an interrupted session resumes instead of restarting.
 
-Running one change through it: `/spec-feature`. Product-owner-only slice — requirement → spec via conversation → tracking issue, stop: `/spec-request`.
+Running one change through it: `/spec-feature`. Product-owner-only slice — requirement → spec via conversation → tracking issue, stop: `/spec-request`. Independent second-developer review of a finished PR against its ticket, standalone from the implementing session: `/spec-review`.
 
 ## What ships
 
@@ -59,6 +60,7 @@ Running one change through it: `/spec-feature`. Product-owner-only slice — req
 .claude/skills/init-workspace/ alias, avoids the built-in /init
 .claude/skills/spec-feature/   drives one change through the gates
 .claude/skills/spec-request/   PO-only slice: requirement -> spec -> ticket, stop
+.claude/skills/spec-review/    standalone reviewer: ticket + PR -> review, stop
 .claude/skills/context-audit/  finds what's re-read a lot, suggests scripts to cut it
 .claude/agents/                spec-planner, spec-implementer, spec-reviewer
 .claude/tasks/                 task board, empty until the first run
