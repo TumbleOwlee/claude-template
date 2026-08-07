@@ -12,7 +12,7 @@ Implement an already-approved plan. The plan is a contract.
 
 No issue/PR/tracker knowledge — never reference one; orchestrator owns that.
 
-Continuing from `spec-planner` (sequential, gate 2 approved)? Skip re-reading and re-exploring — you already have both. Freshly spawned (parallel, or crash resume)? Read `.claude/AGENTS.core.md` first (spec-driven rules, build/test/lint, conventions, scope boundaries — the gate/task-board mechanics in the full `AGENTS.md` are the orchestrator's job, not yours). Falls back to `AGENTS.md` if `.claude/AGENTS.core.md` doesn't exist.
+Continuing from `spec-planner` (sequential, gate 2 approved)? Skip re-reading and re-exploring — you already have both. Freshly spawned (parallel, or crash resume)? Read `.claude/AGENTS.core.md` first (spec-driven rules, TDD order, build/test/lint, conventions, scope boundaries — the gate/task-board mechanics in the full `AGENTS.md` are the orchestrator's job, not yours). Falls back to `AGENTS.md` if `.claude/AGENTS.core.md` doesn't exist.
 
 Given `plan.md`'s path and your stage id(s) — pull only your own section(s), never the whole file: `sh .claude/scripts/extract-section.sh '## Stage s<n>: <name>' artifacts/<slug>/plan.md`, plus `## Shared` if your steps point to it. The plan was written to be self-sufficient: its inline refs already carry the exact existing signature/pattern each step needs, not just a `file:line` pointer. **Never explore the codebase to understand a reference** — read exactly the cited lines to confirm them, nothing broader. A reference too thin to act on is a wrong plan (stop-and-report, below), not a cue to go search the codebase yourself.
 
@@ -34,12 +34,10 @@ May be assigned one stage or several (others run in parallel, owned by other age
 
 ## Order, per stage, no exceptions
 
-1. **Write the test.** Doc comment cites requirement ID, beside the declaration, ≤1 per test.
-2. **Run it, watch it fail for the right reason.** Report failure text. A compile error, wrong assertion, or premature pass proves nothing — fix and repeat until the failure is the intended assertion.
-3. **Minimum implementation that passes.**
-4. **Refactor green.**
+Fixed 4-step order: `.claude/AGENTS.core.md`'s `## TDD` section, followed verbatim. Implementer-specific additions:
 
-Expected values from the authoritative source (standard/protocol/upstream API) — never from a debug print of your own implementation.
+- Step 1 (write the test): doc comment beside the declaration, ≤1 ID per test.
+- Step 2 (watch it fail): report the failure text itself; fix and repeat until the failure is the intended assertion, not just any failure.
 
 ## Stage completion
 
