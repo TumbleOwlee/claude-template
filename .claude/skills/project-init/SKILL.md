@@ -164,6 +164,7 @@ Four things substitution alone doesn't handle:
 | `templates/docs/specs/non-functional-requirements.md` | `docs/specs/non-functional-requirements.md` (static — copy as-is) |
 | `templates/docs/specs/area/*.tmpl` | `docs/specs/<area>/*` — once per area, per step 4 |
 | `templates/.claude/scripts/extract-section.sh` | `.claude/scripts/extract-section.sh` (static — copy as-is, `chmod +x`) |
+| `templates/.claude/scripts/extract-id.sh` | `.claude/scripts/extract-id.sh` (static — copy as-is, `chmod +x`) |
 | `templates/.claude/scripts/list-sections.sh` | `.claude/scripts/list-sections.sh` (static — copy as-is, `chmod +x`) |
 | `templates/.claude/scripts/token-rank.sh` | `.claude/scripts/token-rank.sh` (static — copy as-is, `chmod +x`) |
 | `templates/.claude/scripts/failed-workflow.sh` | `.claude/scripts/failed-workflow.sh` (static — copy as-is, `chmod +x`) — CI backend auto-detected at runtime from `.github/workflows/*.yml` (GitHub Actions) vs `bitbucket-pipelines.yml` (Bitbucket Pipelines, needs `.claude/bitbucket.local.json`) |

@@ -18,7 +18,7 @@ Router for AI coding agents. Read first.
 - Pre-existing spec/code disagreement outside your task: stop, raise separately. Folding it in widens approved work, skips its own review.
 - Specs carry no `file:line`. Locate code with search tools.
 - Requirement IDs stable, append-only. Cite in commits and PRs.
-- One requirement, one physical line, never wrapped — find any by `grep -rn <ID or keyword> docs/specs/`. Read one section of a large spec file instead of the whole thing: `sh .claude/scripts/extract-section.sh '## <heading>' path/to/file.md`.
+- One requirement, one physical line, never wrapped — find any by `grep -rn <ID or keyword> docs/specs/`, or with the exact file:line to edit: `sh .claude/scripts/extract-id.sh <ID> [<ID> ...]` (batch every ID needed into one call). Read one section of a large spec file instead of the whole thing: `sh .claude/scripts/extract-section.sh '## <heading>' path/to/file.md`.
 <!-- CORE:END spec-driven -->
 
 <!-- CORE:BEGIN tdd -->

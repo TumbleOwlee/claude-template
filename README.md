@@ -41,7 +41,8 @@ and then writes:
 | `docs/specs/` | The authoritative specification, one directory per area. |
 | `.github/workflows/check.yml` or `bitbucket-pipelines.yml` | fmt / lint / types / test / coverage gates — whichever matches the detected remote host. |
 | `.lefthook.yml` | Pre-commit checks, plus spec and requirement-ID reminders. |
-| `.claude/scripts/extract-section.sh` | Prints one markdown section by heading — reads a slice of a spec file instead of the whole thing. |
+| `.claude/scripts/extract-section.sh` | Prints one or more markdown sections by heading — reads a slice of a spec file instead of the whole thing. |
+| `.claude/scripts/extract-id.sh` | Finds one or more requirements by ID, prints `file:line:text` each — exact spot to edit, no guessing which file it's in. |
 | `.claude/scripts/list-sections.sh` | Lists a markdown file's headings verbatim, so an agent knows what `extract-section.sh` can pull without grepping first. |
 | `.claude/scripts/token-rank.sh` | Ranks given files by rough token cost of a full Read (`chars/4`), highest first. |
 | `.claude/scripts/failed-workflow.sh` | Prints the error output of the most recent failed CI run on a branch — GitHub Actions or Bitbucket Pipelines, auto-detected. |
