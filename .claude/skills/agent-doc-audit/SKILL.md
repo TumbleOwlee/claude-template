@@ -32,6 +32,7 @@ Before proposing a split, the section earning it has to justify the extra file. 
 - Hedging / filler words (basically, essentially, in order to, it's worth noting).
 - Any explanation of *what* code does where a reader could get that from names alone — only *why* (non-obvious constraint, workaround, invariant) earns a sentence.
 - Repeated instructions across two files where one could `@`-include or cross-reference the other instead of restating.
+- Every trim: check zero information loss. Fewer words for the same fact — never a dropped constraint, edge case, or rule. A trim that loses a fact is a bug, not a fix.
 
 `.claude/scripts/token-rank.sh <file>...` (if the project has it) gives rough per-file cost to prioritize which candidates matter most. Trim-first, split-second: a bloated section split in two is two bloated files — flag the trim regardless of whether the split also happens.
 
