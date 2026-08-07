@@ -42,6 +42,8 @@ and then writes:
 | `.github/workflows/check.yml` or `bitbucket-pipelines.yml` | fmt / lint / types / test / coverage gates — whichever matches the detected remote host. |
 | `.lefthook.yml` | Pre-commit checks, plus spec and requirement-ID reminders. |
 | `.claude/scripts/extract-section.sh` | Prints one markdown section by heading — reads a slice of a spec file instead of the whole thing. |
+| `.claude/scripts/list-sections.sh` | Lists a markdown file's headings verbatim, so an agent knows what `extract-section.sh` can pull without grepping first. |
+| `.claude/scripts/token-rank.sh` | Ranks given files by rough token cost of a full Read (`chars/4`), highest first. |
 | `.claude/scripts/failed-workflow.sh` | Prints the error output of the most recent failed CI run on a branch — GitHub Actions or Bitbucket Pipelines, auto-detected. |
 | `.claude/scripts/issue-view.sh` | Prints an issue's title, body, and comments in compact plain text — Jira or GitHub, auto-detected. |
 
@@ -60,16 +62,17 @@ Running one change through it: `/spec-feature`. Product-owner-only slice — req
 ## What ships
 
 ```
-.claude/skills/project-init/   the bootstrap (self-deleting)
-.claude/skills/init-workspace/ alias, avoids the built-in /init
-.claude/skills/spec-feature/   drives one change through the gates
-.claude/skills/spec-request/   PO-only slice: requirement -> spec -> ticket, stop
-.claude/skills/spec-review/    standalone reviewer: ticket + PR -> review, stop
-.claude/skills/context-audit/  finds what's re-read a lot, suggests scripts to cut it
-.claude/agents/                spec-planner, spec-implementer, spec-reviewer
-.claude/tasks/                 task board, empty until the first run
-.claude/settings.json          SessionStart hook: flags an interrupted run
-templates/                     every generated file, plus one file per stack
+.claude/skills/project-init/     the bootstrap (self-deleting)
+.claude/skills/init-workspace/   alias, avoids the built-in /init
+.claude/skills/spec-feature/     drives one change through the gates
+.claude/skills/spec-request/     PO-only slice: requirement -> spec -> ticket, stop
+.claude/skills/spec-review/      standalone reviewer: ticket + PR -> review, stop
+.claude/skills/context-audit/    finds what's re-read a lot, suggests scripts to cut it
+.claude/skills/agent-doc-audit/  checks agent docs for bloat and split-worthy sections
+.claude/agents/                  spec-planner, spec-implementer, spec-reviewer
+.claude/tasks/                   task board, empty until the first run
+.claude/settings.json            SessionStart hook: flags an interrupted run
+templates/                       every generated file, plus one file per stack
 ```
 
 ## Requirements

@@ -1,7 +1,8 @@
 #!/bin/sh
 # Print one markdown section: the heading line through the next heading of
 # equal or shallower depth (or EOF). Lets an agent read a slice of a file
-# instead of the whole thing.
+# instead of the whole thing. Don't know the exact heading text? Run
+# list-sections.sh on the file first instead of grepping for it.
 #
 # Usage: sh scripts/extract-section.sh '### Heading text' path/to/file.md
 set -eu

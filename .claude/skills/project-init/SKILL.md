@@ -164,6 +164,8 @@ Four things substitution alone doesn't handle:
 | `templates/docs/specs/non-functional-requirements.md` | `docs/specs/non-functional-requirements.md` (static — copy as-is) |
 | `templates/docs/specs/area/*.tmpl` | `docs/specs/<area>/*` — once per area, per step 4 |
 | `templates/.claude/scripts/extract-section.sh` | `.claude/scripts/extract-section.sh` (static — copy as-is, `chmod +x`) |
+| `templates/.claude/scripts/list-sections.sh` | `.claude/scripts/list-sections.sh` (static — copy as-is, `chmod +x`) |
+| `templates/.claude/scripts/token-rank.sh` | `.claude/scripts/token-rank.sh` (static — copy as-is, `chmod +x`) |
 | `templates/.claude/scripts/failed-workflow.sh` | `.claude/scripts/failed-workflow.sh` (static — copy as-is, `chmod +x`) — CI backend auto-detected at runtime from `.github/workflows/*.yml` (GitHub Actions) vs `bitbucket-pipelines.yml` (Bitbucket Pipelines, needs `.claude/bitbucket.local.json`) |
 | `templates/.claude/scripts/issue-view.sh` | `.claude/scripts/issue-view.sh` (static — copy as-is, `chmod +x`) — tracker auto-detected at runtime from `.claude/jira.local.json` presence (Jira) vs absence (GitHub, via `gh`). Note in the final report: if this script or `failed-workflow.sh` ever falls short of what's needed, never fall back to raw `gh`/`git`/`curl` commands — stop and report the shortfall to the user instead. |
 | stack file's `ci` block | `.github/workflows/check.yml` — **only if step 1's remote is `github.com`** |

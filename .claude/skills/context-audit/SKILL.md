@@ -43,7 +43,7 @@ jq -s '
 
 ## 3. Flag waste patterns
 
-- **Full-file re-read, same file, ≥3 times in one session, no `Edit` in between two of them** — file didn't change, content was re-fetched anyway. Check the file's own structure (headings, JSON keys, log sections) against what the agent quoted right after each Read — if only one part was ever used, that's an `extract-section.sh` candidate (or a JSON/log equivalent: `jq`, `awk` slice).
+- **Full-file re-read, same file, ≥3 times in one session, no `Edit` in between two of them** — file didn't change, content was re-fetched anyway. Check the file's own structure (headings, JSON keys, log sections) against what the agent quoted right after each Read — if only one part was ever used, that's an `extract-section.sh` candidate (or a JSON/log equivalent: `jq`, `awk` slice). `.claude/scripts/token-rank.sh <file>...` (if the project has it) gives a quick rough cost per file to prioritize which repeat offenders are worth fixing first.
 - **Large file (`wc -l` it) read whole when the same heading/keyword recurs across sessions** — same pattern, seen over time instead of in one session.
 - **Repeated identical `Bash` command** — deterministic, cacheable output (`git log`, a version check) re-run instead of reasoned from a prior result already in context. Not a script problem — note separately, the fix is behavioral, don't recommend a script for it.
 - **`Grep` with a large match count, re-run later in the same session with an added `-l`/path filter** — the first call's output was too big to use directly; narrowing came a call too late.
