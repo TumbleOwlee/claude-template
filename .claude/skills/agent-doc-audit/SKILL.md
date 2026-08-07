@@ -46,4 +46,6 @@ Two tables, most-costly first (`token-rank.sh` order where available):
 
 One line each, no praise, no summary paragraph. If a proposed split's new file would end up under ~10 lines, say so and recommend a heading instead of a file — splitting past that point adds cross-reference upkeep for a slice `extract-section.sh` could already pull cheaply from the shared file.
 
+Report only improvements found. A table with nothing to put in it collapses to "none" — never a reason why, never "already good," never a paragraph explaining the scan came up empty.
+
 Do not create or edit anything here. If the user approves a specific split, make the new file's headings match exactly what the citing agent instructions already name (or update those instructions in the same change, never leave them pointing at a heading that moved).

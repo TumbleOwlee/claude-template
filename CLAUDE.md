@@ -8,10 +8,7 @@ Do not write a codebase-summary CLAUDE.md — no codebase exists. Read
 [`.claude/skills/project-init/SKILL.md`](./.claude/skills/project-init/SKILL.md)
 and follow it end to end (also `/init-workspace`, `/project-init`).
 
-Asks: project name, purpose, stack, capability areas, coverage floor, scope
-boundaries. Generates `AGENTS.md`, `CLAUDE.md`, `PRD.md`, `ARCHITECTURE.md`,
-`CONTRIBUTING.md`, `README.md`, `docs/specs/`, CI, git hooks from
-[`templates/`](./templates/). Deletes itself after.
+See its frontmatter `description` for what it asks and generates.
 
 ## What this is
 
