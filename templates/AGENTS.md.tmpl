@@ -104,6 +104,7 @@ Rules:
 - **Runnable** = every `blocked-by` id in `done/`. Stage `done` = merged into the feature branch ("the code I depend on is on the branch I branch from").
 - No `blocked/` directory — blocking derives from `blocked-by`, stated once.
 - Card is evidence of intent, never fact. Git is fact. See *Resume*.
+- `done/` is a resting spot for a run in progress, not a permanent record — every card for the run is deleted once the PR is merged. See *Merge*.
 
 ### Gate 1 — spec diff. Orchestrator runs this itself. Stop for approval.
 
@@ -200,6 +201,8 @@ git worktree list   # nothing under .claude/worktrees/ should remain
 ```
 
 Per-wave worktrees are already removed at wave end; this sweep catches stragglers from a stopped agent. Parent card → `done/` — no card for this run stays outside `done/`.
+
+Merged and worktrees clean → **delete every card for this run** (stage cards, wave-gate cards, parent card): `done/` was only ever a resting spot, never the archive. Then ask the user for final "work done" approval — a distinct question from gate 4's PR approval. Approved → also delete `artifacts/<slug>/` (`spec-diff.md`, `plan.md`, `review.md`) for a clean slate. Declined → leave cards and artifacts in place; whatever prompted the decline gets sorted out before either is removed.
 
 ### Resume an interrupted run
 
