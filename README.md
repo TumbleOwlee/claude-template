@@ -76,6 +76,10 @@ Running one change through it: `/spec-feature`. Product-owner-only slice — req
 templates/                       every generated file, plus one file per stack
 ```
 
+## Maintaining this template
+
+Descendant projects run the workflow for real and sometimes improve on it — a sharper agent rule, a fixed script, a Merge-step fix nobody thought of at bootstrap time. `.claude/skills/template-harvest/` (this repo only, self-deleting like `project-init`) points at one or more descendant paths and reports what's worth backporting here, without touching either side — you apply findings by hand.
+
 ## Requirements
 
 - [Claude Code](https://claude.com/claude-code)

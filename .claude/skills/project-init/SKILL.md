@@ -228,7 +228,7 @@ Do **not** create the language manifest (`Cargo.toml`, `package.json`, …) or a
 
 ## 8. Remove the template scaffolding
 
-Delete `templates/`, `.claude/skills/project-init/` and `.claude/skills/init-workspace/`. Keep `.claude/agents/`, remaining `.claude/skills/`, `.claude/tasks/` and `.claude/settings.json` — the workflow uses them. Do not delete `.git`, do not commit — leave the working tree dirty so the user reviews the diff.
+Delete `templates/`, `.claude/skills/project-init/`, `.claude/skills/init-workspace/` and `.claude/skills/template-harvest/` — the last is this repo's own meta-tool for auditing template descendants; a descendant has nothing to audit. Keep `.claude/agents/`, remaining `.claude/skills/`, `.claude/tasks/` and `.claude/settings.json` — the workflow uses them. Do not delete `.git`, do not commit — leave the working tree dirty so the user reviews the diff.
 
 ## 9. Report and hand over
 

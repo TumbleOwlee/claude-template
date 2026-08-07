@@ -23,6 +23,7 @@ counts as verification.
 | Path | Purpose |
 |---|---|
 | `.claude/skills/project-init/` | Bootstrap. Deleted after run. |
+| `.claude/skills/template-harvest/` | Audits a template descendant for improvements to backport here. This repo only — deleted after bootstrap, same as `project-init`. |
 | `.claude/skills/spec-feature/` | Drives one behavior change through gates. Kept. |
 | `.claude/agents/` | `spec-planner`, `spec-implementer`, `spec-reviewer`. Kept. |
 | `templates/` | Source for generated files. Deleted after bootstrap. |
