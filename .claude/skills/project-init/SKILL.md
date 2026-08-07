@@ -165,6 +165,7 @@ Four things substitution alone doesn't handle:
 | `templates/docs/specs/area/*.tmpl` | `docs/specs/<area>/*` — once per area, per step 4 |
 | `templates/.claude/scripts/extract-section.sh` | `.claude/scripts/extract-section.sh` (static — copy as-is, `chmod +x`) |
 | `templates/.claude/scripts/failed-workflow.sh` | `.claude/scripts/failed-workflow.sh` (static — copy as-is, `chmod +x`) — **only if step 1's remote is `github.com`** (uses `gh run`/`gh api`, GitHub-only) |
+| `templates/.claude/scripts/issue-view.sh` | `.claude/scripts/issue-view.sh` (static — copy as-is, `chmod +x`) — **only if step 4b's tracker is GitHub** (uses `gh issue view`, GitHub-only). Note in the final report: if this script or `failed-workflow.sh` ever falls short of what's needed, never fall back to raw `gh`/`git` commands — stop and report the shortfall to the user instead. |
 | stack file's `ci` block | `.github/workflows/check.yml` — **only if step 1's remote is `github.com`** |
 | stack file's `bitbucket-pipelines` block | `bitbucket-pipelines.yml` — **only if step 1's remote is `bitbucket.org`** |
 | stack file's `lefthook` block | `.lefthook.yml` — always, host-agnostic |
