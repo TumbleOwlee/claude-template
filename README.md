@@ -42,10 +42,10 @@ and then writes:
 | `.github/workflows/check.yml` or `bitbucket-pipelines.yml` | fmt / lint / types / test / coverage gates — whichever matches the detected remote host. |
 | `.lefthook.yml` | Pre-commit checks, plus spec and requirement-ID reminders. |
 | `.claude/scripts/extract-section.sh` | Prints one markdown section by heading — reads a slice of a spec file instead of the whole thing. |
-| `.claude/scripts/failed-workflow.sh` | Prints the error output of the most recent failed GitHub Actions run on a branch (GitHub remote only). |
-| `.claude/scripts/issue-view.sh` | Prints an issue's title, body, and comments in compact plain text (GitHub issue tracker only). |
+| `.claude/scripts/failed-workflow.sh` | Prints the error output of the most recent failed CI run on a branch — GitHub Actions or Bitbucket Pipelines, auto-detected. |
+| `.claude/scripts/issue-view.sh` | Prints an issue's title, body, and comments in compact plain text — Jira or GitHub, auto-detected. |
 
-`failed-workflow.sh` and `issue-view.sh`: if a script's output isn't enough (multiple failed jobs, huge issue thread, unexpected `gh` error), never fall back to raw `gh`/`git` commands to fill the gap — stop and report the shortfall to the user.
+`failed-workflow.sh` and `issue-view.sh`: if a script's output isn't enough (multiple failed jobs, huge issue thread, unexpected API error), never fall back to raw `gh`/`git`/`curl` commands to fill the gap — stop and report the shortfall to the user.
 
 Finally it deletes `templates/` and its own skill, so the fork looks like a normal project.
 
