@@ -164,6 +164,7 @@ Four things substitution alone doesn't handle:
 | `templates/docs/specs/non-functional-requirements.md` | `docs/specs/non-functional-requirements.md` (static — copy as-is) |
 | `templates/docs/specs/area/*.tmpl` | `docs/specs/<area>/*` — once per area, per step 4 |
 | `templates/.claude/scripts/extract-section.sh` | `.claude/scripts/extract-section.sh` (static — copy as-is, `chmod +x`) |
+| `templates/.claude/scripts/failed-workflow.sh` | `.claude/scripts/failed-workflow.sh` (static — copy as-is, `chmod +x`) — **only if step 1's remote is `github.com`** (uses `gh run`/`gh api`, GitHub-only) |
 | stack file's `ci` block | `.github/workflows/check.yml` — **only if step 1's remote is `github.com`** |
 | stack file's `bitbucket-pipelines` block | `bitbucket-pipelines.yml` — **only if step 1's remote is `bitbucket.org`** |
 | stack file's `lefthook` block | `.lefthook.yml` — always, host-agnostic |
