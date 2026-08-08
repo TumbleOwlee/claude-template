@@ -38,7 +38,7 @@ Router for AI coding agents. Read first.
 Triggers on **behavior change, any size**: new public function, changed default, new error variant, any observable semantics. Not a behavior change: refactor, rename, perf-with-identical-semantics, tests, docs — no gates, just do it. Size sets stage count, never gate existence.
 
 - Replaces any generic workflow skill (`/workflow`) — don't run one. `docs/specs/` is already the PRD and design record.
-- Branch off `main`, never commit to `main`. `<type>/<slug>`, type ∈ {`feat`, `fix`, `docs`}.
+- Branch off `main`, never commit to `main`. `<type>/<slug>`, type ∈ {`feat`, `fix`, `docs`}. **Enforced, not just advisory:** the same `PreToolUse` hook (`.claude/scripts/hook-guard-shell.sh`) denies `git commit` while the checkout is on `main`, and `git push` targeting `main` — the safety net for an agent that missed the worktree step, not just a written rule.
 - **Gate 1 = orchestrator's own conversation with the user, not an agent's.** Abstract: existing spec + current goal, nothing about current code. No worktree/branch until gate 2 approved.
 - Gate 2 onward delegates to agents. **All agents Sonnet or better** — weaker models stop mid-plan, commit stubs as "green," report hanging tests as verified.
 - **Issue and PR belong to the orchestrator alone.** Neither planning nor implementing agent is ever told an issue number exists; orchestrator updates the issue itself if planning surfaces a spec change.
@@ -121,7 +121,7 @@ Not delegated — direct interactive conversation, orchestrator + user, about ex
 
 {{ISSUE_WORKFLOW}}
 
-Neither planning nor implementing agent is ever told this issue exists. Orchestrator is sole owner, including later updates from gate 2 findings.
+Neither planning nor implementing agent is ever told this issue exists. Orchestrator is sole owner, including later updates from gate 2 findings. **Never edit the issue body after filing** — always `gh issue comment` (or the Jira equivalent) to append the delta. An edited body destroys the history of what was originally filed vs. refined later; a comment preserves that trail and keeps the issue trackable.
 
 ### Gate 2 — implementation plan. Stop for approval.
 
@@ -190,6 +190,7 @@ Re-run the verification yourself, report findings + fixes. User-decision finding
 - Verification run + reported, then **ask whether to open a PR** — user may want a manual run first; don't pre-empt it.
 - Draft title + body, get approval of that text, push. {{PR_OPEN_LINE}}
 - Title plain language, issue's style. Body = the implementation: why, requirement IDs, how the issue was resolved (approach/structure the issue omitted), verification actually performed{{COVERAGE_PR_CLAUSE}}{{CLOSES_CLAUSE}}.
+- CI fails on the pushed branch → `sh .claude/scripts/failed-workflow.sh <branch>`, never raw `gh run view`/pipeline API calls, to see the failure.
 
 ### Merge
 
@@ -268,7 +269,10 @@ Full set before done. `lefthook` enforces fast checks pre-commit; CI runs the fu
 - Domain values typed, not bare primitives, wherever mixing two would be a bug. New domain type = public API = spec (gate 1).
 - Hostile/malformed/truncated external input → typed error, never a crash, out-of-bounds access, or unbounded allocation. Test every parse path with truncated input.
 - Specs and AI-facing files (skills, agents, `AGENTS.md`/`CLAUDE.md` itself) stay concise and compact: facts only, no prose, no filler, zero information loss. Every word an agent must re-read on every load; padding is recurring cost, not one-time.
-- **Every agent's output stays concise and compact** — chat responses, stage/final reports, commit messages, PR and issue bodies, review findings: say the same thing in fewer words whenever fewer words say it. No restating what a diff, file, or prior message already shows. Extra words for the same fact are a defect, not thoroughness — applies to every agent in this workflow, not just the files they write. {{STACK_CONVENTIONS}}
+- Never read a whole file when only part is needed, filter shell output before it lands in context — not after: `sh .claude/scripts/extract-section.sh` (see `list-sections.sh` first if the heading's unknown) or `sed -n '<start>,<end>p'` instead of `cat`/Read on a whole file; narrow `find`/`git show`/`git diff` at the shell instead of dumping the full output. Applies equally to the Read tool and a Bash `cat` — both cost the same context. **Enforced, not just advisory:** a `PreToolUse` hook (`.claude/scripts/hook-guard-shell.sh`) denies an unpiped `cat` of a markdown or large file, an unscoped `git show`/`git diff`, an unscoped `find -type f/d`, a raw `gh issue view`, and a raw `gh pr view`. A denial here means take the message's redirect, not retry the same command differently.
+- Read an existing PR's body/comments with `sh .claude/scripts/pr-view.sh <number>`, never raw `gh pr view` — same GitHub Projects-Classic GraphQL bug as `gh issue view` (`repository.pullRequest.projectCards`), reproduces with or without `--comments`.
+- **Every agent's output stays concise and compact** — chat responses, stage/final reports, commit messages, PR and issue bodies, review findings: say the same thing in fewer words whenever fewer words say it. No restating what a diff, file, or prior message already shows. Extra words for the same fact are a defect, not thoroughness — applies to every agent in this workflow, not just the files they write.
+- **No hard line wrap on anything posted externally** — issue bodies, PR bodies, PR/review comments. The host (GitHub, Jira, …) soft-wraps for display; a manually inserted `\n` mid-sentence survives rendering as a real line break and fragments the text. Paragraphs as single unbroken lines; only headings, list items, and code blocks get their own line. {{STACK_CONVENTIONS}}
 <!-- CORE:END conventions -->
 
 <!-- CORE:BEGIN scope -->

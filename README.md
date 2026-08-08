@@ -47,8 +47,10 @@ and then writes:
 | `.claude/scripts/token-rank.sh` | Ranks given files by rough token cost of a full Read (`chars/4`), highest first. |
 | `.claude/scripts/failed-workflow.sh` | Prints the error output of the most recent failed CI run on a branch — GitHub Actions or Bitbucket Pipelines, auto-detected. |
 | `.claude/scripts/issue-view.sh` | Prints an issue's title, body, and comments in compact plain text — Jira or GitHub, auto-detected. |
+| `.claude/scripts/pr-view.sh` | Prints a PR's title, body, and comments in compact plain text — GitHub or Bitbucket, auto-detected. Sidesteps a `gh pr view` GraphQL bug (legacy Projects-Classic boards) that errors on the raw command with or without `--comments`. |
+| `.claude/scripts/hook-guard-shell.sh` | `PreToolUse` hook, wired in `.claude/settings.json`: denies an unpiped `cat` of a markdown/large file, an unscoped `git show`/`git diff`, an unscoped `find -type f/d`, a raw `gh issue view`, a raw `gh pr view`, a `git commit` while on `main`, or a `git push` targeting `main` — enforces `AGENTS.md`'s shell-output and branch-safety rules instead of just stating them. |
 
-`failed-workflow.sh` and `issue-view.sh`: if a script's output isn't enough (multiple failed jobs, huge issue thread, unexpected API error), never fall back to raw `gh`/`git`/`curl` commands to fill the gap — stop and report the shortfall to the user.
+`failed-workflow.sh`, `issue-view.sh`, `pr-view.sh`: if a script's output isn't enough (multiple failed jobs, huge issue thread, unexpected API error), never fall back to raw `gh`/`git`/`curl` commands to fill the gap — stop and report the shortfall to the user.
 
 Finally it deletes `templates/` and its own skill, so the fork looks like a normal project.
 
@@ -72,7 +74,7 @@ Running one change through it: `/spec-feature`. Product-owner-only slice — req
 .claude/skills/agent-doc-audit/  checks agent docs for bloat and split-worthy sections
 .claude/agents/                  spec-planner, spec-implementer, spec-reviewer
 .claude/tasks/                   task board, empty until the first run
-.claude/settings.json            SessionStart hook: flags an interrupted run
+.claude/settings.json            SessionStart hook: flags an interrupted run; PreToolUse hook: enforces the shell-output Conventions
 templates/                       every generated file, plus one file per stack
 ```
 

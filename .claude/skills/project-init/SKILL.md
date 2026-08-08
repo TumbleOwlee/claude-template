@@ -35,7 +35,7 @@ Check what exists: `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, 
 
 Pristine fork = only bootstrap `CLAUDE.md`, `README.md`, `templates/`, `.claude/` — treat these as template scaffolding to replace, not user content; don't ask about them.
 
-`.claude/tasks/` (agent task board) and `.claude/settings.json` (its `SessionStart` detector) ship ready-to-use: create nothing there, ask nothing about them, delete nothing — an empty board is correct pre-first-feature state.
+`.claude/tasks/` (agent task board) and `.claude/settings.json` (its `SessionStart` detector) ship ready-to-use: create nothing there, ask nothing about them, delete nothing — an empty board is correct pre-first-feature state. Exception: once step 5's script copy lands `.claude/scripts/hook-guard-shell.sh` in the new project, append its `PreToolUse` wiring to the copied `settings.json` (see that script's row) — the block only works once the script exists on disk, which it doesn't in this template repo itself.
 
 Any other pre-existing target file: show it, ask keep / overwrite / merge. Record the decision — step 7 honours it.
 
@@ -169,6 +169,8 @@ Four things substitution alone doesn't handle:
 | `templates/.claude/scripts/token-rank.sh` | `.claude/scripts/token-rank.sh` (static — copy as-is, `chmod +x`) |
 | `templates/.claude/scripts/failed-workflow.sh` | `.claude/scripts/failed-workflow.sh` (static — copy as-is, `chmod +x`) — CI backend auto-detected at runtime from `.github/workflows/*.yml` (GitHub Actions) vs `bitbucket-pipelines.yml` (Bitbucket Pipelines, needs `.claude/bitbucket.local.json`) |
 | `templates/.claude/scripts/issue-view.sh` | `.claude/scripts/issue-view.sh` (static — copy as-is, `chmod +x`) — tracker auto-detected at runtime from `.claude/jira.local.json` presence (Jira) vs absence (GitHub, via `gh`). Note in the final report: if this script or `failed-workflow.sh` ever falls short of what's needed, never fall back to raw `gh`/`git`/`curl` commands — stop and report the shortfall to the user instead. |
+| `templates/.claude/scripts/pr-view.sh` | `.claude/scripts/pr-view.sh` (static — copy as-is, `chmod +x`) — **only if step 1's remote is `github.com` or `bitbucket.org`** (no PR concept otherwise); host auto-detected same as `failed-workflow.sh`. Same fallback rule as `issue-view.sh`: never raw `gh`/`curl` if it falls short. |
+| `templates/.claude/scripts/hook-guard-shell.sh` | `.claude/scripts/hook-guard-shell.sh` (static — copy as-is, `chmod +x`) — denies the Conventions-bypass shapes it detects instead of just advising against them. Requires appending to `.claude/settings.json`'s `hooks` object (see step 1's exception): `"PreToolUse": [{"matcher": "Bash", "hooks": [{"type": "command", "command": "sh .claude/scripts/hook-guard-shell.sh"}]}]` |
 | stack file's `ci` block | `.github/workflows/check.yml` — **only if step 1's remote is `github.com`** |
 | stack file's `bitbucket-pipelines` block | `bitbucket-pipelines.yml` — **only if step 1's remote is `bitbucket.org`** |
 | stack file's `lefthook` block | `.lefthook.yml` — always, host-agnostic |
