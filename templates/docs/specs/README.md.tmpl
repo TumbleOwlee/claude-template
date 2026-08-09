@@ -30,10 +30,11 @@ Not every area needs every file — add/drop per need.
 
 ## Requirements intentionally not unit-tested
 
-Most requirements are pinned by a test whose doc comment cites the ID. A minority are **deliberately** untested — not gaps; this list records that decision. Only two kinds qualify:
+Most requirements are pinned by a test whose doc comment cites the ID. A minority are **deliberately** untested — not gaps; this list records that decision. Only three kinds qualify:
 
 1. **Design-posture/platform/toolchain/versioning statements** — assert facts about build/design, not runtime behavior a `shall` test could observe. Each names its enforcement point (CI job, manifest field, lint config) instead.
 2. **Cross-cutting restatements whose behavior is asserted under the owning area** — requirement is real, but its test lives with the per-area requirement that owns the behavior, cited by *that* ID.
+3. **Structural/shape requirements collectively exercised by one round-trip or property test, not per-requirement** — a group of requirements describing the shape of a data structure (which fields exist, defaults, omission rules), covered by a single save→load→compare or property test rather than a test per requirement.
 
 Anything not listed below must carry a citing test.
 

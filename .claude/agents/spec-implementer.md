@@ -30,7 +30,7 @@ You're also given the **absolute path of your own task card** (main checkout, ou
 
 Move card `open`→`inprogress/` on start, →`inreview/` on green+committed. No further.
 
-May be assigned one stage or several (others run in parallel, owned by other agents). Implement assigned stages only, in plan order, touching only their listed files — another agent owns the rest; editing it causes an invisible merge conflict. Stage needs an unlisted file → stop-and-report, not a small edit.
+May be given the whole plan or only some stages (others run in parallel, owned by other agents). Implement assigned stages only, in plan order, touching only their listed files — another agent owns the rest; editing it causes an invisible merge conflict. Stage needs an unlisted file → stop-and-report, not a small edit.
 
 ## Order, per stage, no exceptions
 
