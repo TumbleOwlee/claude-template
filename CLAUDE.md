@@ -26,3 +26,7 @@ counts as verification.
 | `templates/` | Source for generated files. Deleted after bootstrap. |
 
 Post-init: this file becomes a thin router into `AGENTS.md`.
+
+## RTK (Rust Token Killer) — Token-Optimized Commands
+
+@./templates/fragments/rtk-instructions.md

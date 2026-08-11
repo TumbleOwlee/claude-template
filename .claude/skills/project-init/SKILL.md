@@ -29,6 +29,12 @@ claude plugin marketplace add JuliusBrussee/caveman && claude plugin install cav
 
 Optional — don't block on it. Continue to step 1 either way.
 
+Check whether `rtk` is on PATH (`command -v rtk`). Found → `include_rtk_section = true`, skip the rest of this check. Missing → `AskUserQuestion`: **install now** or **skip**.
+- **Install now**: if `command -v cargo` succeeds, run `cargo install --git https://github.com/rtk-ai/rtk`; otherwise run `curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh`. Either way, afterward re-run `command -v rtk` regardless of the install command's exit code — that's what decides `include_rtk_section`, not the exit code itself (covers PATH-not-refreshed and silent-failure cases alike). Report success or failure to the user.
+- **Skip**: `include_rtk_section = false`.
+
+`include_rtk_section` feeds `{{RTK_SECTION}}` in step 7 — no separate prompt to remove anything later; declining (or a failed install) simply leaves the placeholder empty. Non-blocking either way — continue to step 1.
+
 ## 1. Detect state
 
 Check what exists: `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, `PRD.md`, `ARCHITECTURE.md`, `CONTRIBUTING.md`, `README.md`, `docs/specs/`, `.github/workflows/`, `bitbucket-pipelines.yml`, `.lefthook.yml`, any language manifest (`Cargo.toml`, `package.json`, `pyproject.toml`, `setup.py`, `go.mod`, `CMakeLists.txt`).
@@ -198,6 +204,7 @@ Placeholders used across templates:
 | `{{ISSUE_WORKFLOW}}` | step 4b tracker choice |
 | `{{PR_OPEN_LINE}}` | step 1 remote detection + step 4c (Bitbucket) |
 | `{{SCOPE_BOUNDARIES}}` | step 5 |
+| `{{RTK_SECTION}}` | step 0 `include_rtk_section` — `true` → `## RTK\n\n` + verbatim `templates/fragments/rtk-instructions.md`; `false` → empty |
 | `{{AREA_TITLE}}`, `{{AREA_COVERS}}`, `{{AREA_PREFIX}}` | step 4, per area file |
 | `{{ID_CITATION_BLOCK}}`, `{{COVERAGE_CONTRIB_LINE}}` | stack file + coverage floor |
 | `{{ID_PREFIX_ALTERNATION}}` | step 4 prefixes joined with `\|`, e.g. `FR\|CL\|SV\|NF` — used in the lefthook reminder regex |
@@ -222,7 +229,7 @@ Tracker-dependent slots (choice + branch from step 4b):
 | `{{ISSUE_WORKFLOW}}` | `issue-github.md` | `issue-jira-mcp.md` | `issue-jira-credentials.md` | `issue-filesystem.md` | `issue-none.md` |
 | `{{CLOSES_CLAUSE}}` | `, ` + `` `Closes #<issue>` `` | `, references <ISSUE-KEY>` | `, references <ISSUE-KEY>` | empty | empty |
 
-All five fragment files live in `templates/fragments/`.
+The five issue-tracker fragment files live in `templates/fragments/`; `templates/fragments/rtk-instructions.md` (step 0) lives alongside them.
 
 **Substitute only the placeholders named above.** A GitHub Actions expression like `${{ matrix.python-version }}` inside a CI block is not a placeholder — copy it through verbatim.
 
