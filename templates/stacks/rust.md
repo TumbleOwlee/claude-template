@@ -21,7 +21,7 @@ cargo llvm-cov --all-features --fail-under-lines {{COVERAGE_FLOOR}}
 ## `{{NARROW_COMMANDS}}`
 
 ```sh
-cargo test ut_name                # one unit test
+cargo test -p member ut_name      # one unit test (name alone isn't narrow in a workspace — still builds/runs every member's test binary)
 cargo test --test integration     # one integration test file
 cargo check -p member             # typecheck one workspace member
 cargo llvm-cov --all-features --html   # browsable per-line coverage

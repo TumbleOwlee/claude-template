@@ -19,7 +19,7 @@ Pull one `AGENTS.workflow.md` section at a time, never the whole file: `sh .clau
 
 | Step | Heading |
 |---|---|
-| Parent card | `### Task board` (card naming); the create-on-approval step is already covered by the `### Gate 1` row below |
+| Parent card | `### Gate 1 — spec diff. Orchestrator runs this itself. Stop for approval.` (the **Board:** bullet) |
 | Gate 1 — spec diff | `### Gate 1 — spec diff. Orchestrator runs this itself. Stop for approval.` |
 | Gate 1b — tracking issue | `### Gate 1b — tracking issue. Orchestrator runs this itself. Stop for approval.` |
 | Gate 2 — implementation plan | `### Gate 2 — implementation plan. Stop for approval.` |

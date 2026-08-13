@@ -75,7 +75,7 @@ Detect from manifests if present, else ask. Supported stacks, one file each unde
 | Go | `templates/stacks/go.md` | `go.mod` |
 | C / C++ (CMake) | `templates/stacks/cmake.md` | `CMakeLists.txt` |
 
-Read the chosen stack file — sole source for that stack's build/test/lint commands, narrow-loop commands, test naming conventions, coverage tool, CI job matrix, pre-commit hook bodies. Fills every `{{…}}` slot the other templates carry.
+Read the chosen stack file — sole source for that stack's build/test/lint commands, narrow-loop commands, test naming conventions, coverage tool, CI job matrix, pre-commit hook bodies. Fills every `{{…}}` slot the other templates carry. If a narrow-loop command isn't actually narrow (e.g. a bare test-name filter that still builds/runs every package in a workspace), the stack file documents the real narrow form — carry that caveat into `{{NARROW_COMMANDS}}` rather than the naive form alone.
 
 **Confirm the command block with the user before writing anywhere.** Show exact commands, let them correct any line. If the stack file offers variants (pnpm vs npm, ninja vs make, ruff vs flake8), ask which — don't pick silently.
 

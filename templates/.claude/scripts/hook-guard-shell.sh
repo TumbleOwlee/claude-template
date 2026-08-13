@@ -101,7 +101,7 @@ for seg in $segments; do
   case "$seg" in
     *gh\ issue\ view*)
       offender="$seg"
-      reason="Raw 'gh issue view' bypasses this repo's issue-view.sh convention (AGENTS.md Gate 1b: read any issue with 'sh .claude/scripts/issue-view.sh <number|url>', never raw 'gh issue view' — it also sidesteps a GitHub Projects-Classic API bug that crashes the raw form on some repos). Use: sh .claude/scripts/issue-view.sh <number>"
+      reason="Raw 'gh issue view' bypasses this repo's issue-view.sh convention (AGENTS.workflow.md Gate 1b: read any issue with 'sh .claude/scripts/issue-view.sh <number|url>', never raw 'gh issue view' — it also sidesteps a GitHub Projects-Classic API bug that crashes the raw form on some repos). Use: sh .claude/scripts/issue-view.sh <number>"
       ;;
   esac
   [ -z "$offender" ] || break
@@ -126,7 +126,7 @@ for seg in $segments; do
           branch=$(git -C "$dir" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
           if [ "$branch" = "$PROTECTED_BRANCH" ]; then
             offender="$seg"
-            reason="'git commit' while the checkout in $dir is on '$PROTECTED_BRANCH' (AGENTS.md: branch off main, never commit to main). Create/use a git worktree first: git worktree add .claude/worktrees/<slug> -b <type>/<slug> $PROTECTED_BRANCH — this looks like the worktree step was missed."
+            reason="'git commit' while the checkout in $dir is on '$PROTECTED_BRANCH' (AGENTS.workflow.md: branch off main, never commit to main). Create/use a git worktree first: git worktree add .claude/worktrees/<slug> -b <type>/<slug> $PROTECTED_BRANCH — this looks like the worktree step was missed."
           fi
           ;;
       esac
@@ -149,7 +149,7 @@ for seg in $segments; do
           branch=$(git -C "$dir" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
           if [ "$branch" = "$PROTECTED_BRANCH" ]; then
             offender="$seg"
-            reason="Bare 'git push' while the checkout in $dir is on '$PROTECTED_BRANCH' would push straight to it (AGENTS.md: branch off main, never commit to main). Create/use a git worktree first: git worktree add .claude/worktrees/<slug> -b <type>/<slug> $PROTECTED_BRANCH — this looks like the worktree step was missed."
+            reason="Bare 'git push' while the checkout in $dir is on '$PROTECTED_BRANCH' would push straight to it (AGENTS.workflow.md: branch off main, never commit to main). Create/use a git worktree first: git worktree add .claude/worktrees/<slug> -b <type>/<slug> $PROTECTED_BRANCH — this looks like the worktree step was missed."
           fi
           ;;
       esac

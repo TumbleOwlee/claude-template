@@ -79,6 +79,7 @@ Full set before done. `lefthook` enforces fast checks pre-commit; CI runs the fu
 - Unit tests: {{UNIT_TEST_CONVENTION}}
 - Integration tests: {{INTEGRATION_TEST_CONVENTION}}
 - Bind port 0, read the assigned port back — never a fixed port. To test bind failure, bind the occupier ephemerally first, point the server at that port.
+- External hardware/device dependencies: test via an in-memory or virtual/loopback equivalent, never a real device. A test needing real hardware is ignored or feature-gated and never runs in CI.
 - Don't split a file for size alone. Split for distinct responsibilities, navigability, or coupling. Cohesive files and flat generated data stay whole.
 - Start each stage by listing needed functionality and searching the package registry. Report downloads, last release, maintenance state, recommend — don't default to hand-rolling. Adding a dependency is a scope boundary: the finding goes to the user, not the manifest.
 - Errors typed, never stringly. New failure mode = new error type = public API = spec (gate 1).

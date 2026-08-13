@@ -7,3 +7,4 @@ Fills `{{ISSUE_WORKFLOW}}` when project tracks issues on GitHub. Copy body below
 - Self-contained (spec not pushed yet): quote full normative text beside each new ID, each changed requirement as old → new, plus `api-contract.md`/`edge-cases.md` entries. ID with no text is useless.
 - Goal + normative changes only. No implementation detail (structure/files/functions/approach) — belongs to gate 2 and PR.
 - `##` sections, not prose: `## Background`/`## Why`, `## Scope`, `## Goal`, more as warranted. Compact enumerations, grouped ID ranges. Same shape for PR bodies.
+- Never edit the issue body after filing — append updates with `gh issue comment`.
