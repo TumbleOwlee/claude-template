@@ -7,15 +7,15 @@ description: Drive one behavior change through the repo's gated spec-driven TDD 
 
 **Concise, compact, facts only.**
 
-`AGENTS.md` is authority for every gate, the task board, and the subagents — read its `## Workflow` section and follow it exactly. This skill is only the invocation entrypoint; it does not restate that procedure. Conflict between this file and `AGENTS.md` → `AGENTS.md` wins.
+`AGENTS.workflow.md` is authority for every gate, the task board, and the subagents — read it and follow it exactly. This skill is only the invocation entrypoint; it does not restate that procedure. Conflict between this file and `AGENTS.workflow.md` → `AGENTS.workflow.md` wins.
 
 ## Before anything else
 
-Check `.claude/tasks/`. Cards outside `open/`+`done/` = a run was interrupted → `AGENTS.md`'s *Resume an interrupted run*, don't start fresh.
+Check `.claude/tasks/`. Cards outside `open/`+`done/` = a run was interrupted → `AGENTS.workflow.md`'s *Resume an interrupted run*, don't start fresh.
 
 ## Where each step lives
 
-Pull one `AGENTS.md` section at a time, never the whole file: `sh .claude/scripts/extract-section.sh '<heading>' AGENTS.md`.
+Pull one `AGENTS.workflow.md` section at a time, never the whole file: `sh .claude/scripts/extract-section.sh '<heading>' AGENTS.workflow.md`.
 
 | Step | Heading |
 |---|---|

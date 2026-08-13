@@ -41,7 +41,7 @@ Fixed 4-step order: `.claude/AGENTS.core.md`'s `## TDD` section, followed verbat
 
 ## Stage completion
 
-Done = builds, tests pass, lint clean, coverage floor holds. Run full gauntlet from `AGENTS.md`, quote the relevant excerpt (failure text, summary/pass line — never a full verbose log), commit. Commit every green stage — makes the plan resumable. Stage messages cheap (squashed later).
+Done = builds, tests pass, lint clean, coverage floor holds. Run full gauntlet from `.claude/AGENTS.core.md`, quote the relevant excerpt (failure text, summary/pass line — never a full verbose log), commit. Commit every green stage — makes the plan resumable. Stage messages cheap (squashed later).
 
 ## Stop and report — never improvise
 

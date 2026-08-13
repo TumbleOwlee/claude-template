@@ -33,7 +33,7 @@ Check whether `rtk` is on PATH (`command -v rtk`). Found → `include_rtk_sectio
 - **Install now**: if `command -v cargo` succeeds, run `cargo install --git https://github.com/rtk-ai/rtk`; otherwise run `curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh`. Either way, afterward re-run `command -v rtk` regardless of the install command's exit code — that's what decides `include_rtk_section`, not the exit code itself (covers PATH-not-refreshed and silent-failure cases alike). Report success or failure to the user.
 - **Skip**: `include_rtk_section = false`.
 
-`include_rtk_section` feeds `{{RTK_SECTION}}` in step 7 — no separate prompt to remove anything later; declining (or a failed install) simply leaves the placeholder empty. Non-blocking either way — continue to step 1.
+`include_rtk_section` feeds `{{RTK_SECTION}}` in step 7 — no separate prompt to remove anything later; declining (or a failed install) leaves the placeholder empty. Non-blocking either way — continue to step 1.
 
 ## 1. Detect state
 
@@ -160,6 +160,7 @@ Four things substitution alone doesn't handle:
 | Template | Output |
 |---|---|
 | `templates/AGENTS.md.tmpl` | `AGENTS.md`, plus derived `.claude/AGENTS.core.md` (see above) |
+| `templates/AGENTS.workflow.md.tmpl` | `AGENTS.workflow.md` — gates, task board, implementation, review, PR, merge, resume; `AGENTS.md`'s own `## Workflow` heading is just a pointer to it |
 | `templates/CLAUDE.md` | `CLAUDE.md` (static — copy as-is, replaces the bootstrap one) |
 | `templates/.github/copilot-instructions.md` | `.github/copilot-instructions.md` (static — copy as-is, same router pattern for GitHub Copilot) |
 | `templates/PRD.md.tmpl` | `PRD.md` |

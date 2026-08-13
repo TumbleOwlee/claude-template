@@ -22,6 +22,8 @@ counts as verification.
 | `.claude/skills/project-init/` | Bootstrap. Deleted after run. |
 | `.claude/skills/template-harvest/` | Audits a template descendant for improvements to backport here. This repo only — deleted after bootstrap, same as `project-init`. |
 | `.claude/skills/spec-feature/` | Drives one behavior change through gates. Kept. |
+| `.claude/skills/spec-scaffold-init/` | Adds spec dir + routing pointer only, no full bootstrap. Kept. |
+| `.claude/skills/spec-coverage-audit/` | Finds code with no requirement, proposes approved diff. Kept. |
 | `.claude/agents/` | `spec-planner`, `spec-implementer`, `spec-reviewer`. Kept. |
 | `templates/` | Source for generated files. Deleted after bootstrap. |
 
