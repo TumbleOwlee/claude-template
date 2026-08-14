@@ -62,12 +62,12 @@ Parent frontmatter: `issue`, `branch`, `mode: sequential|parallel(N)`, `gate1`/`
 
 | Card | `open` | `inprogress` | `inreview` | `done` |
 |---|---|---|---|---|
-| stage | created from plan | agent took it | agent claims green | merged + orchestrator-verified |
-| wave gate | not started | stages running | all done; reviewing wave diff | clean — next wave unblocks |
+| stage | created from plan | agent took it | agent claims green | quick-review clean, merged + gauntlet-verified |
+| wave gate | not started | stages running | all done; reviewing wave diff | clean + user-approved — next wave unblocks |
 | parent | gate 1 pending | implementing | gate 3/4 | PR squash-merged |
 
 Rules:
-- **No agent writes its own `done`.** Implementer stops at `inreview`. Orchestrator merges, re-runs gauntlet, only then moves to `done` — same self-report rule as everywhere else.
+- **No agent writes its own `done`.** Implementer stops at `inreview`. Orchestrator quick-reviews (see *Quick review, after each stage*), merges, re-runs gauntlet, only then moves to `done` — same self-report rule as everywhere else.
 - **Runnable** = every `blocked-by` id in `done/`. Stage `done` = merged into the feature branch ("the code I depend on is on the branch I branch from").
 - No `blocked/` directory — blocking derives from `blocked-by`, stated once.
 - Card is evidence of intent, never fact. Git is fact. See *Resume*.
@@ -116,21 +116,21 @@ Default sequential on no preference. Never infer concurrency from plan shape —
 
 ### Implement, stage by stage
 
-Sequential: same planning agent, resumed with worktree path + stage cards — no re-reading `AGENTS.md`, no re-exploring. It reads the implementer rules itself, follows them per stage in plan order. Moves stage card `open`→`inprogress` on start, →`inreview` on green+committed. Orchestrator verifies, moves to `done` — nothing to merge, so `done` = committed+verified.
+Sequential: same planning agent, resumed with worktree path + stage cards — no re-reading `AGENTS.md`, no re-exploring. It reads the implementer rules itself, follows them per stage in plan order. Moves stage card `open`→`inprogress` on start, →`inreview` on green+committed. **Orchestrator quick-reviews every stage landing in `inreview/`** (see *Quick review, after each stage*, below) before moving it to `done` — nothing to merge, so `done` = quick-review clean + committed + verified.
 
-Parallel: one worktree+branch per agent, branched off the feature branch at wave start — `git worktree add .claude/worktrees/<slug>-<n> -b <type>/<slug>-<n> <type>/<slug>` — **fresh** implementer, not a continuation (concurrent agents can't share a running context). Plan's inline refs must be self-sufficient because of this — these agents hold none of the planner's exploration and must never re-derive it by exploring the codebase themselves; an incomplete reference is a stop-and-report against the plan, not something to go dig up. Never two agents, one worktree. Each wave:
+Parallel: one worktree+branch per agent, branched off the feature branch's current tip at wave start — already containing every earlier wave's merged stages, so a dependent stage's worktree never starts without its dependencies' code physically present — `git worktree add .claude/worktrees/<slug>-<n> -b <type>/<slug>-<n> <type>/<slug>` — **fresh** implementer, not a continuation (concurrent agents can't share a running context). Plan's inline refs must be self-sufficient because of this — these agents hold none of the planner's exploration and must never re-derive it by exploring the codebase themselves; an incomplete reference is a stop-and-report against the plan, not something to go dig up. Never two agents, one worktree. Each wave:
 
 1. Runnable stage cards (`blocked-by` all in `done/`) up to approved count. Wave-gate card → `inprogress/`.
 2. One implementer per stage: its worktree path, its own card's absolute path, and its `## Stage s<n>` section pulled with `sh .claude/scripts/extract-section.sh` — never the whole `plan.md`.
 3. Wait for the whole wave; each card lands in `inreview/`.
-4. Per card: merge into feature branch, re-run gauntlet on merged result, card → `done/`, remove worktree.
-5. All `done` → wave gate → `inreview/`: independent reviewer reads the wave's accumulated diff, given the wave's stage ids as its scope (so it pulls only those `plan.md` sections, not the whole file). Clean → wave gate `done/`, next wave unblocks, no approval prompt. Finding → stop, report, implicated stage cards → `inprogress/` with finding appended.
+4. Per card, once it lands in `inreview/`: **orchestrator quick-reviews it** (see *Quick review, after each stage*, below). Clean → merge into the feature branch — **this merge is the new base**, the commit every later wave's worktrees branch from — re-run gauntlet on the merged result, card → `done/`, remove worktree. Finding → card stays `inprogress/` with the finding appended, same implementer resumes and fixes it before it's eligible to merge.
+5. All `done` → wave gate → `inreview/`: independent reviewer reads the wave's accumulated diff, given the wave's stage ids as its scope (so it pulls only those `plan.md` sections, not the whole file). Clean → wave gate `done/`, **stop: ask the user for approval before the next wave starts**. Finding → stop, report, implicated stage cards → `inprogress/` with finding appended.
 
-Clean wave gate is not an approval stop — gate 2 already approved these stages. A finding, red gauntlet, or merge conflict always is.
+A clean wave gate still stops for approval before the next wave starts — the merge that closed this wave is the new base the next wave's worktrees get built on, a fresh checkpoint even though gate 2 already approved the stages themselves. A finding, red gauntlet, or merge conflict stops it too, same as before.
 
 Merge conflict between two stages in a wave = dependency tree was wrong — report, fix the tree, never hand-resolve and continue. Mid-wave stop stops that wave only: finished branches still merge, the rest re-plans.
 
-Gates unchanged under parallelism — verification, review, spec reconcile all happen once, on the merged feature branch, never per agent.
+Gates unchanged under parallelism — verification, independent review, spec reconcile all happen once, on the merged feature branch, never per agent. Quick review is the exception: it happens once per stage, before that stage's merge, precisely because it's what makes each merge safe to build the next wave's worktrees on.
 
 - TDD order above. Stage = green checkpoint: builds, tests pass, lint clean{{COVERAGE_STAGE_CLAUSE}}. Commit every green stage — makes the plan resumable.
 - Stage messages cheap, squashed later. Squash message carries requirement IDs + why. Spec = first stage, first commit.
@@ -139,6 +139,16 @@ Gates unchanged under parallelism — verification, review, spec reconcile all h
 - Every existing test pinning observable behavior cites its requirement. Pure internal/helper-detail tests may stay untagged. Behavior no requirement states = requirement missing — add it (gate 1), never attach a loose ID.
 - Citation directly beside the test declaration, above the function body. ≤1 ID per test.
 - Not done until the Verification method has run and its outcome is reported. Waiving it requires asking.
+
+### Quick review, after each stage
+
+Every stage landing in `inreview/` gets a quick read from the orchestrator itself — not a spawned agent — before it's eligible to merge: diff against that stage's `## Stage s<n>` section, the implementer's final report, its card log. This is not gate 3's independent audit (separate agent, full spec-fidelity/standards/TDD-honesty review, comes later on the whole branch or wave) — it's the orchestrator catching an obvious plan deviation, a stub, or a skipped requirement early, one stage at a time, cheaply, before that stage's work becomes the base something else builds on.
+
+Two outcomes:
+- **Spec-level divergence** — the stage needed behavior the approved spec doesn't cover: that's *Reconcile the spec*, below. Reopens gate 1, needs the user.
+- **Everything else** — a bug, incomplete work, a plan deviation with no spec reason: append the finding to the stage card, leave/move it `inprogress/`, the same implementer resumes and fixes it. No user approval needed — gate 2 already approved this stage; quick review enforces that approval, it doesn't reopen it.
+
+No finding of either kind → proceed straight to merge.
 
 ### Reconcile the spec
 
