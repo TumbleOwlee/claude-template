@@ -24,7 +24,7 @@ counts as verification.
 | `.claude/skills/spec-feature/` | Drives one behavior change through gates. Kept. |
 | `.claude/skills/spec-scaffold-init/` | Adds spec dir + routing pointer only, no full bootstrap. Kept. |
 | `.claude/skills/spec-coverage-audit/` | Finds code with no requirement, proposes approved diff. Kept. |
-| `.claude/agents/` | `spec-planner`, `spec-implementer`, `spec-reviewer`. Kept. |
+| `.claude/agents/` | `spec-author`, `spec-planner`, `spec-implementer`, `spec-reviewer`. Kept. |
 | `templates/` | Source for generated files. Deleted after bootstrap. |
 
 Post-init: this file becomes a thin router into `AGENTS.md`.

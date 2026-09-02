@@ -229,3 +229,19 @@ avoid-breaking-exported-api = false
 channel = "stable"
 components = ["rustfmt", "clippy"]
 ```
+
+## `{{GAUNTLET_STEPS}}`
+
+```sh
+run fmt    900  cargo fmt --check
+run clippy 900  cargo clippy --all-features --all-targets -- -D warnings
+run check  900  cargo check --all-features
+run test   1800 cargo test --all-features
+run cov    1800 cargo llvm-cov --all-features --fail-under-lines {{COVERAGE_FLOOR}}
+```
+
+## `{{COVERAGE_EXTRACT}}`
+
+```sh
+cov=$(grep -E '^TOTAL' "$log" | tail -1 | grep -oE '[0-9.]+%' | sed -n 3p)
+```

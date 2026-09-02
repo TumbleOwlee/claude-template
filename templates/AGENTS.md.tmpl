@@ -12,19 +12,19 @@ Router for AI coding agents. Read first.
 ## Spec-driven
 
 - `docs/specs/` authoritative. Code conforms to spec, never reverse.
-- Read area's `requirements.md` + `edge-cases.md` before editing that area. `edge-cases.md` = deliberate ugliness; check before "fixing."
+- Before editing an area: `sh .claude/scripts/list-sections.sh` its `requirements.md` + `edge-cases.md`, then `extract-section.sh` the headings the task touches (plus their `edge-cases.md` counterparts); the whole file only for a cross-cutting change. `edge-cases.md` = deliberate ugliness; check before "fixing."
 - Behavior change with no spec change = incomplete.
 - `main` never holds unfinished spec: a requirement on `main` describes code that exists and is tested. A branch may hold a spec commit ahead of its code; squash merge keeps that off `main`.
 - Pre-existing spec/code disagreement outside your task: stop, raise separately. Folding it in widens approved work, skips its own review.
 - Specs carry no `file:line`. Locate code with search tools.
-- Requirement IDs stable, append-only. Cite in commits and PRs.
-- One requirement, one physical line, never wrapped — find any by `grep -rn <ID or keyword> docs/specs/`, or with the exact file:line to edit: `sh .claude/scripts/extract-id.sh <ID> [<ID> ...]` (batch every ID needed into one call). Read one section of a large spec file instead of the whole thing: `sh .claude/scripts/extract-section.sh '## <heading>' path/to/file.md`.
+- Requirement and edge-case IDs (`-R-`, `-E-`) stable, append-only. Cite in commits and PRs.
+- One requirement or edge-case entry, one physical line, never wrapped. Find by `grep -rn <ID or keyword> docs/specs/`; exact file:line: `sh .claude/scripts/extract-id.sh <ID> [<ID> ...]` (batch every ID needed into one call). One section of a large file: `sh .claude/scripts/extract-section.sh '## <heading>' path/to/file.md`.
 <!-- CORE:END spec-driven -->
 
 <!-- CORE:BEGIN tdd -->
 ## TDD — fixed order, every stage
 
-1. Write the test. Doc comment cites requirement ID ({{ID_CITATION_EXAMPLE}}).
+1. Write the test. Doc comment cites every requirement or edge-case ID the test pins ({{ID_CITATION_EXAMPLE}}; `docs/specs/README.md` rule 8).
 2. Run it, watch it fail for the right reason, report the failure. Wrong assertion / test-side compile error / premature pass proves nothing.
 3. Minimum implementation that passes.
 4. Refactor green.
@@ -35,9 +35,9 @@ Router for AI coding agents. Read first.
 
 ## Workflow
 
-Triggers on **behavior change, any size**: new public function, changed default, new error variant, any observable semantics. Not a behavior change: refactor, rename, perf-with-identical-semantics, tests, docs — no gates, just do it.
+Triggers on **behavior change, any size**: new public function, changed default, new error variant, any observable semantics. Size sets stage count, never gate existence. Non-behavior change (refactor, rename, perf with identical semantics, test-only, docs, tooling): gate 1 skipped, rest runs. Trivial edit (one file, no semantics, no test/CI/build effect — typo, comment, doc wording): no gates, branch + PR.
 
-Gate 1 through gate 4, task board, stage-by-stage implementation, review, PR, merge, and resuming an interrupted run: [`AGENTS.workflow.md`](./AGENTS.workflow.md).
+Gate 1 through gate 4, task board, stage-by-stage implementation, review, PR, merge, and resuming an interrupted run: [`AGENTS.workflow.md`](./AGENTS.workflow.md). Pull one section at a time with `extract-section.sh`.
 
 ## Where to look for task X
 
@@ -67,7 +67,14 @@ Full set before done. `lefthook` enforces fast checks pre-commit; CI runs the fu
 <!-- CORE:END build -->
 
 <!-- CORE:BEGIN conventions -->
-## Conventions
+## Conventions — reading
+
+- **Never read a whole file when only part is needed.** Any `.md` (specs, `SKILL.md`s, other repos' docs): `sh .claude/scripts/extract-section.sh '<heading>' ['<heading>' ...] <file>` (unknown heading: `sh .claude/scripts/list-sections.sh <file>` first). Other large files: `sed -n '<start>,<end>p' <file>`. Applies to the Read tool and a Bash `cat` alike — same context cost. **Enforced:** a `PreToolUse` hook (`.claude/scripts/hook-guard-shell.sh`) denies an unpiped `cat` of a markdown or large file, an unscoped `git show`/`git diff`, an unscoped `find -type f/d`, a raw `gh issue view`, and a raw `gh pr view`. A denial = convention about to be bypassed; follow the redirect, don't retry the command differently.
+- **Filter shell output before it lands in context.** `find -name`/`-path`, `git show --stat` or a path filter before full content, `grep`/`tail -N`/`head -N` on test and coverage output.
+- **Don't re-run a read-only command whose output is already in context** (`git diff`, `git log`, `git show` on the same refs/paths). Scroll back.
+- Read an existing PR's body/comments with `bash .claude/scripts/pr-view.sh <number>`, never raw `gh pr view` — same GitHub Projects-Classic GraphQL bug as `gh issue view` (`repository.pullRequest.projectCards`), reproduces with or without `--comments`.
+
+## Conventions — code
 
 <!-- PRUNE ME. Bullets between this marker and {{STACK_CONVENTIONS}} are the
      stack-neutral core. Before writing this file: drop any that don't apply
@@ -80,16 +87,19 @@ Full set before done. `lefthook` enforces fast checks pre-commit; CI runs the fu
 - Integration tests: {{INTEGRATION_TEST_CONVENTION}}
 - Bind port 0, read the assigned port back — never a fixed port. To test bind failure, bind the occupier ephemerally first, point the server at that port.
 - External hardware/device dependencies: test via an in-memory or virtual/loopback equivalent, never a real device. A test needing real hardware is ignored or feature-gated and never runs in CI.
-- Don't split a file for size alone. Split for distinct responsibilities, navigability, or coupling. Cohesive files and flat generated data stay whole.
+- **Never split a source file just because it is large.** A split must separate distinct responsibilities, improve navigability, or cut coupling. One cohesive concern or flat generated data stays whole. Line count = prompt to review, not mandate to divide.
 - Start each stage by listing needed functionality and searching the package registry. Report downloads, last release, maintenance state, recommend — don't default to hand-rolling. Adding a dependency is a scope boundary: the finding goes to the user, not the manifest.
 - Errors typed, never stringly. New failure mode = new error type = public API = spec (gate 1).
 - Domain values typed, not bare primitives, wherever mixing two would be a bug. New domain type = public API = spec (gate 1).
 - Hostile/malformed/truncated external input → typed error, never a crash, out-of-bounds access, or unbounded allocation. Test every parse path with truncated input.
+- **A comment says what the code cannot.** No restating the adjacent statement/field/function name; no step narration (`// Create app state`); no banners or import-group headers; no paragraph where a sentence does. **Never cite this workflow** — plan, stage id (`s7`), gate (`Gate3#2`), task item, `(Shared)`, "sanctioned change": rots when the plan is deleted, meaningless to a later reader. Keep the technical content, drop the citation. Requirement IDs are the only sanctioned cross-reference. A lint-suppression justification names the condition that lifts it, never the stage that will. Applies to line and doc comments alike. {{STACK_CONVENTIONS}}
+
+## Conventions — text
+
 - Specs and AI-facing files (skills, agents, `AGENTS.md`/`CLAUDE.md` itself) stay concise and compact: facts only, no prose, no filler, zero information loss. Every word an agent must re-read on every load; padding is recurring cost, not one-time.
-- Never read a whole file when only part is needed, filter shell output before it lands in context — not after: `sh .claude/scripts/extract-section.sh` (see `list-sections.sh` first if the heading's unknown) or `sed -n '<start>,<end>p'` instead of `cat`/Read on a whole file; narrow `find`/`git show`/`git diff` at the shell instead of dumping the full output. Applies equally to the Read tool and a Bash `cat` — both cost the same context. Don't re-run a read-only command for output already in context this session — `git diff`, `git log`, `git show`, etc. against the same refs/paths already shown once — scroll back instead of re-running. **Enforced, not just advisory:** a `PreToolUse` hook (`.claude/scripts/hook-guard-shell.sh`) denies an unpiped `cat` of a markdown or large file, an unscoped `git show`/`git diff`, an unscoped `find -type f/d`, a raw `gh issue view`, and a raw `gh pr view`. A denial here means take the message's redirect, not retry the same command differently.
-- Read an existing PR's body/comments with `sh .claude/scripts/pr-view.sh <number>`, never raw `gh pr view` — same GitHub Projects-Classic GraphQL bug as `gh issue view` (`repository.pullRequest.projectCards`), reproduces with or without `--comments`.
-- **Every agent's output stays concise and compact** — chat responses, stage/final reports, commit messages, PR and issue bodies, review findings: say the same thing in fewer words whenever fewer words say it. No restating what a diff, file, or prior message already shows. Extra words for the same fact are a defect, not thoroughness — applies to every agent in this workflow, not just the files they write.
-- **No hard line wrap on anything posted externally** — issue bodies, PR bodies, PR/review comments. The host (GitHub, Jira, …) soft-wraps for display; a manually inserted `\n` mid-sentence survives rendering as a real line break and fragments the text. Paragraphs as single unbroken lines; only headings, list items, and code blocks get their own line. {{STACK_CONVENTIONS}}
+- **Every agent's output stays concise and compact** — chat responses, status lines, card logs, commit messages, PR and issue bodies, review findings: say the same thing in fewer words whenever fewer words say it. No restating what a diff, file, or prior message already shows.
+- **No hard line wrap on anything posted externally** — issue bodies, PR bodies, PR/review comments. The host (GitHub, Jira, …) soft-wraps for display; a manually inserted `\n` mid-sentence survives rendering as a real line break. Paragraphs as single unbroken lines; only headings, list items, and code blocks get their own line.
+- **Spec text never wrapped** — `docs/specs/` and any `spec-diff.md`: one requirement or edge-case entry, one physical line, however long, so `grep` returns the whole entry and `extract-id.sh` points at one line. **Commit messages are the exception: wrap** — subject ≤ 72 columns, body at 72. `git log` never soft-wraps.
 <!-- CORE:END conventions -->
 
 <!-- CORE:BEGIN scope -->

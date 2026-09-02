@@ -245,3 +245,20 @@ linters:
       rules:
         - name: exported
 ```
+
+## `{{GAUNTLET_STEPS}}`
+
+```sh
+run fmt   600  'test -z "$(gofmt -l .)"'
+run vet   900  go vet ./...
+run lint  900  golangci-lint run
+run build 900  go build ./...
+run test  1800 go test -race ./...
+run cov   1800 'go test -coverprofile=cover.out ./... && go tool cover -func=cover.out | tail -1'
+```
+
+## `{{COVERAGE_EXTRACT}}`
+
+```sh
+cov=$(grep -E '^total:' "$log" | tail -1 | grep -oE '[0-9.]+%')
+```

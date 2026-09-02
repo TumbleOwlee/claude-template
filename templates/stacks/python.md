@@ -215,3 +215,19 @@ select = ["E", "F", "W", "I", "N", "UP", "B", "A", "C4", "RET", "SIM", "ARG", "P
 [lint.per-file-ignores]
 "tests/**" = ["ARG"]
 ```
+
+## `{{GAUNTLET_STEPS}}`
+
+```sh
+run fmt   600  uv run ruff format --check .
+run lint  600  uv run ruff check .
+run types 900  uv run mypy src
+run test  1800 uv run pytest
+run cov   1800 uv run pytest --cov=src --cov-fail-under={{COVERAGE_FLOOR}}
+```
+
+## `{{COVERAGE_EXTRACT}}`
+
+```sh
+cov=$(grep -E '^TOTAL' "$log" | tail -1 | grep -oE '[0-9]+%' | tail -1)
+```

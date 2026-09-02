@@ -218,3 +218,19 @@ pre-commit:
         fi
         exit 0
 ```
+
+## `{{GAUNTLET_STEPS}}`
+
+```sh
+run fmt   600  pnpm prettier --check .
+run lint  900  pnpm eslint .
+run types 900  pnpm tsc --noEmit
+run test  1800 pnpm vitest run
+run cov   1800 pnpm vitest run --coverage.enabled --coverage.thresholds.lines={{COVERAGE_FLOOR}}
+```
+
+## `{{COVERAGE_EXTRACT}}`
+
+```sh
+cov=$(grep -E '^All files' "$log" | tail -1 | awk -F'|' '{gsub(/ /,"",$5); print $5 "%"}')
+```

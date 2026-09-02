@@ -13,7 +13,7 @@ Direction matters: this skill finds what a project **improved beyond** the templ
 
 ## 1. Inputs
 
-One or more project paths. Confirm each looks like a template descendant: has `AGENTS.md` with `<!-- CORE:BEGIN spec-driven -->` and `.claude/agents/spec-planner.md`. Skip + report any path that doesn't — comparing against an unrelated repo produces noise, not findings.
+One or more project paths. Confirm each looks like a template descendant: has `.claude/agents/spec-planner.md` and either `.claude/AGENTS.core.md` or an `AGENTS.md` with `<!-- CORE:BEGIN spec-driven -->` (a bootstrapped project strips the markers into `AGENTS.core.md`). Skip + report any path that doesn't — comparing against an unrelated repo produces noise, not findings.
 
 ## 2. Compare, per project
 
@@ -22,11 +22,11 @@ One or more project paths. Confirm each looks like a template descendant: has `A
 - Same script, content differs → read both; a bug fix, new flag, or batching improvement is a candidate; a project-specific hack (hard-coded path, project-only assumption) is not — say why, don't propose it.
 - Template's version is newer/more capable → staleness, not a finding (see §1).
 
-**`.claude/agents/*.md`** (`spec-planner.md`, `spec-implementer.md`, `spec-reviewer.md`) — diff against this repo's own. Ignore reformatting/line-wrap noise. Flag: a new stop-condition, a new "Never" bullet, a clearer rule the project's real usage forced into existence, a batching/wiring pattern this repo hasn't adopted yet. Skip anything that's just this project's stack leaking in (a language-specific example is fine to keep phrased generically if worth harvesting, but don't import the literal stack reference).
+**`.claude/agents/*.md`** (`spec-author.md`, `spec-planner.md`, `spec-implementer.md`, `spec-reviewer.md`) — diff against this repo's own. Ignore reformatting/line-wrap noise. Flag: a new stop-condition, a new "Never" bullet, a clearer rule the project's real usage forced into existence, a batching/wiring pattern this repo hasn't adopted yet. Skip anything that's just this project's stack leaking in (a language-specific example is fine to keep phrased generically if worth harvesting, but don't import the literal stack reference).
 
 **`.claude/skills/*/SKILL.md`** (`spec-feature`, `spec-request`, `spec-review`, `context-audit`, `agent-doc-audit`) — same approach. A project inventing a new skill entirely (not present in this repo) is itself a candidate — evaluate for genericity same as a new script.
 
-**`AGENTS.workflow.md`** (`### Task board`, every `### Gate`, `### Implement, stage by stage`, `### Reconcile the spec`, `### Merge`, `### Resume an interrupted run`) — should track `templates/AGENTS.workflow.md.tmpl`'s corresponding sections near-verbatim once `{{PLACEHOLDER}}` substitutions are mentally undone. This is the highest-value category: a project running the workflow for real invents fixes here that never make it back without a skill like this one looking. Diff against `templates/AGENTS.workflow.md.tmpl`, flag anything the project added or changed that isn't just its own placeholder value.
+**`AGENTS.workflow.md`** (root or `.claude/AGENTS.workflow.md` — location is a layout choice, not a finding; `### Principles`, `### Verify before an approval stop`, `### Task board`, `### Agent hand-off`, every `### Gate`, `### Implement, stage by stage`, `### Reconcile the spec`, `### Merge`, `### Resume an interrupted run`) — should track `templates/AGENTS.workflow.md.tmpl`'s corresponding sections near-verbatim once `{{PLACEHOLDER}}` substitutions are mentally undone. This is the highest-value category: a project running the workflow for real invents fixes here that never make it back without a skill like this one looking. Diff against `templates/AGENTS.workflow.md.tmpl`, flag anything the project added or changed that isn't just its own placeholder value.
 
 **`AGENTS.md` CORE spans** (`spec-driven`, `tdd`, `build`, `conventions`, `scope`) — `build`/`conventions`/`scope` are inherently project-specific (stack commands, house style); don't diff their content wholesale. Do watch for a new *kind* of rule that generalizes regardless of stack (e.g. a citation convention, a structural constraint on spec files) — those are candidates even inside an otherwise project-specific span.
 

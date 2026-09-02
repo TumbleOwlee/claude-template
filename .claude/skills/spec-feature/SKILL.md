@@ -7,21 +7,24 @@ description: Drive one behavior change through the repo's gated spec-driven TDD 
 
 **Concise, compact, facts only.**
 
-`AGENTS.workflow.md` is authority for every gate, the task board, and the subagents — read it and follow it exactly. This skill is only the invocation entrypoint; it does not restate that procedure. Conflict between this file and `AGENTS.workflow.md` → `AGENTS.workflow.md` wins.
+`AGENTS.workflow.md` is authority for every gate, the task board, and the subagents — follow exactly, one heading at a time per the table (`AGENTS.md`'s `## Workflow` is a pointer to it). This skill is the entrypoint only; it restates nothing. Conflict → `AGENTS.workflow.md` wins.
 
 ## Before anything else
 
-Check `.claude/tasks/`. Cards outside `open/`+`done/` = a run was interrupted → `AGENTS.workflow.md`'s *Resume an interrupted run*, don't start fresh.
+Check `.claude/tasks/`. Cards outside `open/`+`done/` = interrupted run → `### Resume an interrupted run`, don't start fresh.
 
 ## Where each step lives
 
-Pull one `AGENTS.workflow.md` section at a time, never the whole file: `sh .claude/scripts/extract-section.sh '<heading>' AGENTS.workflow.md`.
+One section at a time: `sh .claude/scripts/extract-section.sh '<heading>' AGENTS.workflow.md`.
 
 | Step | Heading |
 |---|---|
-| Parent card | `### Gate 1 — spec diff. Orchestrator runs this itself. Stop for approval.` (the **Board:** bullet) |
-| Gate 1 — spec diff | `### Gate 1 — spec diff. Orchestrator runs this itself. Stop for approval.` |
-| Gate 1b — tracking issue | `### Gate 1b — tracking issue. Orchestrator runs this itself. Stop for approval.` |
+| Orchestrator role, branch/worktree/agent rules — read once per run | `### Principles` |
+| What runs before any approval stop | `### Verify before an approval stop` |
+| Agent hand-off (status lines, file paths) | `### Agent hand-off` |
+| Parent card | `### Gate 1 — spec diff. Stop for approval.` (the **Board:** bullet) |
+| Gate 1 — spec diff | `### Gate 1 — spec diff. Stop for approval.` |
+| Gate 1b — tracking issue | `### Gate 1b — tracking issue. Stop for approval.` |
 | Gate 2 — implementation plan | `### Gate 2 — implementation plan. Stop for approval.` |
 | Implement, stage by stage | `### Implement, stage by stage` |
 | Reconcile the spec | `### Reconcile the spec` |

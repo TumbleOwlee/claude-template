@@ -301,3 +301,20 @@ Checks: >
 WarningsAsErrors: "bugprone-*,performance-*"
 HeaderFilterRegex: "^(src|include)/"
 ```
+
+## `{{GAUNTLET_STEPS}}`
+
+```sh
+run configure 900  cmake --preset dev
+run build     1800 cmake --build --preset dev
+run test      1800 ctest --preset dev --output-on-failure
+run fmt       600  "clang-format --dry-run --Werror \$(git ls-files '*.cpp' '*.hpp' '*.c' '*.h')"
+run tidy      1800 "clang-tidy -p build/dev \$(git ls-files '*.cpp')"
+run cov       1800 gcovr --root . --fail-under-line {{COVERAGE_FLOOR}}
+```
+
+## `{{COVERAGE_EXTRACT}}`
+
+```sh
+cov=$(grep -E '^TOTAL' "$log" | tail -1 | grep -oE '[0-9]+%' | head -1)
+```

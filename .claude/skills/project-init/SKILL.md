@@ -41,18 +41,18 @@ Check what exists: `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, 
 
 Pristine fork = only bootstrap `CLAUDE.md`, `README.md`, `templates/`, `.claude/` — treat these as template scaffolding to replace, not user content; don't ask about them.
 
-`.claude/tasks/` (agent task board) and `.claude/settings.json` (its `SessionStart` detector) ship ready-to-use: create nothing there, ask nothing about them, delete nothing — an empty board is correct pre-first-feature state. Exception: once step 5's script copy lands `.claude/scripts/hook-guard-shell.sh` in the new project, append its `PreToolUse` wiring to the copied `settings.json` (see that script's row) — the block only works once the script exists on disk, which it doesn't in this template repo itself.
+`.claude/tasks/` (agent task board) and `.claude/settings.json` (its `SessionStart` detector) ship ready-to-use: create nothing there, ask nothing about them, delete nothing — an empty board is correct pre-first-feature state. Exception: once step 7's script copy lands `.claude/scripts/hook-guard-shell.sh` and `hook-guard-attribution.sh` in the new project, append their `PreToolUse` wiring to the copied `settings.json` (see the `hook-guard-shell.sh` row) — the block only works once the scripts exist on disk, which they don't in this template repo itself.
 
 Any other pre-existing target file: show it, ask keep / overwrite / merge. Record the decision — step 7 honours it.
 
 If `AGENTS.md` already exists and looks like this workflow (contains "Gate 1"): say so, ask whether user wants a re-run (re-ask everything, rewrite) or a targeted edit. A re-run on a live project silently discards local customisation — make that explicit before proceeding.
 
 **PR host.** Read the remote: `git remote get-url origin` (fall back to `git config --get remote.origin.url`). Determines `{{PR_OPEN_LINE}}` (step 7). No remote → `{{PR_OPEN_LINE}}` = manual variant below, nothing to detect.
-- `github.com` → `{{PR_OPEN_LINE}}` = `` Open via `gh pr create`. `` — no action here; `gh` already covers it.
+- `github.com` → `{{PR_OPEN_LINE}}` = `` Open via `gh pr create --title "$(head -1 .claude/tasks/artifacts/<slug>/pr.md)" --body-file <(tail -n +2 .claude/tasks/artifacts/<slug>/pr.md)`. `` — no action here; `gh` already covers it.
 - `bitbucket.org` → Bitbucket-hosted, handled in step 4c below (sets `{{PR_OPEN_LINE}}`).
 - anything else (GitLab, self-hosted, unrecognized) → `AskUserQuestion`: **set up instructions** or **skip**. Either way `{{PR_OPEN_LINE}}` = manual variant below — this skill doesn't know the host's auth/CLI shape well enough to template automation for it. Set up → additionally give the host's CLI/API setup pointer generically (its hosted CLI if one exists, else its REST API + a personal access token) in chat, not in any generated file. Skip → note in the final report that PR opening (gate 4) is manual for this host.
 
-Manual variant (no host automation): `{{PR_OPEN_LINE}}` = `No supported host automation configured — report the drafted title/body and ask the user to open the PR themselves.`
+Manual variant (no host automation): `{{PR_OPEN_LINE}}` = `No supported host automation configured — open pr.md for the user (show-file.sh) and ask them to open the PR themselves from it.`
 
 ## 2. Ask the project facts
 
@@ -132,7 +132,7 @@ Write verbatim to `.claude/bitbucket.local.json`:
 ```json
 { "workspace": "...", "repoSlug": "...", "username": "...", "appPassword": "..." }
 ```
-Never echo the app password back in chat once written. `.gitignore` already carries `.claude/bitbucket.local.json` unconditionally — nothing more to do here. Sets `{{PR_OPEN_LINE}}` = `` Open via the Bitbucket REST API (`/2.0/repositories/<workspace>/<repo>/pullrequests`), using `.claude/bitbucket.local.json`. `` — substitute the real `<workspace>`/`<repo>` values, not the literal placeholders.
+Never echo the app password back in chat once written. `.gitignore` already carries `.claude/bitbucket.local.json` unconditionally — nothing more to do here. Sets `{{PR_OPEN_LINE}}` = `` Open via the Bitbucket REST API (`/2.0/repositories/<workspace>/<repo>/pullrequests`), using `.claude/bitbucket.local.json`; `title` = line 1 of pr.md, `description` = the rest, read from the file into the JSON payload with `jq -Rs`, never retyped. `` — substitute the real `<workspace>`/`<repo>` values, not the literal placeholders.
 
 ## 5. Ask the scope boundaries
 
@@ -155,7 +155,7 @@ Four things substitution alone doesn't handle:
 - **`<!-- PRUNE ME -->` blocks.** `AGENTS.md.tmpl` marks its stack-neutral conventions this way. Drop bullets that don't apply to this project, merge any the stack block restates in stack-specific terms (keep the specific wording), delete the marker comment. Two bullets saying the same thing in different words is how a conventions section starts getting ignored.
 - **Source paths in the hook blocks.** The `spec-reminder` and `test-id-reminder` hooks match product code by path (`^src/`, `^(src|include)/`, `*.go`). Point them at this project's actual source directory, or the reminder never fires.
 - **No line-wrapping, anywhere.** One logical statement/paragraph stays one physical line, however long a substituted slot makes it (coverage line, stack name, area description) — never hard-wrapped to a column count. Keeps every line `grep -n`-able for its full text, not just a truncated first fragment.
-- **`.claude/AGENTS.core.md`.** After `AGENTS.md` is fully substituted and pruned, extract the spans marked `<!-- CORE:BEGIN … --> … <!-- CORE:END … -->` (Spec-driven, TDD, Build/test/lint, Conventions, Scope boundaries) into a new file `.claude/AGENTS.core.md`, in that order, under a one-line header: `Excerpt of AGENTS.md — spec-driven core, TDD order, build/test/lint, conventions, scope boundaries. Full gates and task board: ../AGENTS.md. Regenerate by re-copying these sections if they change.` Then strip the `CORE:BEGIN`/`CORE:END` marker comments from the copy that becomes `AGENTS.md` itself — they're authoring metadata, not part of the router. This is what lets a spawned `spec-planner`/`spec-implementer`/`spec-reviewer` read one short file instead of the whole router.
+- **`.claude/AGENTS.core.md`.** After `AGENTS.md` is fully substituted and pruned, extract the spans marked `<!-- CORE:BEGIN … --> … <!-- CORE:END … -->` (Spec-driven, TDD, Build/test/lint, Conventions — reading/code/text, Scope boundaries) into a new file `.claude/AGENTS.core.md`, in that order, under a one-line header: `Excerpt of AGENTS.md — spec-driven core, TDD order, build/test/lint, conventions, scope boundaries. Router: ../AGENTS.md. Gates and task board: ../AGENTS.workflow.md (orchestrator only, never read by AGENTS.core.md readers). Regenerate by re-copying these sections if they change.` Then strip the `CORE:BEGIN`/`CORE:END` marker comments from the copy that becomes `AGENTS.md` itself — they're authoring metadata, not part of the router. This is what lets a spawned `spec-author`/`spec-planner`/`spec-implementer`/`spec-reviewer` read one short file instead of the whole router. Heading text must survive verbatim — the agents extract `## Conventions — code` etc. by exact heading.
 
 | Template | Output |
 |---|---|
@@ -177,7 +177,11 @@ Four things substitution alone doesn't handle:
 | `templates/.claude/scripts/failed-workflow.sh` | `.claude/scripts/failed-workflow.sh` (static — copy as-is, `chmod +x`) — CI backend auto-detected at runtime from `.github/workflows/*.yml` (GitHub Actions) vs `bitbucket-pipelines.yml` (Bitbucket Pipelines, needs `.claude/bitbucket.local.json`) |
 | `templates/.claude/scripts/issue-view.sh` | `.claude/scripts/issue-view.sh` (static — copy as-is, `chmod +x`) — tracker auto-detected at runtime from `.claude/jira.local.json` presence (Jira) vs absence (GitHub, via `gh`). Note in the final report: if this script or `failed-workflow.sh` ever falls short of what's needed, never fall back to raw `gh`/`git`/`curl` commands — stop and report the shortfall to the user instead. |
 | `templates/.claude/scripts/pr-view.sh` | `.claude/scripts/pr-view.sh` (static — copy as-is, `chmod +x`) — **only if step 1's remote is `github.com` or `bitbucket.org`** (no PR concept otherwise); host auto-detected same as `failed-workflow.sh`. Same fallback rule as `issue-view.sh`: never raw `gh`/`curl` if it falls short. |
-| `templates/.claude/scripts/hook-guard-shell.sh` | `.claude/scripts/hook-guard-shell.sh` (static — copy as-is, `chmod +x`) — denies the Conventions-bypass shapes it detects instead of just advising against them. Requires appending to `.claude/settings.json`'s `hooks` object (see step 1's exception): `"PreToolUse": [{"matcher": "Bash", "hooks": [{"type": "command", "command": "sh .claude/scripts/hook-guard-shell.sh"}]}]` |
+| `templates/.claude/scripts/hook-guard-shell.sh` | `.claude/scripts/hook-guard-shell.sh` (static — copy as-is, `chmod +x`) — denies the Conventions-bypass shapes it detects instead of just advising against them. Requires appending to `.claude/settings.json`'s `hooks` object (see step 1's exception), both guards in one matcher, absolute via `$CLAUDE_PROJECT_DIR` so the hook still resolves when the shell cwd is a worktree: `"PreToolUse": [{"matcher": "Bash", "hooks": [{"type": "command", "command": "sh \"$CLAUDE_PROJECT_DIR\"/.claude/scripts/hook-guard-shell.sh"}, {"type": "command", "command": "sh \"$CLAUDE_PROJECT_DIR\"/.claude/scripts/hook-guard-attribution.sh"}]}]` |
+| `templates/.claude/scripts/hook-guard-attribution.sh` | `.claude/scripts/hook-guard-attribution.sh` (static — copy as-is, `chmod +x`) — denies a `git commit`/`gh pr create`/`gh pr edit` carrying a `Co-Authored-By` or "Generated with" trailer. Wired with `hook-guard-shell.sh` above. |
+| `templates/.claude/scripts/hook-guard-readonly.sh` | `.claude/scripts/hook-guard-readonly.sh` (static — copy as-is, `chmod +x`) — read-only guard for `spec-reviewer`, wired by that agent's own frontmatter `hooks:` block (nothing to add to `settings.json`). Its `cargo)` case is the one stack-specific block: extend it with this stack's package-manager mutating subcommands if the stack has any; a foreign block is harmless. |
+| `templates/.claude/scripts/show-file.sh` | `.claude/scripts/show-file.sh` (static — copy as-is, `chmod +x`) — opens a file for the user outside the agent's context (tmux+glow, wslview, tmux+less, else a manual hint); refuses a `*.summary.md`/`*.verdict.md` over 25 lines / 2 KB. |
+| `templates/.claude/scripts/gauntlet.sh.tmpl` | `.claude/scripts/gauntlet.sh` (`chmod +x`) — one `run <step> <timeout> <command>` line per confirmed command, from the stack file's `{{GAUNTLET_STEPS}}` block (edit the lines if the user corrected the command block in step 3 — they must match `{{FULL_COMMANDS}}` exactly), plus the stack's `{{COVERAGE_EXTRACT}}` line. Stack not in the table: write the `run` lines yourself from the five commands, timeouts 900/1800, and `cov=` (prints `cov=?`). |
 | stack file's `ci` block | `.github/workflows/check.yml` — **only if step 1's remote is `github.com`** |
 | stack file's `bitbucket-pipelines` block | `bitbucket-pipelines.yml` — **only if step 1's remote is `bitbucket.org`** |
 | stack file's `lefthook` block | `.lefthook.yml` — always, host-agnostic |
@@ -198,7 +202,7 @@ Placeholders used across templates:
 | Placeholder | From |
 |---|---|
 | `{{PROJECT_NAME}}`, `{{ONE_LINER}}`, `{{PROJECT_KIND}}` | step 2 |
-| `{{STACK_NAME}}`, `{{FULL_COMMANDS}}`, `{{NARROW_COMMANDS}}`, `{{UNIT_TEST_CONVENTION}}`, `{{INTEGRATION_TEST_CONVENTION}}`, `{{ID_CITATION_EXAMPLE}}`, `{{STACK_CONVENTIONS}}`, `{{SETUP_STEPS}}` | step 3 stack file |
+| `{{STACK_NAME}}`, `{{FULL_COMMANDS}}`, `{{NARROW_COMMANDS}}`, `{{UNIT_TEST_CONVENTION}}`, `{{INTEGRATION_TEST_CONVENTION}}`, `{{ID_CITATION_EXAMPLE}}`, `{{STACK_CONVENTIONS}}`, `{{SETUP_STEPS}}`, `{{GAUNTLET_STEPS}}`, `{{COVERAGE_EXTRACT}}` | step 3 stack file (`{{ID_CITATION_EXAMPLE}}` also lands in `docs/specs/README.md` rule 8) |
 | `{{AREA_ROUTING_TABLE}}` | step 4 — AGENTS.md rows, links relative to repo root (`./docs/specs/<area>/`) |
 | `{{AREA_TABLE}}` | step 4 — **link base differs per file**: `./<area>/` in `docs/specs/README.md`, `./docs/specs/<area>/` in `PRD.md`. Same rows, different hrefs; get this wrong and every link in one of the two files is dead. |
 | `{{COVERAGE_FLOOR}}`, `{{COVERAGE_LINE}}` | step 4 |
@@ -217,10 +221,10 @@ Coverage-dependent slots, all filled from the floor chosen in step 4 — and all
 |---|---|---|
 | `{{COVERAGE_FLOOR}}` | `N` | — (coverage command dropped) |
 | `{{COVERAGE_LINE}}` | `- Coverage floor N% of lines, CI-gated on every push and PR. A floor, not a target — never inflate it with tests that execute code without asserting.` | empty |
-| `{{COVERAGE_GAUNTLET_WORD}}` | `/coverage` | empty |
 | `{{COVERAGE_PLAN_CLAUSE}}` | `; expected coverage impact` | empty |
 | `{{COVERAGE_STAGE_CLAUSE}}` | `, coverage ≥ N%` | empty |
-| `{{COVERAGE_PR_CLAUSE}}` | `, the coverage number` | empty |
+| `{{COVERAGE_PR_CLAUSE}}` | `, ending with the current coverage percentage` | empty |
+| `{{GAUNTLET_STEPS}}` / `{{COVERAGE_EXTRACT}}` | stack file blocks as-is | drop the `run cov …` line; `{{COVERAGE_EXTRACT}}` = `cov=` (status line prints `cov=?`) |
 | `{{COVERAGE_CONTRIB_LINE}}` | `Line coverage must stay at or above **N%**, enforced in CI. Coverage is a floor, not a goal — never pad it with tests that execute code without asserting on it.` | empty |
 
 Tracker-dependent slots (choice + branch from step 4b):
@@ -238,14 +242,14 @@ Do **not** create the language manifest (`Cargo.toml`, `package.json`, …) or a
 
 ## 8. Remove the template scaffolding
 
-Delete `templates/`, `.claude/skills/project-init/`, `.claude/skills/init-workspace/` and `.claude/skills/template-harvest/` — the last is this repo's own meta-tool for auditing template descendants; a descendant has nothing to audit. Keep `.claude/agents/`, remaining `.claude/skills/`, `.claude/tasks/` and `.claude/settings.json` — the workflow uses them. Do not delete `.git`, do not commit — leave the working tree dirty so the user reviews the diff.
+Delete `templates/`, `.claude/skills/project-init/`, `.claude/skills/init-workspace/` and `.claude/skills/template-harvest/` — the last is this repo's own meta-tool for auditing template descendants; a descendant has nothing to audit. Keep `.claude/agents/` (`spec-author`, `spec-planner`, `spec-implementer`, `spec-reviewer`), remaining `.claude/skills/`, `.claude/tasks/` and `.claude/settings.json` — the workflow uses them. Do not delete `.git`, do not commit — leave the working tree dirty so the user reviews the diff.
 
 ## 9. Report and hand over
 
 State what was created, overwritten and deleted, then the three things the user does next:
 
 1. Review the diff and commit the scaffolding on `main` (this is the one commit that legitimately lands on `main` without going through the gates).
-2. Install the hook runner if lefthook was generated (`lefthook install`).
+2. Install the hook runner if lefthook was generated (`lefthook install`). Optionally `tmux` + `glow` (or `wslview` on WSL) so `show-file.sh` can open approval files outside the agent's context; without them it prints the path to open by hand.
 3. Start the first feature: describe it, and the agent opens **gate 1** — the spec diff — before any code.
 
 Then stop. Do not roll into the first feature.
