@@ -17,7 +17,7 @@ Router for AI coding agents. Read first.
 - Pre-existing spec/code disagreement outside your task: stop, raise separately. Folding it in widens approved work, skips its own review.
 - Specs carry no `file:line`. Locate code with search tools.
 - Requirement and edge-case IDs (`-R-`, `-E-`) stable, append-only. Cite in commits and PRs.
-- One requirement or edge-case entry, one physical line, never wrapped. Find by `grep -rn <ID or keyword> docs/specs/`; exact file:line: `sh .claude/scripts/extract-id.sh <ID> [<ID> ...]` (batch every ID needed into one call). One section of a large file: `sh .claude/scripts/extract-section.sh '## <heading>' path/to/file.md`.
+- Find an entry by `grep -rn <ID or keyword> docs/specs/`; exact file:line: `sh .claude/scripts/extract-id.sh <ID> [<ID> ...]` (batch every ID needed into one call).
 
 ## TDD — fixed order, every stage
 

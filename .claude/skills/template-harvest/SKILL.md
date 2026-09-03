@@ -38,7 +38,7 @@ One table per project, most-impactful first:
 
 `file — what changed — genuine improvement or project-specific (one line why) — proposed template action (add / reword / skip)`
 
-No praise, no summary paragraph. End with a one-line "Not harvested" list for anything that was staleness, not an improvement (§1) — keeps the two directions visibly separate.
+No praise, no summary paragraph. End with the one-line "Not harvested" list (intro).
 
 ## 4. If the user approves a finding
 

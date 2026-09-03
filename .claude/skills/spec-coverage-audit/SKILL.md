@@ -61,8 +61,6 @@ the nearest area.
 
 ## 4. Draft the diff
 
-Do not write anything yet — only draft.
-
 - **Gaps within an existing area**: new `<PREFIX>-R-nnn` "shall" entries,
   next free number for that area's prefix (append-only — check the highest
   existing number in that `requirements.md`, never reuse or renumber).
@@ -81,8 +79,7 @@ for one explicit approval: derive the spec text, stop before writing.
 No tracking issue, no commit — code already exists, so there's no
 implementation step to track.
 
-Rejected/edited items: adjust and re-confirm before writing. Never write a
-requirement the user didn't see in this form.
+Rejected/edited items: adjust and re-confirm before writing.
 
 ## 6. Write
 
@@ -100,8 +97,7 @@ for it:
 | <area covers> | [`<area>`](<spec-dir>/<area>/) | `<PREFIX>-R-*` |
 ```
 
-Then append the approved requirement entries to each `requirements.md` —
-one requirement per physical line, never wrapped.
+Then append the approved requirement entries to each `requirements.md`.
 
 Report what was written (files touched, requirement IDs added, any new
 area created). Then stop — no commit, no issue, no PR. The user reviews and

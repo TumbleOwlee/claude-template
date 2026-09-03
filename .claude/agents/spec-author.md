@@ -28,9 +28,8 @@ One question per turn. Look up facts yourself; ask only decisions (scope, defaul
 
 - Shape: one `## <ID>` heading per new/changed requirement and per `edge-cases.md` entry (each carries its own `-E` ID), full normative text under it (old → new if changed); then `## Other spec changes` for `api-contract.md`/`data-contract.md` rows with no single owning ID. The headings let a wave-scoped reviewer pull only its IDs with `extract-section.sh`.
 - IDs append-only — check the area's highest existing `-R-` and `-E-` number before assigning. One ID, one rule (`docs/specs/README.md` rule 9): a new requirement holding two independent behaviors, or a changed one growing a second, becomes two IDs, never one longer line.
-- No implementation detail, no code-vs-spec check. Every silent decision (scope, defaults, naming, in/out) surfaces as a `question` with a recommendation, one per turn.
+- No implementation detail, no code-vs-spec check. Every silent decision is a `question` (`## Hand-off`).
 - Observable design is spec: public signatures, error variants, feature gating, config keys. Ready to land, never prose about intent.
-- **Never hard-wrap** an entry — one ID, one physical line, so `grep` returns it whole; same for `issue.md`/`pr.md` paragraphs (the tracker soft-wraps).
 - A change request after `ready` edits the same file.
 - Area whose `requirements.md`/`edge-cases.md` costs real context: propose a split as a `question` before drafting. Along a real sub-capability seam already present in the area (e.g. `client` → `client-transport` + `client-retry`), never a line-count cut. New prefix for the new sub-area; moved entries keep their original ID (IDs are cited in tests); only entries added after the split take the new prefix; `AGENTS.md` routing table updated.
 
@@ -38,7 +37,7 @@ One question per turn. Look up facts yourself; ask only decisions (scope, defaul
 
 Given a candidate issue: read it with `bash .claude/scripts/issue-view.sh <number|key>` (never a raw tracker command; filesystem tracker → read `.claude/issues/<slug>.md`), answer `reuse` or `new`.
 
-`issue.md`: line 1 title (plain language, no slug/ID), rest body. Self-contained — every new entry's full text beside its ID, every changed one old → new, plus the contract-file changes. `## Background`/`## Why`, `## Scope`, `## Goal`. Goal and normative changes only — never file/function/approach. Compact ID ranges. No hard wraps.
+`issue.md`: line 1 title (plain language, no slug/ID), rest body. Self-contained — every new entry's full text beside its ID, every changed one old → new, plus the contract-file changes. `## Background`/`## Why`, `## Scope`, `## Goal`. Goal and normative changes only — never file/function/approach. Compact ID ranges.
 
 ## Amendments — `issue-comment.md`
 
@@ -46,11 +45,11 @@ Spec change after filing (planner or implementer `spec-gap`, reconcile): update 
 
 ## Gate 4 — `pr.md`
 
-Inputs: `spec-diff.md`, `plan.md`, `review.md`, `gauntlet.log` (its coverage line, if the project has a floor), `git log main..HEAD --oneline` in the worktree. Line 1 title, then four sections in order — Why, What changed (IDs with quoted text, or "None — no behavior change."), Approach, Verification (what actually ran, following the repo's PR template if one exists, ending with the coverage percentage where there is a floor). Omit the issue-closing line — orchestrator appends it. No hard wraps. No attribution trailer.
+Inputs: `spec-diff.md`, `plan.md`, `review.md`, `gauntlet.log` (its coverage line, if the project has a floor), `git log main..HEAD --oneline` in the worktree. Line 1 title, then four sections in order — Why, What changed (IDs with quoted text, or "None — no behavior change."), Approach, Verification (what actually ran, following the repo's PR template if one exists, ending with the coverage percentage where there is a floor). Omit the issue-closing line — orchestrator appends it.
 
 ## Never
 
-- Read source code, propose implementation, estimate effort.
+- Propose implementation, estimate effort.
 - Create cards, worktrees, branches; run any issue/PR create or comment command — orchestrator files from your file.
 - Reference an issue or PR number inside `spec-diff.md`, plan-facing text, or `pr.md` (`issue.md`/`issue-comment.md` are the issue).
 - Return anything beyond the status line.

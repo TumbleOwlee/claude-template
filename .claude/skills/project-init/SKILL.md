@@ -30,7 +30,7 @@ claude plugin marketplace add JuliusBrussee/caveman && claude plugin install cav
 Optional — don't block on it. Continue to step 1 either way.
 
 Check whether `rtk` is on PATH (`command -v rtk`). Found → `include_rtk_section = true`, skip the rest of this check. Missing → `AskUserQuestion`: **install now** or **skip**.
-- **Install now**: if `command -v cargo` succeeds, run `cargo install --git https://github.com/rtk-ai/rtk`; otherwise run `curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh`. Either way, afterward re-run `command -v rtk` regardless of the install command's exit code — that's what decides `include_rtk_section`, not the exit code itself (covers PATH-not-refreshed and silent-failure cases alike). Report success or failure to the user.
+- **Install now**: if `command -v cargo` succeeds, run `cargo install --git https://github.com/rtk-ai/rtk`; otherwise run `curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh`. Either way, `command -v rtk` afterwards decides `include_rtk_section`, never the install's exit code. Report the outcome.
 - **Skip**: `include_rtk_section = false`.
 
 `include_rtk_section` feeds `{{RTK_SECTION}}` in step 7 — no separate prompt to remove anything later; declining (or a failed install) leaves the placeholder empty. Non-blocking either way — continue to step 1.
@@ -41,7 +41,7 @@ Check what exists: `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, 
 
 Pristine fork = only bootstrap `CLAUDE.md`, `README.md`, `templates/`, `.claude/` — treat these as template scaffolding to replace, not user content; don't ask about them.
 
-`.claude/tasks/` (agent task board) and `.claude/settings.json` (its `SessionStart` detector) ship ready-to-use: create nothing there, ask nothing about them, delete nothing — an empty board is correct pre-first-feature state. Exception: once step 7's script copy lands `.claude/scripts/hook-guard-shell.sh` and `hook-guard-attribution.sh` in the new project, append their `PreToolUse` wiring to the copied `settings.json` (see the `hook-guard-shell.sh` row) — the block only works once the scripts exist on disk, which they don't in this template repo itself.
+`.claude/tasks/` (agent task board) and `.claude/settings.json` (its `SessionStart` detector) ship ready-to-use: create nothing there, ask nothing about them, delete nothing — an empty board is correct pre-first-feature state. Exception: the `PreToolUse` wiring in step 7's `hook-guard-shell.sh` row, appended once those scripts exist on disk.
 
 Any other pre-existing target file: show it, ask keep / overwrite / merge. Record the decision — step 7 honours it.
 
@@ -109,9 +109,9 @@ Separate `AskUserQuestion`, options **GitHub / Jira / Filesystem / None** — ea
     ```
     Never echo the token back in chat once written. `.gitignore` already carries `.claude/jira.local.json` unconditionally (ships in the template itself) — nothing more to do here.
 - **Filesystem** → `templates/fragments/issue-filesystem.md`. No credentials, no external check. Ensure `.claude/issues/.gitkeep` gets created in step 7 so the empty directory is tracked.
-- **None** → `templates/fragments/issue-none.md`. `{{CLOSES_CLAUSE}}` empty.
+- **None** → `templates/fragments/issue-none.md`.
 
-`{{CLOSES_CLAUSE}}` per choice (a clause between "orchestrator" and "pushes" in gate 4 — the one PR-body line the orchestrator writes itself): GitHub → `` appends `Closes #<issue>` as the body's last line, then `` · Jira → `` appends `references <ISSUE-KEY>` as the body's last line, then `` · Filesystem → empty (PR body already carries the goal) · None → empty.
+`{{CLOSES_CLAUSE}}` per choice: step 7's tracker-dependent table.
 
 ## 4c. Bitbucket credentials
 
@@ -146,9 +146,7 @@ This is the only approval gate in this skill. After it, write everything without
 
 ## 7. Write the files
 
-`.tmpl` suffix = has `{{PLACEHOLDER}}`s, needs substitution. No suffix = static, copy byte-for-byte, no read-and-rewrite. Check which before touching a file — writing a static file through the substitution pass is harmless but wasted work; skipping substitution on a `.tmpl` ships a literal `{{PLACEHOLDER}}`.
-
-For `.tmpl` files: read, substitute every placeholder, write to the repo root (drop the `.tmpl` suffix). Never leave a `{{PLACEHOLDER}}` unfilled — that's a bug. Grep written files for `{{` before reporting; a leak means a missed slot.
+`.tmpl` suffix = has `{{PLACEHOLDER}}`s, needs substitution. No suffix = static, copy byte-for-byte, no read-and-rewrite. For `.tmpl` files: read, substitute every placeholder, write to the repo root (drop the suffix). Grep written files for `{{` before reporting; a leak means a missed slot.
 
 Four things substitution alone doesn't handle:
 
@@ -230,12 +228,11 @@ Coverage-dependent slots, all filled from the floor chosen in step 4 — and all
 | `{{GAUNTLET_STEPS}}` / `{{COVERAGE_EXTRACT}}` | stack file blocks as-is | drop the `run cov …` line; `{{COVERAGE_EXTRACT}}` = `cov=` (status line prints `cov=-`) |
 | `{{COVERAGE_CONTRIB_LINE}}` | `Line coverage must stay at or above **N%**, enforced in CI. Coverage is a floor, not a goal — never pad it with tests that execute code without asserting on it.` | empty |
 
-Tracker-dependent slots (choice + branch from step 4b):
+Tracker-dependent slot (choice from step 4b; `{{ISSUE_WORKFLOW}}` is the fragment named there). `{{CLOSES_CLAUSE}}` sits between "orchestrator" and "pushes" in gate 4 — the one PR-body line the orchestrator writes itself:
 
-| Placeholder | GitHub | Jira (MCP) | Jira (credentials) | Filesystem | None |
-|---|---|---|---|---|---|
-| `{{ISSUE_WORKFLOW}}` | `issue-github.md` | `issue-jira-mcp.md` | `issue-jira-credentials.md` | `issue-filesystem.md` | `issue-none.md` |
-| `{{CLOSES_CLAUSE}}` | `` appends `Closes #<issue>` as the body's last line, then `` | `` appends `references <ISSUE-KEY>` as the body's last line, then `` | same as Jira (MCP) | empty | empty |
+| GitHub | Jira (MCP / credentials) | Filesystem | None |
+|---|---|---|---|
+| `` appends `Closes #<issue>` as the body's last line, then `` | `` appends `references <ISSUE-KEY>` as the body's last line, then `` | empty (PR body already carries the goal) | empty |
 
 The five issue-tracker fragment files live in `templates/fragments/`; `templates/fragments/rtk-instructions.md` (step 0) lives alongside them.
 

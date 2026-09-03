@@ -7,11 +7,7 @@ description: Add a governed spec directory (capability areas, requirement-ID con
 
 **Concise, compact, facts only.**
 
-This skill only makes a `docs/specs/`-equivalent structure exist and be
-findable. It never asks about stack, CI, hooks, or issue-tracker
-credentials, never sets up build/test/lint, and never adds gates 2-4
-(implementation plan, worktree, review) — only the minimal note in step 6
-covering how a spec change itself gets proposed and approved.
+Gates 2-4 (implementation plan, worktree, review) stay out; step 6's note covers only how a spec change itself gets proposed and approved.
 
 Self-contained: every source file this skill writes lives under this
 skill's own directory (`templates/`, `scripts/`). Copy this skill's folder
@@ -107,8 +103,7 @@ placeholder.
 ## 6. Append the routing section
 
 Append to the target file from step 1 (or write the new minimal file if
-neither existed) a section containing exactly three things, nothing more —
-no build/test/lint, no conventions, no scope boundaries, no gates 2-4:
+neither existed) a section containing exactly three things, nothing more:
 
 1. **Routing table** — one row per area, plus the fixed
    `non-functional-requirements.md` row:

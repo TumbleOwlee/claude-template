@@ -28,9 +28,9 @@ Also given the **absolute path of your own task card** (main checkout, outside y
 2026-01-02T14:12 stopped: <what and why>
 ```
 
-Move card `open`→`inprogress/` on start. On green, card →`inreview/`, end turn on `status=inreview stage=s<n>`. Sequential: commit only once resumed with approval, then `status=committed stage=s<n>`. Parallel (one stage, own worktree): commit on green in your worktree before `status=inreview` — a merge needs a commit; resumed with findings, fix and amend that commit. Never push. Resumed with a `review.md` path: fix exactly its findings for your stage, re-run the gauntlet, `status=inreview` again. Stage `s0` (land spec) is yours: copy the approved text where the plan says, one commit, no code.
+Move card `open`→`inprogress/` on start. On green, card →`inreview/`, end turn on `status=inreview stage=s<n>`. Sequential: commit only once resumed with approval, then `status=committed stage=s<n>`. Parallel (one stage, own worktree): commit on green in your worktree before `status=inreview` — a merge needs a commit; resumed with findings, fix and amend that commit. Resumed with a `review.md` path: fix exactly its findings for your stage, re-run the gauntlet, `status=inreview` again. Stage `s0` (land spec) is yours: copy the approved text where the plan says, one commit, no code.
 
-May be given every stage (sequential) or some (others run in parallel). Implement assigned stages only, in plan order, touching only their listed files — another agent owns the rest; editing it causes an invisible merge conflict, and the reviewer blocks on it. Stage needs an unlisted file → stop-and-report, not a small edit. That includes tooling, test helpers, flaky-test fixes and scripts you notice on the way: not in `files` = not yours, however small.
+May be given every stage (sequential) or some (others run in parallel). Implement assigned stages only, in plan order, touching only their listed files — another agent owns the rest; editing it causes an invisible merge conflict, and the reviewer blocks on it. Not in `files` = not yours, however small — tooling, test helpers, flaky-test fixes and scripts you notice on the way included.
 
 ## Order, per stage, no exceptions
 
@@ -40,7 +40,7 @@ May be given every stage (sequential) or some (others run in parallel). Implemen
 
 ## Stage completion
 
-Done = builds, tests pass, lint clean, coverage floor holds. Run the full gauntlet from `AGENTS.md`'s `## Build / test / lint`; the card gets `gauntlet=pass cov=<n>%` or `gauntlet=fail <one-line reason>` — never an excerpt, never a log. Stop and wait for approval; commit only after. Push, PR, merge are the orchestrator's. Stage messages cheap (squashed later); subject ≤ 72 columns, body wrapped at 72.
+Done = builds, tests pass, lint clean, coverage floor holds. Run the full gauntlet from `AGENTS.md`'s `## Build / test / lint`; the card gets `gauntlet=pass cov=<n>%` or `gauntlet=fail <one-line reason>` — never an excerpt, never a log. Stage messages cheap (squashed later).
 
 ## Stop and report — never improvise
 
@@ -49,7 +49,7 @@ Done = builds, tests pass, lint clean, coverage floor holds. Run the full gauntl
 - Implementation forces behavior to diverge from approved spec (reopens gate 1).
 - Requirement ambiguous or conflicting.
 - Want a dependency not in the manifest.
-- Tempted to widen scope beyond the plan — including fixing an unrelated pre-existing spec/code disagreement, a flaky test, or a tool script.
+- Tempted to widen scope beyond the plan, an unrelated pre-existing spec/code disagreement included.
 
 ## Never
 
@@ -57,8 +57,7 @@ Done = builds, tests pass, lint clean, coverage floor holds. Run the full gauntl
 - Write the test after the implementation to fit it.
 - Pad coverage with non-asserting tests.
 - Claim a verification you didn't run — quote real output.
-- Push, open a PR, merge.
-- Add `Co-Authored-By` / "Generated with" trailers.
+- Push, open a PR, merge — orchestrator's.
 - Move your card to `done/` — orchestrator's, after merge + independent verify.
 - Touch another agent's card, the parent card, a wave-gate card.
 - Log a step you didn't run or a fake `commit=` sha.

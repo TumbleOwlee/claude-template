@@ -60,6 +60,6 @@ A waste pattern that keeps recurring even though `AGENTS.md`'s Conventions alrea
 - **A `PreToolUse` hook** that detects the exact bypass shape at the tool-call boundary and denies it with a message pointing at the convention's intended path — same shape as `.claude/scripts/hook-guard-shell.sh` if the project has it (checked with `ls .claude/scripts/hook-guard-*.sh`; extend an existing guard script before adding a new one covering an overlapping shape). State the matcher (tool name), the detection condition, and the redirect message.
 - **A convention-wording gap**, if the bypass happened because the existing bullet didn't cover the observed shape (wrong tool, wrong file type, ambiguous wording) — quote the current bullet and the proposed edit.
 
-One line each: pattern → proposed fix → which file changes (`.claude/settings.json` + a new/edited `.claude/scripts/hook-guard-*.sh`, or the Conventions bullet). Do not create or edit anything in this skill — list the proposal, let the user approve which to build, same as section 4's script proposals.
+One line each: pattern → proposed fix → which file changes (`.claude/settings.json` + a new/edited `.claude/scripts/hook-guard-*.sh`, or the Conventions bullet).
 
-Do not create anything here. If the user approves a specific recommendation, draft that one script the same way `extract-section.sh` was built: POSIX `sh`, single file, one clear job, tested against a real sample before reporting done.
+If the user approves a specific recommendation, draft that one script the same way `extract-section.sh` was built: POSIX `sh`, single file, one clear job, tested against a real sample before reporting done.
