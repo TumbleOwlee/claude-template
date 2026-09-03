@@ -12,12 +12,12 @@ description: Independent second-developer review of an open PR against its ticke
 ## Gather inputs — no shared session, no artifacts dir
 
 - **Ticket** — `sh .claude/scripts/extract-section.sh '### Gate 1b — tracking issue. Stop for approval.' AGENTS.workflow.md` names the tracker and how to read it. Ticket is self-contained: full current normative text, including updates landed via "Reconcile the spec". This *is* the approved spec — `artifacts/<slug>/spec-diff.md` may not exist on this machine or may be gone.
-- **Branch/PR** — from the ticket's linked PR, or ask the user for PR number/branch.
+- **Branch/PR** — from the ticket's linked PR, or ask the user for PR number/branch. Read the PR with `bash .claude/scripts/pr-view.sh <number>`, never raw `gh pr view`.
 - **Base ref** — PR's target branch (usually `main`).
 
 ## Run the review
 
-Spawn `spec-reviewer` (`.claude/agents/spec-reviewer.md`) with: spec text from the ticket, `git diff <base>...<head>` scoped to the whole branch (scope `branch`, not a wave), every stage in scope. It reads its own rules (`.claude/AGENTS.core.md`); give it nothing more, never the issue/PR number.
+Write the ticket's normative text into a scratch `artifacts/<slug>/spec-diff.md` (one `## <ID>` per requirement, same shape as gate 1) so the reviewer reads it the way it reads every spec diff. Spawn `spec-reviewer` (`.claude/agents/spec-reviewer.md`) with: scope `branch` (not a wave), the base ref, the artifact dir, the checkout path, every stage in scope. No `plan.md` exists on this side — say so; spec fidelity is checked against `spec-diff.md` alone. It reads its own rules (`.claude/AGENTS.core.md`); give it nothing more, never the issue/PR number.
 
 Give it a scratch `artifacts/<slug>/` for `review.md` and `review.verdict.md`; it answers with a status line only (`### Agent hand-off`). Reviewing yourself instead of spawning is fine — same axes, same rigor. Requirement is an independent read, not necessarily a subagent.
 

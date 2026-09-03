@@ -32,7 +32,10 @@ and then writes:
 
 | File | What it is |
 |---|---|
-| `AGENTS.md` | The workflow and conventions. The file agents read first. |
+| `AGENTS.md` | Spec-driven rules, TDD order, build commands, conventions, scope boundaries. The file agents read first. |
+| `AGENTS.workflow.md` | The gates, task board, stage-by-stage implementation, review, PR, merge, resume. Orchestrator-only, pulled one heading at a time. |
+| `.claude/AGENTS.core.md` | The agent-facing excerpt of `AGENTS.md` — what `spec-author`/`spec-planner`/`spec-implementer`/`spec-reviewer` read instead of the router. |
+| `.github/PULL_REQUEST_TEMPLATE.md` | Why / What changed / Approach / Verification — the same four sections the gate 4 PR body uses (GitHub remotes only). |
 | `CLAUDE.md` | Thin router into `AGENTS.md`. |
 | `.github/copilot-instructions.md` | Same router, for GitHub Copilot. |
 | `PRD.md` | Why the project exists — goals, non-goals, users. |
@@ -49,12 +52,12 @@ and then writes:
 | `.claude/scripts/issue-view.sh` | Prints an issue's title, body, and comments in compact plain text — Jira or GitHub, auto-detected. |
 | `.claude/scripts/pr-view.sh` | Prints a PR's title, body, and comments in compact plain text — GitHub or Bitbucket, auto-detected. Sidesteps a `gh pr view` GraphQL bug (legacy Projects-Classic boards) that errors on the raw command with or without `--comments`. |
 | `.claude/scripts/hook-guard-shell.sh` | `PreToolUse` hook, wired in `.claude/settings.json`: denies an unpiped `cat` of a markdown/large file, an unscoped `git show`/`git diff`, an unscoped `find -type f/d`, a raw `gh issue view`, a raw `gh pr view`, a `git commit` while on `main`, or a `git push` targeting `main` — enforces `AGENTS.md`'s shell-output and branch-safety rules instead of just stating them. |
-| `.claude/scripts/hook-guard-attribution.sh` | `PreToolUse` hook, wired alongside: denies a `git commit` / `gh pr create` / `gh pr edit` carrying a `Co-Authored-By` or "Generated with" trailer. |
+| `.claude/scripts/hook-guard-attribution.sh` | `PreToolUse` hook, wired alongside: denies a `git commit` / `gh pr create|edit|comment` / `gh issue create|comment` whose text or `--body-file` carries a `Co-Authored-By` / "Generated with" trailer. |
 | `.claude/scripts/hook-guard-readonly.sh` | `PreToolUse` hook on the `spec-reviewer` agent only (its frontmatter): denies every command that could alter the repo, the worktree, or the filesystem — the reviewer's only sanctioned writes are `review.md` (append) and `review.verdict.md` (rewrite). |
 | `.claude/scripts/show-file.sh` | Opens a file for the user in a viewer outside the agent's context (tmux + glow, wslview, tmux + less, else a manual hint); refuses a `*.summary.md` / `*.verdict.md` over 25 lines / 2 KB so agents keep user-facing summaries short. |
 | `.claude/scripts/gauntlet.sh` | Runs the full build/test/lint/coverage block with per-step timeouts, logs everything to `artifacts/<slug>/gauntlet.log`, prints one `gauntlet=pass cov=… sha=…` / `gauntlet=fail step=…` line — the only verification output the orchestrator ever holds in context. |
 
-`failed-workflow.sh`, `issue-view.sh`, `pr-view.sh`: if a script's output isn't enough (multiple failed jobs, huge issue thread, unexpected API error), never fall back to raw `gh`/`git`/`curl` commands to fill the gap — stop and report the shortfall to the user.
+`failed-workflow.sh`, `issue-view.sh`, `pr-view.sh` are bash scripts (`bash .claude/scripts/…`, not `sh` — they use `pipefail`). If a script's output isn't enough (multiple failed jobs, huge issue thread, unexpected API error), never fall back to raw `gh`/`git`/`curl` commands to fill the gap — stop and report the shortfall to the user.
 
 Finally it deletes `templates/` and its own skill, so the fork looks like a normal project.
 
@@ -89,7 +92,7 @@ Descendant projects run the workflow for real and sometimes improve on it — a 
 ## Requirements
 
 - [Claude Code](https://claude.com/claude-code)
-- `git` 2.5+ (worktrees), and `gh` (GitHub) or a Jira MCP server / API token if you want the tracking-issue gate backed by a tracker
+- `git` 2.5+ (worktrees), `jq` (hooks), `timeout` (coreutils, for `gauntlet.sh`), and `gh` (GitHub) or a Jira MCP server / API token if you want the tracking-issue gate backed by a tracker
 - Optionally [lefthook](https://github.com/evilmartians/lefthook) for the pre-commit checks
 - Optionally `tmux` + [glow](https://github.com/charmbracelet/glow) (or `wslview` on WSL) so approval files open in a viewer instead of being printed
 - Optionally the caveman plugin for compressed agent output — install command offered by the bootstrap itself (`project-init` step 0)

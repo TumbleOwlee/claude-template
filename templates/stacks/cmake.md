@@ -302,7 +302,9 @@ WarningsAsErrors: "bugprone-*,performance-*"
 HeaderFilterRegex: "^(src|include)/"
 ```
 
-## `{{GAUNTLET_STEPS}}`
+## `{{GAUNTLET_STEPS}}` → `.claude/scripts/gauntlet.sh`
+
+Step name, timeout (s), command — one `run` line each. Coverage step present only with a floor.
 
 ```sh
 run configure 900  cmake --preset dev

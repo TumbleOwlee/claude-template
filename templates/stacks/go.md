@@ -246,7 +246,9 @@ linters:
         - name: exported
 ```
 
-## `{{GAUNTLET_STEPS}}`
+## `{{GAUNTLET_STEPS}}` → `.claude/scripts/gauntlet.sh`
+
+Step name, timeout (s), command — one `run` line each. Coverage step present only with a floor.
 
 ```sh
 run fmt   600  'test -z "$(gofmt -l .)"'

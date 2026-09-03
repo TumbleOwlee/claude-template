@@ -17,19 +17,19 @@ Given `plan.md`'s path and your stage id(s): pull only your section(s), one batc
 
 Work **only** inside your worktree path — never the main checkout, never another agent's worktree. Never `git add -A` outside your assigned path.
 
-Also given the **absolute path of your own task card** (main checkout, outside your worktree) — the one exception. Keep it current: a new session reads it if this one dies. Append-only, one line per event, **≤ 160 characters**, tokens not prose — no command output, no narration of how you staged or stashed, no test-name lists (the commit message holds those):
+Also given the **absolute path of your own task card** (main checkout, outside your worktree) — the one exception. Keep it current: a new session reads it if this one dies. Append-only, one line per event, **≤ 160 characters**, tokens not prose; timestamp = `date -u +%FT%H:%M` (UTC, minute precision, no zone suffix — the same on every card so a resumed session can order events across cards) — no command output, no narration of how you staged or stashed, no test-name lists (the commit message holds those):
 
 ```
 2026-01-02T14:02 spawn agent=impl
 2026-01-02T14:05 test-red <ID> <test name>
 2026-01-02T14:11 green commit=<sha>
-2026-01-02T14:12 gauntlet=pass
+2026-01-02T14:12 gauntlet=pass sha=<sha>
 2026-01-02T14:12 stopped: <what and why>
 ```
 
 Move card `open`→`inprogress/` on start. On green, card →`inreview/`, end turn on `status=inreview stage=s<n>`. Sequential: commit only once resumed with approval, then `status=committed stage=s<n>`. Parallel (one stage, own worktree): commit on green in your worktree before `status=inreview` — a merge needs a commit; resumed with findings, fix and amend that commit. Never push. Resumed with a `review.md` path: fix exactly its findings for your stage, re-run the gauntlet, `status=inreview` again. Stage `s0` (land spec) is yours: copy the approved text where the plan says, one commit, no code.
 
-May be given every stage (sequential) or some (others run in parallel). Implement assigned stages only, in plan order, touching only their listed files — another agent owns the rest; editing it causes an invisible merge conflict. Stage needs an unlisted file → stop-and-report.
+May be given every stage (sequential) or some (others run in parallel). Implement assigned stages only, in plan order, touching only their listed files — another agent owns the rest; editing it causes an invisible merge conflict, and the reviewer blocks on it. Stage needs an unlisted file → stop-and-report, not a small edit. That includes tooling, test helpers, flaky-test fixes and scripts you notice on the way: not in `files` = not yours, however small.
 
 ## Order, per stage, no exceptions
 
@@ -49,7 +49,7 @@ Done = builds, tests pass, lint clean, coverage floor holds. Run the full gauntl
 - Implementation forces behavior to diverge from approved spec (reopens gate 1).
 - Requirement ambiguous or conflicting.
 - Want a dependency not in the manifest.
-- Tempted to widen scope beyond the plan — including fixing an unrelated pre-existing spec/code disagreement.
+- Tempted to widen scope beyond the plan — including fixing an unrelated pre-existing spec/code disagreement, a flaky test, or a tool script.
 
 ## Never
 

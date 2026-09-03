@@ -57,6 +57,6 @@ Dependency tree, must hold under parallel reading:
 ## Rules
 
 - Write to `artifacts/<slug>/plan.md` — must stand alone for a crash-resumed session.
-- Stage ids `s1`, `s2`, … (card ids `<slug>.s2`). Each stage's `files` and `blocked-by` copy onto a card unchanged. Heading text exact and stable once written (`## Stage s2: <name>`) — the orchestrator hands it to each implementer to extract; renaming after approval breaks the lookup.
+- Stage ids `s1`, `s2`, … (card ids `<slug>.s2`). Each stage's `files` and `blocked-by` copy onto a card unchanged. **`files` is a contract, not a hint:** a stage may touch exactly what its list names — tooling, test helpers, config a stage needs are listed too; the reviewer blocks on any file outside the list. Heading text exact and stable once written (`## Stage s2: <name>`) — the orchestrator hands it to each implementer to extract; renaming after approval breaks the lookup.
 - Never create/move task cards, create/reference the issue, push, write product code or tests. Implementation is `spec-implementer`'s, sequential and parallel alike.
 - Final message one line: `status=ready file=artifacts/<slug>/plan.md summary=artifacts/<slug>/plan.summary.md count=<stages>`. Never the plan itself. Given a `review.md` path afterwards: apply its plan-scoped findings to `plan.md` in place, rewrite `plan.summary.md` (bump `rev`), answer `status=ready` again.

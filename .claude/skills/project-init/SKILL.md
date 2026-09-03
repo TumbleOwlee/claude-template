@@ -178,10 +178,11 @@ Four things substitution alone doesn't handle:
 | `templates/.claude/scripts/issue-view.sh` | `.claude/scripts/issue-view.sh` (static — copy as-is, `chmod +x`) — tracker auto-detected at runtime from `.claude/jira.local.json` presence (Jira) vs absence (GitHub, via `gh`). Note in the final report: if this script or `failed-workflow.sh` ever falls short of what's needed, never fall back to raw `gh`/`git`/`curl` commands — stop and report the shortfall to the user instead. |
 | `templates/.claude/scripts/pr-view.sh` | `.claude/scripts/pr-view.sh` (static — copy as-is, `chmod +x`) — **only if step 1's remote is `github.com` or `bitbucket.org`** (no PR concept otherwise); host auto-detected same as `failed-workflow.sh`. Same fallback rule as `issue-view.sh`: never raw `gh`/`curl` if it falls short. |
 | `templates/.claude/scripts/hook-guard-shell.sh` | `.claude/scripts/hook-guard-shell.sh` (static — copy as-is, `chmod +x`) — denies the Conventions-bypass shapes it detects instead of just advising against them. Requires appending to `.claude/settings.json`'s `hooks` object (see step 1's exception), both guards in one matcher, absolute via `$CLAUDE_PROJECT_DIR` so the hook still resolves when the shell cwd is a worktree: `"PreToolUse": [{"matcher": "Bash", "hooks": [{"type": "command", "command": "sh \"$CLAUDE_PROJECT_DIR\"/.claude/scripts/hook-guard-shell.sh"}, {"type": "command", "command": "sh \"$CLAUDE_PROJECT_DIR\"/.claude/scripts/hook-guard-attribution.sh"}]}]` |
-| `templates/.claude/scripts/hook-guard-attribution.sh` | `.claude/scripts/hook-guard-attribution.sh` (static — copy as-is, `chmod +x`) — denies a `git commit`/`gh pr create`/`gh pr edit` carrying a `Co-Authored-By` or "Generated with" trailer. Wired with `hook-guard-shell.sh` above. |
+| `templates/.claude/scripts/hook-guard-attribution.sh` | `.claude/scripts/hook-guard-attribution.sh` (static — copy as-is, `chmod +x`) — denies a `git commit`/`gh pr create|edit|comment`/`gh issue create|comment` whose text (or `--body-file`) carries a `Co-Authored-By`/"Generated with" trailer. Wired with `hook-guard-shell.sh` above. |
 | `templates/.claude/scripts/hook-guard-readonly.sh` | `.claude/scripts/hook-guard-readonly.sh` (static — copy as-is, `chmod +x`) — read-only guard for `spec-reviewer`, wired by that agent's own frontmatter `hooks:` block (nothing to add to `settings.json`). Its `cargo)` case is the one stack-specific block: extend it with this stack's package-manager mutating subcommands if the stack has any; a foreign block is harmless. |
 | `templates/.claude/scripts/show-file.sh` | `.claude/scripts/show-file.sh` (static — copy as-is, `chmod +x`) — opens a file for the user outside the agent's context (tmux+glow, wslview, tmux+less, else a manual hint); refuses a `*.summary.md`/`*.verdict.md` over 25 lines / 2 KB. |
-| `templates/.claude/scripts/gauntlet.sh.tmpl` | `.claude/scripts/gauntlet.sh` (`chmod +x`) — one `run <step> <timeout> <command>` line per confirmed command, from the stack file's `{{GAUNTLET_STEPS}}` block (edit the lines if the user corrected the command block in step 3 — they must match `{{FULL_COMMANDS}}` exactly), plus the stack's `{{COVERAGE_EXTRACT}}` line. Stack not in the table: write the `run` lines yourself from the five commands, timeouts 900/1800, and `cov=` (prints `cov=?`). |
+| `templates/.claude/scripts/gauntlet.sh.tmpl` | `.claude/scripts/gauntlet.sh` (`chmod +x`) — one `run <step> <timeout> <command>` line per confirmed command, from the stack file's `{{GAUNTLET_STEPS}}` block (edit the lines if the user corrected the command block in step 3 — they must match `{{FULL_COMMANDS}}` exactly), plus the stack's `{{COVERAGE_EXTRACT}}` line; `{{COVERAGE_GAUNTLET_WORD}}` as in the coverage table below. Stack not in the table: write the `run` lines yourself from the five commands, timeouts 900/1800, and `cov=` (prints `cov=-`). |
+| `templates/.github/PULL_REQUEST_TEMPLATE.md.tmpl` | `.github/PULL_REQUEST_TEMPLATE.md` — **only if step 1's remote is `github.com`**. `{{PR_CHECKLIST}}` = one `- [ ] <command>` line per `{{FULL_COMMANDS}}` line; `{{COVERAGE_PR_TEMPLATE_LINE}}` per the coverage table below. |
 | stack file's `ci` block | `.github/workflows/check.yml` — **only if step 1's remote is `github.com`** |
 | stack file's `bitbucket-pipelines` block | `bitbucket-pipelines.yml` — **only if step 1's remote is `bitbucket.org`** |
 | stack file's `lefthook` block | `.lefthook.yml` — always, host-agnostic |
@@ -203,6 +204,7 @@ Placeholders used across templates:
 |---|---|
 | `{{PROJECT_NAME}}`, `{{ONE_LINER}}`, `{{PROJECT_KIND}}` | step 2 |
 | `{{STACK_NAME}}`, `{{FULL_COMMANDS}}`, `{{NARROW_COMMANDS}}`, `{{UNIT_TEST_CONVENTION}}`, `{{INTEGRATION_TEST_CONVENTION}}`, `{{ID_CITATION_EXAMPLE}}`, `{{STACK_CONVENTIONS}}`, `{{SETUP_STEPS}}`, `{{GAUNTLET_STEPS}}`, `{{COVERAGE_EXTRACT}}` | step 3 stack file (`{{ID_CITATION_EXAMPLE}}` also lands in `docs/specs/README.md` rule 8) |
+| `{{PR_CHECKLIST}}` | one `- [ ] <command>` line per `{{FULL_COMMANDS}}` line — into `.github/PULL_REQUEST_TEMPLATE.md` |
 | `{{AREA_ROUTING_TABLE}}` | step 4 — AGENTS.md rows, links relative to repo root (`./docs/specs/<area>/`) |
 | `{{AREA_TABLE}}` | step 4 — **link base differs per file**: `./<area>/` in `docs/specs/README.md`, `./docs/specs/<area>/` in `PRD.md`. Same rows, different hrefs; get this wrong and every link in one of the two files is dead. |
 | `{{COVERAGE_FLOOR}}`, `{{COVERAGE_LINE}}` | step 4 |
@@ -224,7 +226,9 @@ Coverage-dependent slots, all filled from the floor chosen in step 4 — and all
 | `{{COVERAGE_PLAN_CLAUSE}}` | `; expected coverage impact` | empty |
 | `{{COVERAGE_STAGE_CLAUSE}}` | `, coverage ≥ N%` | empty |
 | `{{COVERAGE_PR_CLAUSE}}` | `, ending with the current coverage percentage` | empty |
-| `{{GAUNTLET_STEPS}}` / `{{COVERAGE_EXTRACT}}` | stack file blocks as-is | drop the `run cov …` line; `{{COVERAGE_EXTRACT}}` = `cov=` (status line prints `cov=?`) |
+| `{{COVERAGE_PR_TEMPLATE_LINE}}` | `- Coverage: __% lines` | empty |
+| `{{COVERAGE_GAUNTLET_WORD}}` | `/coverage` | empty |
+| `{{GAUNTLET_STEPS}}` / `{{COVERAGE_EXTRACT}}` | stack file blocks as-is | drop the `run cov …` line; `{{COVERAGE_EXTRACT}}` = `cov=` (status line prints `cov=-`) |
 | `{{COVERAGE_CONTRIB_LINE}}` | `Line coverage must stay at or above **N%**, enforced in CI. Coverage is a floor, not a goal — never pad it with tests that execute code without asserting on it.` | empty |
 
 Tracker-dependent slots (choice + branch from step 4b):
