@@ -1,17 +1,11 @@
 # {{PROJECT_NAME}} Specs
 
-Authoritative spec of `{{PROJECT_NAME}}`'s behavior, by capability area. **Normative**: code conforms to these, not vice versa. Code/spec disagreement = defect in one — resolve, don't paper over.
-
-## Areas
-
-{{AREA_TABLE}}
-
-Cross-cutting: [`non-functional-requirements.md`](./non-functional-requirements.md) (`NF-R-nnn`).
+Authoritative spec of `{{PROJECT_NAME}}`'s behavior, by capability area. **Normative**: code conforms to these, not vice versa. Code/spec disagreement = defect in one — resolve, don't paper over. Areas, ID prefixes and the rules of engagement live once, in the agent-instructions file's routing table (`AGENTS.md`, `## Where to look for task X`) — this file never carries a second copy. Cross-cutting: [`non-functional-requirements.md`](./non-functional-requirements.md) (`NF-R-nnn`).
 
 ## Rules for writing specs
 
 1. **No code pointers.** Never cite file:line, function/type names, internal identifiers — specs state *what must be true*, not where implemented (code pointers rot on refactor). Exception: public, user-facing surface (exported names, signatures, error variants, feature flags, config fields, CLI flags, commands) IS spec content → area's `api-contract.md`.
-2. **IDs stable, append-only.** `<PREFIX>-R-nnn` for a requirement, `<PREFIX>-E-nnn` for an `edge-cases.md` entry; prefix per area from the `## Areas` table (`NF` has no `-E` series). The two series are numbered independently per area; never renumber, never reuse a retired ID (a deleted entry's ID stays dead). Reference by ID in commits/PRs/tests/agent instructions. An `-E` entry derived from a requirement cites that `-R` ID in its text and still carries its own `-E` ID. Tests cite `-E` IDs exactly as `-R` IDs (rule 8).
+2. **IDs stable, append-only.** `<PREFIX>-R-nnn` for a requirement, `<PREFIX>-E-nnn` for an `edge-cases.md` entry; prefix per area from `AGENTS.md`'s routing table (`NF` has no `-E` series). The two series are numbered independently per area; never renumber, never reuse a retired ID (a deleted entry's ID stays dead). Reference by ID in commits/PRs/tests/agent instructions. An `-E` entry derived from a requirement cites that `-R` ID in its text and still carries its own `-E` ID. Tests cite `-E` IDs exactly as `-R` IDs (rule 8).
 3. **Owner = the behavior, not the surface.** Spec a config field with the behavior it controls, not where it's typed (one change → one file). Shared behavior across areas → belongs to the area owning it, stated once.
 4. **Requirements are testable.** "Shall" statements, observable outcomes. Good: "The client shall fail a request with a timeout error after the configured response timeout elapses with no matching response." Bad: "The client is robust." Format-involving requirements: name the exact bytes where possible.
 5. **Known gaps are specified, not hidden.** Intentional-but-ugly behavior (unsupported case, deliberate deviation, missing policy) → area's `edge-cases.md` as a stated constraint with its own `-E` ID, so it isn't mistaken for an oversight and "fixed".

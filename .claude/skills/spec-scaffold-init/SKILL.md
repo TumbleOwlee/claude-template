@@ -86,8 +86,8 @@ placeholders, write to `<spec-dir>/...`:
 
 `{{PROJECT_NAME}}` in `README.md.tmpl`: infer silently from the repo
 directory name — cosmetic title text, not worth an `AskUserQuestion`.
-`{{AREA_TABLE}}`: one row per area, name linking to `./<area>/`, plus the
-fixed non-functional-requirements row. `{{AREA_TITLE}}`, `{{AREA_COVERS}}`,
+`README.md.tmpl` carries no area table — it points at the routing table
+step 6 appends, the single copy of the area list. `{{AREA_TITLE}}`, `{{AREA_COVERS}}`,
 `{{AREA_PREFIX}}` in the per-area templates: from step 3's answers for that
 area.
 

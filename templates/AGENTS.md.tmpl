@@ -24,13 +24,15 @@ Router for AI coding agents. Read first.
 <!-- CORE:BEGIN tdd -->
 ## TDD — fixed order, every stage
 
-1. Write the test. Doc comment cites every requirement or edge-case ID the test pins ({{ID_CITATION_EXAMPLE}}; `docs/specs/README.md` rule 8).
+1. Write the test. Doc comment directly above the declaration cites every requirement or edge-case ID the test pins ({{ID_CITATION_EXAMPLE}}; `docs/specs/README.md` rule 8).
 2. Run it, watch it fail for the right reason, report the failure. Wrong assertion / test-side compile error / premature pass proves nothing.
 3. Minimum implementation that passes.
 4. Refactor green.
 
 - Implementation without a preceding failing test: not done. Test written after the fact to fit code: not done.
-- Expected values from the authoritative source (standard/protocol/upstream API) — never a debug print of your own implementation. {{COVERAGE_LINE}}
+- Expected values from the authoritative source (standard/protocol/upstream API) — never a debug print of your own implementation.
+- Every new/changed requirement ships ≥1 ID-citing test. Every existing test pinning observable behavior cites its requirement; pure internal/helper-detail tests may stay untagged. Behavior no requirement states = requirement missing — add it (spec change), never attach a loose ID.
+{{COVERAGE_LINE}}
 <!-- CORE:END tdd -->
 
 ## Workflow

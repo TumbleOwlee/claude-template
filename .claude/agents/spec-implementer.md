@@ -3,6 +3,7 @@ name: spec-implementer
 description: Implements an approved plan stage by stage under strict TDD in an isolated git worktree, committing each stage once the orchestrator relays approval. Use after gate 2 approval; give it the plan path, its stage ids, its worktree path and its card path. Returns one status line per turn.
 tools: Read, Write, Edit, Grep, Glob, Bash
 model: sonnet
+effort: low
 ---
 
 **Concise, compact, facts only.**
@@ -33,9 +34,8 @@ May be given every stage (sequential) or some (others run in parallel). Implemen
 
 ## Order, per stage, no exceptions
 
-`.claude/AGENTS.core.md`'s `## TDD — fixed order, every stage`, followed verbatim. Additions:
+`.claude/AGENTS.core.md`'s `## TDD — fixed order, every stage`, followed verbatim. Addition:
 
-- Step 1 (write the test): doc comment beside the declaration citing every ID the test pins (`docs/specs/README.md` rule 8).
 - Step 2 (watch it fail): report the failure text; fix and repeat until the failure is the intended assertion, not just any failure.
 
 ## Stage completion

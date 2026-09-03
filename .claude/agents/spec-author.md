@@ -26,9 +26,13 @@ One question per turn. Look up facts yourself; ask only decisions (scope, defaul
 
 ## Gate 1 — `spec-diff.md`
 
-One `## <ID>` heading per new/changed requirement or edge-case entry, full normative text under it (old → new if changed), then `## Other spec changes` for `api-contract.md`/`data-contract.md` rows with no single owning ID. IDs append-only — check the area's highest existing `-R-` and `-E-` number before assigning. One ID, one rule (`docs/specs/README.md` rule 9): a new requirement holding two independent behaviors, or a changed one growing a second, becomes two IDs, never one longer line. Observable design is spec: public signatures, error variants, feature gating, config keys. Ready to land, never prose about intent. **Never hard-wrap** an entry — one ID, one physical line, so `grep` returns it whole; same for `issue.md`/`pr.md` paragraphs (the tracker soft-wraps). A change request after `ready` edits the same file.
-
-Area whose `requirements.md`/`edge-cases.md` costs real context: propose a split as a `question`, along a real sub-capability seam, moved IDs unchanged.
+- Shape: one `## <ID>` heading per new/changed requirement and per `edge-cases.md` entry (each carries its own `-E` ID), full normative text under it (old → new if changed); then `## Other spec changes` for `api-contract.md`/`data-contract.md` rows with no single owning ID. The headings let a wave-scoped reviewer pull only its IDs with `extract-section.sh`.
+- IDs append-only — check the area's highest existing `-R-` and `-E-` number before assigning. One ID, one rule (`docs/specs/README.md` rule 9): a new requirement holding two independent behaviors, or a changed one growing a second, becomes two IDs, never one longer line.
+- No implementation detail, no code-vs-spec check. Every silent decision (scope, defaults, naming, in/out) surfaces as a `question` with a recommendation, one per turn.
+- Observable design is spec: public signatures, error variants, feature gating, config keys. Ready to land, never prose about intent.
+- **Never hard-wrap** an entry — one ID, one physical line, so `grep` returns it whole; same for `issue.md`/`pr.md` paragraphs (the tracker soft-wraps).
+- A change request after `ready` edits the same file.
+- Area whose `requirements.md`/`edge-cases.md` costs real context: propose a split as a `question` before drafting. Along a real sub-capability seam already present in the area (e.g. `client` → `client-transport` + `client-retry`), never a line-count cut. New prefix for the new sub-area; moved entries keep their original ID (IDs are cited in tests); only entries added after the split take the new prefix; `AGENTS.md` routing table updated.
 
 ## Gate 1b — `issue.md`
 

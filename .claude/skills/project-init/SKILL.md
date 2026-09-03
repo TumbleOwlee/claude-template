@@ -111,7 +111,7 @@ Separate `AskUserQuestion`, options **GitHub / Jira / Filesystem / None** — ea
 - **Filesystem** → `templates/fragments/issue-filesystem.md`. No credentials, no external check. Ensure `.claude/issues/.gitkeep` gets created in step 7 so the empty directory is tracked.
 - **None** → `templates/fragments/issue-none.md`. `{{CLOSES_CLAUSE}}` empty.
 
-`{{CLOSES_CLAUSE}}` per choice: GitHub → `` , `Closes #<issue>` `` · Jira → `, references <ISSUE-KEY>` · Filesystem → empty (PR body already carries the goal) · None → empty.
+`{{CLOSES_CLAUSE}}` per choice (a clause between "orchestrator" and "pushes" in gate 4 — the one PR-body line the orchestrator writes itself): GitHub → `` appends `Closes #<issue>` as the body's last line, then `` · Jira → `` appends `references <ISSUE-KEY>` as the body's last line, then `` · Filesystem → empty (PR body already carries the goal) · None → empty.
 
 ## 4c. Bitbucket credentials
 
@@ -206,7 +206,7 @@ Placeholders used across templates:
 | `{{STACK_NAME}}`, `{{FULL_COMMANDS}}`, `{{NARROW_COMMANDS}}`, `{{UNIT_TEST_CONVENTION}}`, `{{INTEGRATION_TEST_CONVENTION}}`, `{{ID_CITATION_EXAMPLE}}`, `{{STACK_CONVENTIONS}}`, `{{SETUP_STEPS}}`, `{{GAUNTLET_STEPS}}`, `{{COVERAGE_EXTRACT}}` | step 3 stack file (`{{ID_CITATION_EXAMPLE}}` also lands in `docs/specs/README.md` rule 8) |
 | `{{PR_CHECKLIST}}` | one `- [ ] <command>` line per `{{FULL_COMMANDS}}` line — into `.github/PULL_REQUEST_TEMPLATE.md` |
 | `{{AREA_ROUTING_TABLE}}` | step 4 — AGENTS.md rows, links relative to repo root (`./docs/specs/<area>/`) |
-| `{{AREA_TABLE}}` | step 4 — **link base differs per file**: `./<area>/` in `docs/specs/README.md`, `./docs/specs/<area>/` in `PRD.md`. Same rows, different hrefs; get this wrong and every link in one of the two files is dead. |
+| `{{AREA_TABLE}}` | step 4 — `PRD.md` only, links `./docs/specs/<area>/`. `docs/specs/README.md` carries no area table: it points at `AGENTS.md`'s routing table, the single copy. |
 | `{{COVERAGE_FLOOR}}`, `{{COVERAGE_LINE}}` | step 4 |
 | `{{ISSUE_WORKFLOW}}` | step 4b tracker choice |
 | `{{PR_OPEN_LINE}}` | step 1 remote detection + step 4c (Bitbucket) |
@@ -225,7 +225,6 @@ Coverage-dependent slots, all filled from the floor chosen in step 4 — and all
 | `{{COVERAGE_LINE}}` | `- Coverage floor N% of lines, CI-gated on every push and PR. A floor, not a target — never inflate it with tests that execute code without asserting.` | empty |
 | `{{COVERAGE_PLAN_CLAUSE}}` | `; expected coverage impact` | empty |
 | `{{COVERAGE_STAGE_CLAUSE}}` | `, coverage ≥ N%` | empty |
-| `{{COVERAGE_PR_CLAUSE}}` | `, ending with the current coverage percentage` | empty |
 | `{{COVERAGE_PR_TEMPLATE_LINE}}` | `- Coverage: __% lines` | empty |
 | `{{COVERAGE_GAUNTLET_WORD}}` | `/coverage` | empty |
 | `{{GAUNTLET_STEPS}}` / `{{COVERAGE_EXTRACT}}` | stack file blocks as-is | drop the `run cov …` line; `{{COVERAGE_EXTRACT}}` = `cov=` (status line prints `cov=-`) |
@@ -236,7 +235,7 @@ Tracker-dependent slots (choice + branch from step 4b):
 | Placeholder | GitHub | Jira (MCP) | Jira (credentials) | Filesystem | None |
 |---|---|---|---|---|---|
 | `{{ISSUE_WORKFLOW}}` | `issue-github.md` | `issue-jira-mcp.md` | `issue-jira-credentials.md` | `issue-filesystem.md` | `issue-none.md` |
-| `{{CLOSES_CLAUSE}}` | `, ` + `` `Closes #<issue>` `` | `, references <ISSUE-KEY>` | `, references <ISSUE-KEY>` | empty | empty |
+| `{{CLOSES_CLAUSE}}` | `` appends `Closes #<issue>` as the body's last line, then `` | `` appends `references <ISSUE-KEY>` as the body's last line, then `` | same as Jira (MCP) | empty | empty |
 
 The five issue-tracker fragment files live in `templates/fragments/`; `templates/fragments/rtk-instructions.md` (step 0) lives alongside them.
 
