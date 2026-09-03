@@ -17,7 +17,7 @@ description: Independent second-developer review of an open PR against its ticke
 
 ## Run the review
 
-Write the ticket's normative text into a scratch `artifacts/<slug>/spec-diff.md` (one `## <ID>` per requirement, same shape as gate 1) so the reviewer reads it the way it reads every spec diff. Spawn `spec-reviewer` (`.claude/agents/spec-reviewer.md`) with: scope `branch` (not a wave), the base ref, the artifact dir, the checkout path, every stage in scope. No `plan.md` exists on this side — say so; spec fidelity is checked against `spec-diff.md` alone. It reads its own rules (`.claude/AGENTS.core.md`); give it nothing more, never the issue/PR number.
+Write the ticket's normative text into a scratch `artifacts/<slug>/spec-diff.md` (one `## <ID>` per requirement, same shape as gate 1) so the reviewer reads it the way it reads every spec diff. Spawn `spec-reviewer` (`.claude/agents/spec-reviewer.md`) with: scope `branch` (not a wave), the base ref, the artifact dir, the checkout path, every stage in scope. No `plan.md` exists on this side — say so; spec fidelity is checked against `spec-diff.md` alone. It reads its own rules (its file names the `AGENTS.md` headings); give it nothing more, never the issue/PR number.
 
 Give it a scratch `artifacts/<slug>/` for `review.md` and `review.verdict.md`; it answers with a status line only (`### Agent hand-off`). The requirement is a reader that never held the implementer's context: a fresh session may review inline with the same axes and rigor; a session that implemented any of it spawns.
 

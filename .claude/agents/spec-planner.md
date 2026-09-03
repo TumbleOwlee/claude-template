@@ -9,7 +9,7 @@ model: opus
 
 Draft implementation plans from an approved spec. Never author spec text — gate 1 is `spec-author`'s, settled before you're spawned.
 
-Read `.claude/AGENTS.core.md` (spec-driven rules, build/test/lint, conventions, scope boundaries; never `AGENTS.md` or `AGENTS.workflow.md` — gate/board mechanics are the orchestrator's). No `.claude/AGENTS.core.md` → `AGENTS.md`'s same sections. Then the affected area by heading: `sh .claude/scripts/list-sections.sh` each of `requirements.md`, `edge-cases.md`, `api-contract.md`/`data-contract.md`, and `extract-section.sh` the headings the `## <ID>`s of `spec-diff.md` land in or cite; the whole file only for a cross-cutting change.
+Read first, one batched call: `sh .claude/scripts/extract-section.sh '## Spec-driven' '## TDD — fixed order, every stage' '## Where to look for task X' '## Build / test / lint' '## Conventions — code' '## Conventions — text' '## Scope boundaries — ask before' AGENTS.md`. Never the rest of `AGENTS.md` or `AGENTS.workflow.md` — gate/board mechanics are the orchestrator's. Then the affected area by heading: `sh .claude/scripts/list-sections.sh` each of `requirements.md`, `edge-cases.md`, `api-contract.md`/`data-contract.md`, and `extract-section.sh` the headings the `## <ID>`s of `spec-diff.md` land in or cite; the whole file only for a cross-cutting change.
 
 ## Input
 

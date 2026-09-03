@@ -1,6 +1,6 @@
 # Workflow
 
-Gate/task-board mechanics, split out of [`AGENTS.md`](./AGENTS.md) (its `## Workflow` heading is the pointer) so sessions that never run the workflow don't pay for it. Orchestrator only — `.claude/AGENTS.core.md` readers (`spec-author`/`spec-planner`/`spec-implementer`/`spec-reviewer`) never read this file. Every heading below is one `sh .claude/scripts/extract-section.sh '<heading>' AGENTS.workflow.md` pull; never read whole.
+Gate/task-board mechanics, split out of [`AGENTS.md`](./AGENTS.md) (its `## Workflow` heading is the pointer) so sessions that never run the workflow don't pay for it. Orchestrator only — subagents (`spec-author`/`spec-planner`/`spec-implementer`/`spec-reviewer`) never read this file; they batch-pull their own `AGENTS.md` headings. Every heading below is one `sh .claude/scripts/extract-section.sh '<heading>' AGENTS.workflow.md` pull; never read whole.
 
 Trigger and tiers: `AGENTS.md`'s `## Workflow`. Size sets stage count, never gate existence.
 
@@ -155,7 +155,7 @@ Default sequential. Never infer concurrency from plan shape — five parallel-ca
 
 ### Implement, stage by stage
 
-Sequential: one fresh `spec-implementer`, spawned with worktree path, plan path, its stage cards — never the planner continued. It reads its own rules (`.claude/agents/spec-implementer.md`, `.claude/AGENTS.core.md`) and works stages in plan order, one plan section at a time. Stage card `open`→`inprogress` on start. On green: card → `inreview`, `status=inreview stage=s<n>`; orchestrator runs `gauntlet.sh` and the per-stage review below. Both clean → user approval stop; after approval the same implementer (resumed) commits and answers `status=committed`. Push is never the implementer's — orchestrator pushes the worktree once committed, re-runs `gauntlet.sh` on the pushed sha, moves to `done` (nothing to merge: `done` = approved+reviewed+committed+pushed+green).
+Sequential: one fresh `spec-implementer`, spawned with worktree path, plan path, its stage cards — never the planner continued. It reads its own rules (`.claude/agents/spec-implementer.md`, which names its `AGENTS.md` headings) and works stages in plan order, one plan section at a time. Stage card `open`→`inprogress` on start. On green: card → `inreview`, `status=inreview stage=s<n>`; orchestrator runs `gauntlet.sh` and the per-stage review below. Both clean → user approval stop; after approval the same implementer (resumed) commits and answers `status=committed`. Push is never the implementer's — orchestrator pushes the worktree once committed, re-runs `gauntlet.sh` on the pushed sha, moves to `done` (nothing to merge: `done` = approved+reviewed+committed+pushed+green).
 
 **Per-stage review** (sequential; parallel's equivalent is the wave gate, step 5 below). Every green stage gets a fresh `spec-reviewer` before its approval stop. Base ref = previous stage's commit, or branch point for the first stage; scope = that stage id. Same four axes as gate 3, on one stage's diff. `clean`, or `findings` with `count=0` → show `review.verdict.md`, forward the gauntlet line, approval stop. `count>0` → card back to `inprogress/`, resume implementer with `review.md` path and stage id (it fixes; orchestrator never does), re-run `gauntlet.sh`, fresh reviewer. An unreviewed stage is never committed.
 
@@ -192,7 +192,7 @@ Wrong cross-reference / clumsy wording = editorial: implementer fixes in place, 
 
 ### Gate 3 — review. Stop for approval.
 
-Before proposing a PR: fresh `spec-reviewer`, scope `branch`. Whole-branch pass: cross-stage bugs, spec drift across stages, scope creep. Give it base ref, artifact dir, worktree path, all stage ids — never the issue number, same as every agent in this workflow. It reads its own rules (`.claude/AGENTS.core.md`). Four axes — spec fidelity, standards, TDD honesty, docs currency; criteria: `spec-reviewer.md`'s `## Four axes, reported separately`.
+Before proposing a PR: fresh `spec-reviewer`, scope `branch`. Whole-branch pass: cross-stage bugs, spec drift across stages, scope creep. Give it base ref, artifact dir, worktree path, all stage ids — never the issue number, same as every agent in this workflow. It reads its own rules (`spec-reviewer.md`, which names its `AGENTS.md` headings). Four axes — spec fidelity, standards, TDD honesty, docs currency; criteria: `spec-reviewer.md`'s `## Four axes, reported separately`.
 
 Orchestrator runs `gauntlet.sh` on the branch, forwards both status lines, shows `review.verdict.md`. `count>0` → implicated cards → `inprogress/`, fresh implementer with `review.md` path, re-gauntlet, fresh reviewer. Findings needing a user decision are relayed as questions, never fixed unasked.
 

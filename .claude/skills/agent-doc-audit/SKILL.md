@@ -1,6 +1,6 @@
 ---
 name: agent-doc-audit
-description: Check every agent-facing markdown file this project's agents read (AGENTS.md, AGENTS.workflow.md, .claude/AGENTS.core.md, .claude/agents/*.md, .claude/skills/*/SKILL.md, docs/specs/**) for prose bloat, for the same instruction stated more than once (within a file or across files), and for whether their headings let extract-section.sh pull one section instead of the whole file; propose a splitting plan where an agent is forced to read content only relevant to a different agent. Use when the user asks to "audit agent docs", "check doc splitting", "propose a split plan", or invokes /agent-doc-audit.
+description: Check every agent-facing markdown file this project's agents read (AGENTS.md, AGENTS.workflow.md, .claude/agents/*.md, .claude/skills/*/SKILL.md, docs/specs/**) for prose bloat, for the same instruction stated more than once (within a file or across files), and for whether their headings let extract-section.sh pull one section instead of the whole file; propose a splitting plan where an agent is forced to read content only relevant to a different agent. Use when the user asks to "audit agent docs", "check doc splitting", "propose a split plan", or invokes /agent-doc-audit.
 ---
 
 # Agent-facing doc split audit
@@ -11,7 +11,7 @@ Read-only. Never split or edit — propose, user decides (a split is a maintenan
 
 ## 1. Scope: agent-facing files
 
-`AGENTS.md`, `AGENTS.workflow.md`, `.claude/AGENTS.core.md`, `.claude/agents/*.md`, `.claude/skills/*/SKILL.md`, `docs/specs/**/*.md`, any file a skill/agent instruction names with "Read". Skip human-facing docs (`PRD.md`, `ARCHITECTURE.md`, `CONTRIBUTING.md`, `README.md`) unless an agent's instructions cite one.
+`AGENTS.md`, `AGENTS.workflow.md`, `.claude/agents/*.md`, `.claude/skills/*/SKILL.md`, `docs/specs/**/*.md`, any file a skill/agent instruction names with "Read". Skip human-facing docs (`PRD.md`, `ARCHITECTURE.md`, `CONTRIBUTING.md`, `README.md`) unless an agent's instructions cite one.
 
 ## 2. Build the read-map
 

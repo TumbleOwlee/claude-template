@@ -13,7 +13,7 @@ Direction matters: this skill finds what a project **improved beyond** the templ
 
 ## 1. Inputs
 
-One or more project paths. Confirm each looks like a template descendant: has `.claude/agents/spec-planner.md` and either `.claude/AGENTS.core.md` or an `AGENTS.md` with `<!-- CORE:BEGIN spec-driven -->` (a bootstrapped project strips the markers into `AGENTS.core.md`). Skip + report any path that doesn't — comparing against an unrelated repo produces noise, not findings.
+One or more project paths. Confirm each looks like a template descendant: has `.claude/agents/spec-planner.md` and an `AGENTS.md` with a `## Spec-driven` heading (an older descendant may still carry a `.claude/AGENTS.core.md` excerpt — a hand-maintained copy this template no longer generates; its removal in that project is staleness, not a finding). Skip + report any path that doesn't — comparing against an unrelated repo produces noise, not findings.
 
 ## 2. Compare, per project
 
@@ -28,7 +28,7 @@ One or more project paths. Confirm each looks like a template descendant: has `.
 
 **`AGENTS.workflow.md`** (root or `.claude/AGENTS.workflow.md` — location is a layout choice, not a finding; `### Principles`, `### Verify before an approval stop`, `### Task board`, `### Agent hand-off`, every `### Gate`, `### Implement, stage by stage`, `### Reconcile the spec`, `### Merge`, `### Resume an interrupted run`) — should track `templates/AGENTS.workflow.md.tmpl`'s corresponding sections near-verbatim once `{{PLACEHOLDER}}` substitutions are mentally undone. This is the highest-value category: a project running the workflow for real invents fixes here that never make it back without a skill like this one looking. Diff against `templates/AGENTS.workflow.md.tmpl`, flag anything the project added or changed that isn't just its own placeholder value.
 
-**`AGENTS.md` CORE spans** (`spec-driven`, `tdd`, `build`, `conventions`, `scope`) — `build`/`conventions`/`scope` are inherently project-specific (stack commands, house style); don't diff their content wholesale. Do watch for a new *kind* of rule that generalizes regardless of stack (e.g. a citation convention, a structural constraint on spec files) — those are candidates even inside an otherwise project-specific span.
+**`AGENTS.md` agent-read sections** (`## Spec-driven`, `## TDD — fixed order, every stage`, `## Build / test / lint`, `## Conventions — *`, `## Scope boundaries — ask before`) — build/conventions/scope are inherently project-specific (stack commands, house style); don't diff their content wholesale. Do watch for a new *kind* of rule that generalizes regardless of stack (e.g. a citation convention, a structural constraint on spec files) — those are candidates even inside an otherwise project-specific span.
 
 **`docs/specs/README.md`** vs `templates/docs/specs/README.md.tmpl` — the "rules for writing specs" convention. A project's own evolved rule (stricter ID format, a citation convention) that isn't just area-naming is a candidate.
 

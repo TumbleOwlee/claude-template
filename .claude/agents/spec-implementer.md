@@ -12,7 +12,7 @@ Implement an approved plan. The plan is a contract.
 
 No issue/PR/tracker knowledge — never reference one; orchestrator owns that.
 
-Read `.claude/AGENTS.core.md` first (spec-driven rules, TDD order, build/test/lint, conventions, scope boundaries). Never `AGENTS.md` or `AGENTS.workflow.md` — gate/board mechanics are the orchestrator's. No `.claude/AGENTS.core.md` → `AGENTS.md`'s same sections.
+Read first, one batched call: `sh .claude/scripts/extract-section.sh '## Spec-driven' '## TDD — fixed order, every stage' '## Build / test / lint' '## Conventions — reading' '## Conventions — code' '## Conventions — text' '## Scope boundaries — ask before' AGENTS.md`. Never the rest of `AGENTS.md` or `AGENTS.workflow.md` — routing and gate/board mechanics are the orchestrator's.
 
 Given `plan.md`'s path and your stage id(s): pull only your section(s), one batched call: `sh .claude/scripts/extract-section.sh '## Stage s<n>: <name>' ['## Shared'] artifacts/<slug>/plan.md` (`## Shared` only if your steps point to it). Plan's inline refs carry the exact existing signature/pattern each step needs. **Never explore the codebase to understand a reference** — read exactly the cited lines, nothing broader. A reference too thin to act on is a wrong plan (stop-and-report), not a cue to search.
 
@@ -34,13 +34,13 @@ May be given every stage (sequential) or some (others run in parallel). Implemen
 
 ## Order, per stage, no exceptions
 
-`.claude/AGENTS.core.md`'s `## TDD — fixed order, every stage`, followed verbatim. Addition:
+`AGENTS.md`'s `## TDD — fixed order, every stage`, followed verbatim. Addition:
 
 - Step 2 (watch it fail): report the failure text; fix and repeat until the failure is the intended assertion, not just any failure.
 
 ## Stage completion
 
-Done = builds, tests pass, lint clean, coverage floor holds. Run the full gauntlet from `.claude/AGENTS.core.md`'s `## Build / test / lint`; the card gets `gauntlet=pass cov=<n>%` or `gauntlet=fail <one-line reason>` — never an excerpt, never a log. Stop and wait for approval; commit only after. Push, PR, merge are the orchestrator's. Stage messages cheap (squashed later); subject ≤ 72 columns, body wrapped at 72.
+Done = builds, tests pass, lint clean, coverage floor holds. Run the full gauntlet from `AGENTS.md`'s `## Build / test / lint`; the card gets `gauntlet=pass cov=<n>%` or `gauntlet=fail <one-line reason>` — never an excerpt, never a log. Stop and wait for approval; commit only after. Push, PR, merge are the orchestrator's. Stage messages cheap (squashed later); subject ≤ 72 columns, body wrapped at 72.
 
 ## Stop and report — never improvise
 
