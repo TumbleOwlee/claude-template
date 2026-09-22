@@ -1,6 +1,6 @@
 ---
 name: spec-author
-description: Drafts every human-facing text of a spec-driven run — gate 1 spec diff, gate 1b issue body, later issue comments, gate 4 PR body — into artifacts/<slug>/ files, one user decision at a time. Never plans, never implements, never files anything itself; the orchestrator relays and files.
+description: Drafts every human-facing text of a spec-driven run — gate 1 spec diff, gate 1b issue body, later issue comments, the PR body (draft form after gate 2, full form at gate 4) — into artifacts/<slug>/ files, one user decision at a time. Never plans, never implements, never files anything itself; the orchestrator relays and files.
 tools: Read, Grep, Glob, Bash, Write, Edit
 model: opus
 ---
@@ -43,9 +43,13 @@ Given a candidate issue: read it with `bash .claude/scripts/issue-view.sh <numbe
 
 Spec change after filing (planner or implementer `spec-gap`, reconcile): update `spec-diff.md` in place (old → new, what forced it), write `issue-comment.md` with the delta only. Issue body is never edited.
 
-## Gate 4 — `pr.md`
+## Draft PR — `pr.md`, draft form (after gate 2)
 
-Inputs: `spec-diff.md`, `plan.md`, `review.md`, `gauntlet.log` (its coverage line, if the project has a floor), `git log main..HEAD --oneline` in the worktree. Line 1 title, then four sections in order — Why, What changed (IDs with quoted text, or "None — no behavior change."), Approach, Verification (what actually ran, following the repo's PR template if one exists, ending with the coverage percentage where there is a floor). Omit the issue-closing line — orchestrator appends it.
+Inputs: `issue.md`, `plan.summary.md` — both already approved; add nothing they don't say. Line 1 title = `issue.md`'s title. Body: `## Why` (from `issue.md`), `## Plan` (the stages, one line each, from `plan.summary.md`), then one closing line: `Draft — stages land as commits; review inline, replies come back on each thread.` No Verification section yet. Gate 4 replaces this file whole.
+
+## Gate 4 — `pr.md`, full form
+
+Inputs: `spec-diff.md`, `plan.md`, `review.md`, `gauntlet.log` (its coverage line, if the project has a floor), `git log main..HEAD --oneline` in the worktree. Rewrite the file: line 1 title, then four sections in order — Why, What changed (IDs with quoted text, or "None — no behavior change."), Approach, Verification (what actually ran, following the repo's PR template if one exists, ending with the coverage percentage where there is a floor). Omit the issue-closing line — orchestrator appends it.
 
 ## Never
 

@@ -47,12 +47,12 @@ Any other pre-existing target file: show it, ask keep / overwrite / merge. Recor
 
 If `AGENTS.md` already exists and looks like this workflow (contains "Gate 1"): say so, ask whether user wants a re-run (re-ask everything, rewrite) or a targeted edit. A re-run on a live project silently discards local customisation — make that explicit before proceeding.
 
-**PR host.** Read the remote: `git remote get-url origin` (fall back to `git config --get remote.origin.url`). Determines `{{PR_OPEN_LINE}}` (step 7). No remote → `{{PR_OPEN_LINE}}` = manual variant below, nothing to detect.
-- `github.com` → `{{PR_OPEN_LINE}}` = `` Open via `gh pr create --title "$(head -1 .claude/tasks/artifacts/<slug>/pr.md)" --body-file <(tail -n +2 .claude/tasks/artifacts/<slug>/pr.md)`. `` — no action here; `gh` already covers it.
-- `bitbucket.org` → Bitbucket-hosted, handled in step 4c below (sets `{{PR_OPEN_LINE}}`).
-- anything else (GitLab, self-hosted, unrecognized) → `AskUserQuestion`: **set up instructions** or **skip**. Either way `{{PR_OPEN_LINE}}` = manual variant below — this skill doesn't know the host's auth/CLI shape well enough to template automation for it. Set up → additionally give the host's CLI/API setup pointer generically (its hosted CLI if one exists, else its REST API + a personal access token) in chat, not in any generated file. Skip → note in the final report that PR opening (gate 4) is manual for this host.
+**PR host.** Read the remote: `git remote get-url origin` (fall back to `git config --get remote.origin.url`). Determines `{{PR_DRAFT_LINE}}` (draft PR on the first push) and `{{PR_READY_LINE}}` (gate 4 marks it ready) — both in step 7. No remote → both = manual variant below, nothing to detect.
+- `github.com` → `{{PR_DRAFT_LINE}}` = `` `gh pr create --draft --title "$(head -1 .claude/tasks/artifacts/<slug>/pr.md)" --body-file <(tail -n +2 .claude/tasks/artifacts/<slug>/pr.md)`. `` and `{{PR_READY_LINE}}` = `` `gh pr edit <pr> --title "$(head -1 .claude/tasks/artifacts/<slug>/pr.md)" --body-file <(tail -n +2 .claude/tasks/artifacts/<slug>/pr.md)`, then `gh pr ready <pr>`. `` — no action here; `gh` already covers it. `pr-feedback.sh` works out of the box.
+- `bitbucket.org` → Bitbucket-hosted, handled in step 4c below (sets both lines).
+- anything else (GitLab, self-hosted, unrecognized) → `AskUserQuestion`: **set up instructions** or **skip**. Either way both lines = manual variant below — this skill doesn't know the host's auth/CLI shape well enough to template automation for it. Set up → additionally give the host's CLI/API setup pointer generically (its hosted CLI if one exists, else its REST API + a personal access token) in chat, not in any generated file. Skip → note in the final report that opening the draft PR, marking it ready, and fetching PR feedback are manual for this host.
 
-Manual variant (no host automation): `{{PR_OPEN_LINE}}` = `No supported host automation configured — open pr.md for the user (show-file.sh) and ask them to open the PR themselves from it.`
+Manual variant (no host automation): `{{PR_DRAFT_LINE}}` = `No supported host automation configured — open pr.md for the user (show-file.sh) and ask them to open a draft PR themselves from it; PR feedback is relayed in chat.` and `{{PR_READY_LINE}}` = `No supported host automation configured — open pr.md for the user (show-file.sh) and ask them to update the PR from it and mark it ready themselves.`
 
 ## 2. Ask the project facts
 
@@ -115,11 +115,11 @@ Separate `AskUserQuestion`, options **GitHub / Jira / Filesystem / None** — ea
 
 ## 4c. Bitbucket credentials
 
-Only runs if step 1 detected `bitbucket.org` as the remote host — independent of the step 4b tracker choice (Bitbucket here is the *PR host*, gate 4; a project can still track issues in Jira or nowhere).
+Only runs if step 1 detected `bitbucket.org` as the remote host — independent of the step 4b tracker choice (Bitbucket here is the *PR host*: draft PR, PR feedback, gate 4; a project can still track issues in Jira or nowhere).
 
 `AskUserQuestion`: **set up Bitbucket credentials now** or **skip**.
 
-Skip → `{{PR_OPEN_LINE}}` = the manual variant (step 1). No file written.
+Skip → `{{PR_DRAFT_LINE}}` and `{{PR_READY_LINE}}` = the manual variants (step 1). No file written.
 
 Set up → collect via `AskUserQuestion`, one call, batched, each with a best-guess option pre-filled from the remote URL / git config, exact value via `Other`:
 
@@ -132,7 +132,7 @@ Write verbatim to `.claude/bitbucket.local.json`:
 ```json
 { "workspace": "...", "repoSlug": "...", "username": "...", "appPassword": "..." }
 ```
-Never echo the app password back in chat once written. `.gitignore` already carries `.claude/bitbucket.local.json` unconditionally — nothing more to do here. Sets `{{PR_OPEN_LINE}}` = `` Open via the Bitbucket REST API (`/2.0/repositories/<workspace>/<repo>/pullrequests`), using `.claude/bitbucket.local.json`; `title` = line 1 of pr.md, `description` = the rest, read from the file into the JSON payload with `jq -Rs`, never retyped. `` — substitute the real `<workspace>`/`<repo>` values, not the literal placeholders.
+Never echo the app password back in chat once written. `.gitignore` already carries `.claude/bitbucket.local.json` unconditionally — nothing more to do here. Sets `{{PR_DRAFT_LINE}}` = `` Open via the Bitbucket REST API (`POST /2.0/repositories/<workspace>/<repo>/pullrequests`, `"draft": true`), using `.claude/bitbucket.local.json`; `title` = line 1 of pr.md, `description` = the rest, read from the file into the JSON payload with `jq -Rs`, never retyped. `` and `{{PR_READY_LINE}}` = `` Update via the same API (`PUT …/pullrequests/<pr>` with the new `title`/`description` from pr.md, then `"draft": false`), never retyped. `` — substitute the real `<workspace>`/`<repo>` values, not the literal placeholders. `pr-feedback.sh` reads the same credentials file.
 
 ## 5. Ask the scope boundaries
 
@@ -175,6 +175,7 @@ Four things substitution alone doesn't handle:
 | `templates/.claude/scripts/failed-workflow.sh` | `.claude/scripts/failed-workflow.sh` (static — copy as-is, `chmod +x`) — CI backend auto-detected at runtime from `.github/workflows/*.yml` (GitHub Actions) vs `bitbucket-pipelines.yml` (Bitbucket Pipelines, needs `.claude/bitbucket.local.json`) |
 | `templates/.claude/scripts/issue-view.sh` | `.claude/scripts/issue-view.sh` (static — copy as-is, `chmod +x`) — tracker auto-detected at runtime from `.claude/jira.local.json` presence (Jira) vs absence (GitHub, via `gh`). Note in the final report: if this script or `failed-workflow.sh` ever falls short of what's needed, never fall back to raw `gh`/`git`/`curl` commands — stop and report the shortfall to the user instead. |
 | `templates/.claude/scripts/pr-view.sh` | `.claude/scripts/pr-view.sh` (static — copy as-is, `chmod +x`) — **only if step 1's remote is `github.com` or `bitbucket.org`** (no PR concept otherwise); host auto-detected same as `failed-workflow.sh`. Same fallback rule as `issue-view.sh`: never raw `gh`/`curl` if it falls short. |
+| `templates/.claude/scripts/pr-feedback.sh` | `.claude/scripts/pr-feedback.sh` (static — copy as-is, `chmod +x`) — same condition and host detection as `pr-view.sh`. `fetch` writes the draft PR's unresolved inline review threads to `artifacts/<slug>/pr-feedback.md`, `reply` posts the implementer's `reply:` lines and resolves the threads (`AGENTS.workflow.md` *PR feedback*). Same fallback rule. |
 | `templates/.claude/scripts/hook-guard-shell.sh` | `.claude/scripts/hook-guard-shell.sh` (static — copy as-is, `chmod +x`) — denies the Conventions-bypass shapes it detects instead of just advising against them. Requires appending to `.claude/settings.json`'s `hooks` object (see step 1's exception), both guards in one matcher, absolute via `$CLAUDE_PROJECT_DIR` so the hook still resolves when the shell cwd is a worktree: `"PreToolUse": [{"matcher": "Bash", "hooks": [{"type": "command", "command": "sh \"$CLAUDE_PROJECT_DIR\"/.claude/scripts/hook-guard-shell.sh"}, {"type": "command", "command": "sh \"$CLAUDE_PROJECT_DIR\"/.claude/scripts/hook-guard-attribution.sh"}]}]` |
 | `templates/.claude/scripts/hook-guard-attribution.sh` | `.claude/scripts/hook-guard-attribution.sh` (static — copy as-is, `chmod +x`) — denies a `git commit`/`gh pr create|edit|comment`/`gh issue create|comment` whose text (or `--body-file`) carries a `Co-Authored-By`/"Generated with" trailer. Wired with `hook-guard-shell.sh` above. |
 | `templates/.claude/scripts/hook-guard-readonly.sh` | `.claude/scripts/hook-guard-readonly.sh` (static — copy as-is, `chmod +x`) — read-only guard for `spec-reviewer`, wired by that agent's own frontmatter `hooks:` block (nothing to add to `settings.json`). Its `cargo)` case is the one stack-specific block: extend it with this stack's package-manager mutating subcommands if the stack has any; a foreign block is harmless. |
@@ -207,7 +208,7 @@ Placeholders used across templates:
 | `{{AREA_TABLE}}` | step 4 — `PRD.md` only, links `./docs/specs/<area>/`. `docs/specs/README.md` carries no area table: it points at `AGENTS.md`'s routing table, the single copy. |
 | `{{COVERAGE_FLOOR}}`, `{{COVERAGE_LINE}}` | step 4 |
 | `{{ISSUE_WORKFLOW}}` | step 4b tracker choice |
-| `{{PR_OPEN_LINE}}` | step 1 remote detection + step 4c (Bitbucket) |
+| `{{PR_DRAFT_LINE}}`, `{{PR_READY_LINE}}` | step 1 remote detection + step 4c (Bitbucket) |
 | `{{SCOPE_BOUNDARIES}}` | step 5 |
 | `{{RTK_SECTION}}` | step 0 `include_rtk_section` — `true` → `## RTK\n\n` + verbatim `templates/fragments/rtk-instructions.md`; `false` → empty |
 | `{{AREA_TITLE}}`, `{{AREA_COVERS}}`, `{{AREA_PREFIX}}` | step 4, per area file |
@@ -228,7 +229,7 @@ Coverage-dependent slots, all filled from the floor chosen in step 4 — and all
 | `{{GAUNTLET_STEPS}}` / `{{COVERAGE_EXTRACT}}` | stack file blocks as-is | drop the `run cov …` line; `{{COVERAGE_EXTRACT}}` = `cov=` (status line prints `cov=-`) |
 | `{{COVERAGE_CONTRIB_LINE}}` | `Line coverage must stay at or above **N%**, enforced in CI. Coverage is a floor, not a goal — never pad it with tests that execute code without asserting on it.` | empty |
 
-Tracker-dependent slot (choice from step 4b; `{{ISSUE_WORKFLOW}}` is the fragment named there). `{{CLOSES_CLAUSE}}` sits between "orchestrator" and "pushes" in gate 4 — the one PR-body line the orchestrator writes itself:
+Tracker-dependent slot (choice from step 4b; `{{ISSUE_WORKFLOW}}` is the fragment named there). `{{CLOSES_CLAUSE}}` sits between "orchestrator" and "pushes" in gate 4 — the one PR-body line the orchestrator writes itself (appended to the draft body at first push and again to the full body at gate 4, since gate 4 replaces the body whole):
 
 | GitHub | Jira (MCP / credentials) | Filesystem | None |
 |---|---|---|---|
