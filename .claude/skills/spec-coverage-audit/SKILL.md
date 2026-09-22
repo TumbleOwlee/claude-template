@@ -62,7 +62,8 @@ the nearest area.
 ## 4. Draft the diff
 
 - **Gaps within an existing area**: new `<PREFIX>-R-nnn` "shall" entries,
-  next free number for that area's prefix (append-only — check the highest
+  one rule each (`docs/specs/README.md` rule 9 — two independent behaviors
+  are two IDs, never one longer line), next free number for that area's prefix (append-only — check the highest
   existing number in that `requirements.md`, never reuse or renumber).
   Testable, observable-outcome wording, e.g.
   `**<PREFIX>-R-001** — The <subject> shall <observable outcome> when <condition>.`

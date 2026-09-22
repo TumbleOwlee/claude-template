@@ -23,7 +23,7 @@ The requirement is a reader that never held the implementer's context: a fresh s
 
 ## Output
 
-Point the developer at `review.verdict.md` (`sh .claude/scripts/show-file.sh`), the full `review.md` on request.
+Point the developer at `review.verdict.md` (`sh .claude/scripts/show-file.sh`), the full `review.md` on request. Findings needing a user decision are flagged, not resolved.
 
 ## Stop condition
 

@@ -1,7 +1,7 @@
 #!/bin/sh
 # Open a file for the user without its contents entering the agent's context.
-# Preference order: tmux window with glow, wslview (Windows default app), tmux
-# window with less, else print a hint to open the file manually. Prints one
+# Preference order: tmux pane with glow, wslview (Windows default app), tmux
+# pane with less, else print a hint to open the file manually. Prints one
 # line naming the viewer used; never the file.
 #
 # A user-facing summary (`*.summary.md`, `*.verdict.md`) is capped at
@@ -33,11 +33,11 @@ esac
 has() { command -v "$1" >/dev/null 2>&1; }
 
 if [ -n "$TMUX" ] && has glow; then
-    tmux new-window -n "claude: $file" "glow -p '$abs'" && echo "show-file: opened in tmux window (glow): $abs"
+    tmux split-window -v "glow -p '$abs'" && echo "show-file: opened in tmux pane (glow): $abs"
 elif has wslview; then
     wslview "$abs" && echo "show-file: opened with wslview: $abs"
 elif [ -n "$TMUX" ]; then
-    tmux new-window -n "claude: $file" "less '$abs'" && echo "show-file: opened in tmux window (less): $abs"
+    tmux split-window -v "less '$abs'" && echo "show-file: opened in tmux pane (less): $abs"
 else
     echo "show-file: no viewer available (need tmux+glow, wslview, or tmux+less); open manually: $abs"
 fi
