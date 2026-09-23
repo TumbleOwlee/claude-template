@@ -33,16 +33,25 @@ Surface every plan-shaped decision (stage boundaries, extend-vs-reimplement, tes
 
 Anchor every code reference on a name or a quoted unique string (`fn parse_frame`, the `case Timeout:` arm), **never a line number**: numbers are stale by the time the reviewer reads them and again when the implementer edits, and every stale span is a review pass.
 
-`plan.summary.md` — the user's file, written last, rewritten whole on every revision, **≤ 25 lines / 2 KB** (`show-file.sh` refuses more). Decisions only, never how:
+`plan.summary.md` — the user's file, written last, rewritten whole on every revision, **≤ 25 lines / 2 KB** (`show-file.sh` refuses more). Decisions only, never how. The `**Decide:**` line is what the user is being asked: stage count, whether the tree is a chain or admits waves (they choose the concurrency, you only state what is possible), and the verification method, which cannot be waived without asking. `Touches` names modules or packages, never full paths. Blank line between blocks:
 
 ```
 # <slug> — plan summary (rev N)
-Stages (chain | waves: w1 [s1,s2], w2 [s3]):
-- s0 land spec — docs/specs/<area>/requirements.md
-- s1 <what, ≤ 12 words> — <files>
-Behavior changes accepted: <one line each, or none>
-Out of scope, raise separately: <one line each, or none>
-Open: <decision the user still owes, or none>
+
+**Decide:** approve <n> stages, <chain | waves possible: w1 [s1,s2], w2 [s3]>. Verification: <unit tests | plus <manual/integration method>>, for <stages>.
+
+| Stage | What | Touches |
+|---|---|---|
+| s0 | land spec | docs/specs <areas> |
+| s1 | <≤ 12 words> | <module> |
+
+**Accepted behavior changes**
+- <one line each, with ID, or none>
+
+**Out of scope, raise separately**
+- <one line each, or none>
+
+**Open:** <decision the user still owes, or none>
 ```
 
 Existing-code references inline at the step — not `3. use retry helper (src/http/retry.py)` but the exact signature/pattern to match, quoted verbatim where that removes ambiguity; never a prose paragraph or separate refs section. **The plan is the implementer's only codebase knowledge** (every implementer is a fresh spawn, sequential runs included): a step that sends it back into the codebase is incomplete — expand now. A reference needed by 2+ stages lives once in `## Shared`; steps point to it (`3. use retry helper — see Shared`).
@@ -57,5 +66,5 @@ Dependency tree, must hold under parallel reading:
 
 - Write to `artifacts/<slug>/plan.md` — must stand alone for a crash-resumed session.
 - Stage ids `s1`, `s2`, … (card ids `<slug>.s2`). Each stage's `files` and `blocked-by` copy onto a card unchanged. **`files` is a contract, not a hint:** a stage may touch exactly what its list names — tooling, test helpers, config a stage needs are listed too; the reviewer blocks on any file outside the list. Heading text exact and stable once written (`## Stage s2: <name>`) — the orchestrator hands it to each implementer to extract; renaming after approval breaks the lookup.
-- Never create/move task cards, push, write product code or tests. Implementation is `spec-implementer`'s, sequential and parallel alike.
+- Never create/move task cards, create or reference the issue or PR, push, write product code or tests. Implementation is `spec-implementer`'s, sequential and parallel alike.
 - Final message one line: `status=ready file=artifacts/<slug>/plan.md summary=artifacts/<slug>/plan.summary.md count=<stages>`. Never the plan itself. Given a `review.md` path afterwards: apply its plan-scoped findings to `plan.md` in place, rewrite `plan.summary.md` (bump `rev`), answer `status=ready` again.

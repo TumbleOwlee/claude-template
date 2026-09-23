@@ -53,7 +53,7 @@ For the confirmed source directory:
    intentional gap isn't re-flagged as missing).
 2. Read the source code in that area.
 3. Reason about what observable behavior exists vs. what's stated as a
-   `shall` requirement. Flag behavior with nothing covering it.
+   requirement statement. Flag behavior with nothing covering it.
 
 For anything that doesn't fit any area in scope (or any area at all): note
 it separately — handled below in this same step, not folded silently into
@@ -61,12 +61,12 @@ the nearest area.
 
 ## 4. Draft the diff
 
-- **Gaps within an existing area**: new `<PREFIX>-R-nnn` "shall" entries,
+- **Gaps within an existing area**: new `<PREFIX>-R-nnn` entries (indicative statements, README rule 4),
   one rule each (`docs/specs/README.md` rule 9 — two independent behaviors
   are two IDs, never one longer line), next free number for that area's prefix (append-only — check the highest
   existing number in that `requirements.md`, never reuse or renumber).
   Testable, observable-outcome wording, e.g.
-  `**<PREFIX>-R-001** — The <subject> shall <observable outcome> when <condition>.`
+  `**<PREFIX>-R-001** — The <subject> <observable outcome, indicative> when <condition>.`
 - **Code fitting no existing area**: propose a new area inline —
   directory name (lowercase, short), one-line "covers" description, and a
   unique requirement ID prefix (two letters + `-R-`, not colliding with any

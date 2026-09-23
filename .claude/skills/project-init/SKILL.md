@@ -14,7 +14,7 @@ Source of truth: `templates/`. Read the template files — do not reproduce from
 ## Guard rails
 
 - Ask, never guess: every unknown below is an `AskUserQuestion`, not an assumption. A wrong build command baked into AGENTS.md is worse than one question.
-- Never fabricate requirements: `docs/specs/*/requirements.md` ships as an empty, header-only stub. Real "shall" statements are written later through gate 1. Same for ungrounded PRD sections — `*(TBD)*`.
+- Never fabricate requirements: `docs/specs/*/requirements.md` ships as an empty, header-only stub. Real requirement statements are written later through gate 1. Same for ungrounded PRD sections — `*(TBD)*`.
 - Never overwrite a file the user wants kept — step 1 settles that per file.
 - Do not start implementing the product. This skill sets up the workflow; the first feature goes through gate 1 afterwards.
 - Secrets (Jira API token, Bitbucket app password) collected via `AskUserQuestion` like everything else, written once to their `.claude/*.local.json` file, never echoed back, never left ungitignored.
@@ -48,7 +48,7 @@ Any other pre-existing target file: show it, ask keep / overwrite / merge. Recor
 If `AGENTS.md` already exists and looks like this workflow (contains "Gate 1"): say so, ask whether user wants a re-run (re-ask everything, rewrite) or a targeted edit. A re-run on a live project silently discards local customisation — make that explicit before proceeding.
 
 **PR host.** Read the remote: `git remote get-url origin` (fall back to `git config --get remote.origin.url`). Determines `{{PR_DRAFT_LINE}}` (draft PR on the first push) and `{{PR_READY_LINE}}` (gate 4 marks it ready) — both in step 7. No remote → both = manual variant below, nothing to detect.
-- `github.com` → `{{PR_DRAFT_LINE}}` = `` `gh pr create --draft --title "$(head -1 .claude/tasks/artifacts/<slug>/pr.md)" --body-file <(tail -n +2 .claude/tasks/artifacts/<slug>/pr.md)`. `` and `{{PR_READY_LINE}}` = `` `gh pr edit <pr> --title "$(head -1 .claude/tasks/artifacts/<slug>/pr.md)" --body-file <(tail -n +2 .claude/tasks/artifacts/<slug>/pr.md)`, then `gh pr ready <pr>`. `` — no action here; `gh` already covers it. `pr-feedback.sh` works out of the box.
+- `github.com` → `{{PR_DRAFT_LINE}}` = `` `gh pr create --draft --title "$(head -1 .claude/tasks/artifacts/<slug>/pr.md | sed 's/^# //')" --body-file <(tail -n +2 .claude/tasks/artifacts/<slug>/pr.md)`. `` and `{{PR_READY_LINE}}` = `` `gh pr edit <pr> --title "$(head -1 .claude/tasks/artifacts/<slug>/pr.md | sed 's/^# //')" --body-file <(tail -n +2 .claude/tasks/artifacts/<slug>/pr.md)`, then `gh pr ready <pr>`. `` — no action here; `gh` already covers it. `pr-feedback.sh` works out of the box.
 - `bitbucket.org` → Bitbucket-hosted, handled in step 4c below (sets both lines).
 - anything else (GitLab, self-hosted, unrecognized) → `AskUserQuestion`: **set up instructions** or **skip**. Either way both lines = manual variant below — this skill doesn't know the host's auth/CLI shape well enough to template automation for it. Set up → additionally give the host's CLI/API setup pointer generically (its hosted CLI if one exists, else its REST API + a personal access token) in chat, not in any generated file. Skip → note in the final report that opening the draft PR, marking it ready, and fetching PR feedback are manual for this host.
 
@@ -132,7 +132,7 @@ Write verbatim to `.claude/bitbucket.local.json`:
 ```json
 { "workspace": "...", "repoSlug": "...", "username": "...", "appPassword": "..." }
 ```
-Never echo the app password back in chat once written. `.gitignore` already carries `.claude/bitbucket.local.json` unconditionally — nothing more to do here. Sets `{{PR_DRAFT_LINE}}` = `` Open via the Bitbucket REST API (`POST /2.0/repositories/<workspace>/<repo>/pullrequests`, `"draft": true`), using `.claude/bitbucket.local.json`; `title` = line 1 of pr.md, `description` = the rest, read from the file into the JSON payload with `jq -Rs`, never retyped. `` and `{{PR_READY_LINE}}` = `` Update via the same API (`PUT …/pullrequests/<pr>` with the new `title`/`description` from pr.md, then `"draft": false`), never retyped. `` — substitute the real `<workspace>`/`<repo>` values, not the literal placeholders. `pr-feedback.sh` reads the same credentials file.
+Never echo the app password back in chat once written. `.gitignore` already carries `.claude/bitbucket.local.json` unconditionally — nothing more to do here. Sets `{{PR_DRAFT_LINE}}` = `` Open via the Bitbucket REST API (`POST /2.0/repositories/<workspace>/<repo>/pullrequests`, `"draft": true`), using `.claude/bitbucket.local.json`; `title` = line 1 of pr.md with its `# ` stripped, `description` = the rest, read from the file into the JSON payload with `jq -Rs`, never retyped. `` and `{{PR_READY_LINE}}` = `` Update via the same API (`PUT …/pullrequests/<pr>` with the new `title`/`description` from pr.md, then `"draft": false`), never retyped. `` — substitute the real `<workspace>`/`<repo>` values, not the literal placeholders. `pr-feedback.sh` reads the same credentials file.
 
 ## 5. Ask the scope boundaries
 

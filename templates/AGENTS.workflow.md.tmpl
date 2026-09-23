@@ -12,7 +12,7 @@ Trigger and tiers: `AGENTS.md`'s `## Workflow`. Size sets stage count, never gat
 - **Gate 1 is a dialog with the user, drafted by `spec-author`.** Existing spec + goal, nothing about current code.
 - **No spec effect (docs-only, non-functional, no observable-behavior change) → skip gate 1**, go to gate 2. No `spec-diff.md`; parent card records `gate1: skipped`. Gate 2 planning finds a spec gap → stop, run gate 1, continue.
 - Gate 2 onward delegates to agents. **All agents Sonnet or better** — weaker models stop mid-plan, commit stubs as "green," report hanging tests as verified.
-- **Issue and PR filed by the orchestrator alone**, from a body file `spec-author` drafted, title = line 1, body = the rest, never retyped. No agent but `spec-author` learns an issue or PR number exists — spawn briefs never carry one. A later spec change goes to the issue the same way (`spec-author` drafts the comment file, orchestrator posts).
+- **Issue and PR filed by the orchestrator alone**, from a body file `spec-author` drafted, title = line 1 with its `# ` stripped, body = the rest, never retyped. No agent but `spec-author` learns an issue or PR number exists — spawn briefs never carry one. A later spec change goes to the issue the same way (`spec-author` drafts the comment file, orchestrator posts).
 - **The draft PR is the user's review surface.** The feature branch's first push opens a *draft* PR; every later push updates it, so the user reviews each stage as it lands and gives feedback as inline PR comments. Feedback re-enters the run only through `bash .claude/scripts/pr-feedback.sh` (*PR feedback*): the file it writes goes to the implementer like `review.md`, the orchestrator never reads a comment. Gate 4 marks the same PR ready — it never opens a second one.
 - **One git worktree per issue per agent**, `.claude/worktrees/<slug>` — inside project dir (agent-reachable), gitignored. Two agents in one checkout interleave commits; a branch is not a working tree. Created only once gate 2 is approved (first thing to touch disk); removed after merge.
 - Plan is a contract; a wrong plan stops the implementer (`spec-implementer.md` `## Stop and report — never improvise`), never gets improvised around.
@@ -44,7 +44,7 @@ State on disk so an interrupted session resumes, not restarts. Directory a card 
     review.md          review findings + history, keyed by stage id, append-only
     review.verdict.md  open findings per stage, rewritten every pass, capped
     gauntlet.log       full build/test/lint output of the last gauntlet.sh run
-    pr.md              title (line 1) + body — draft form after gate 2, full form at gate 4
+    pr.md              `# <title>` (line 1) + body — draft form after gate 2, full form at gate 4
     pr-feedback.md     unresolved PR review threads (pr-feedback.sh fetch), replies filled by the implementer
 ```
 
@@ -100,7 +100,7 @@ status=<token> file=<path> [summary=<path>] [stage=s<n>] [question=<one line>] [
 
 | Agent | `status` tokens | `file` | `summary` |
 |---|---|---|---|
-| spec-author | `question` · `ready` · `no-diff` · `reuse` · `new` | `artifacts/<slug>/spec-diff.md`, `issue.md`, `issue-comment.md`, `pr.md` | none — normative lines are already the summary |
+| spec-author | `question` · `ready` · `no-diff` · `reuse` · `new` | `artifacts/<slug>/spec-diff.md`, `issue.md`, `issue-comment.md`, `pr.md` | none — each file opens with its own overview block (`
 | spec-planner | `question` · `spec-gap` · `ready` (`count=` stages) | `artifacts/<slug>/plan.md` | `artifacts/<slug>/plan.summary.md` |
 | spec-implementer | `inreview` · `committed` · `blocked` · `spec-gap` | stage card (`stage=`); resumed with a `review.md` or `pr-feedback.md` path it fixes and answers `inreview` again | none — the card is the summary |
 | spec-reviewer | `clean` · `findings` (`count=` blockers+majors, `stage=` list) | `artifacts/<slug>/review.md` | `artifacts/<slug>/review.verdict.md` |

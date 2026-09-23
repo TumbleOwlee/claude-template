@@ -4,7 +4,7 @@ Cross-cutting requirements belonging to no single area: platforms, toolchain, pe
 
 IDs stable, append-only (`NF-R-nnn`). See [`README.md`](./README.md).
 
-Added via workflow in [`AGENTS.md`](../../AGENTS.md) — gate 1 approves "shall" text before code is written. Nothing here precedes that approval.
+Added via workflow in [`AGENTS.md`](../../AGENTS.md) — gate 1 approves requirement text before code is written. Nothing here precedes that approval.
 
 ---
 

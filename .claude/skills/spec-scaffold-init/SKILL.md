@@ -15,7 +15,7 @@ alone into any project and it still works.
 
 Guard rails: ask, never guess (`AskUserQuestion` for every unknown below) —
 never fabricate requirement text (every generated file ships empty/stub,
-real "shall" statements land later, through the approval step in step 4) —
+real requirement statements land later, through the approval step in step 4) —
 never overwrite a file without asking keep/overwrite/merge first.
 
 ## 0. Check requirements
