@@ -7,11 +7,11 @@ description: Drive one behavior change through the repo's gated spec-driven TDD 
 
 **Concise, compact, facts only.**
 
-`AGENTS.workflow.md` is authority for every gate, the task board, and the subagents — follow exactly, one heading at a time per the table (`AGENTS.md`'s `## Workflow` is a pointer to it). This skill is the entrypoint only; it restates nothing. Conflict → `AGENTS.workflow.md` wins.
+`AGENTS.workflow.md` is authority for every gate, the task board, and the subagents — follow exactly, one heading at a time per the table. Conflict → `AGENTS.workflow.md` wins.
 
 ## Before anything else
 
-Check `.claude/tasks/`. Cards outside `open/`+`done/` = interrupted run → `### Resume an interrupted run`, don't start fresh.
+Check `.claude/tasks/` against `### Resume an interrupted run` before starting fresh.
 
 ## Where each step lives
 
@@ -26,7 +26,7 @@ One section at a time: `sh .claude/scripts/extract-section.sh '<heading>' AGENTS
 | Gate 1 — spec diff | `### Gate 1 — spec diff. Stop for approval.` |
 | Gate 1b — tracking issue | `### Gate 1b — tracking issue. Stop for approval.` |
 | Gate 2 — implementation plan | `### Gate 2 — implementation plan. Stop for approval.` |
-| Implement, stage by stage | `### Implement, stage by stage` |
+| Implement, stage by stage — a sequential run pulls `#### Every stage`, `#### Sequential`, `#### Per-stage review` | `### Implement, stage by stage` |
 | PR feedback — draft PR comments back into the run, before every approval stop once the draft exists | `### PR feedback` |
 | Reconcile the spec | `### Reconcile the spec` |
 | Gate 3 — independent review | `### Gate 3 — review. Stop for approval.` |

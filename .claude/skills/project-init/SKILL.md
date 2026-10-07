@@ -222,8 +222,6 @@ Coverage-dependent slots, all filled from the floor chosen in step 4 — and all
 |---|---|---|
 | `{{COVERAGE_FLOOR}}` | `N` | — (coverage command dropped) |
 | `{{COVERAGE_LINE}}` | `- Coverage floor N% of lines, CI-gated on every push and PR. A floor, not a target — never inflate it with tests that execute code without asserting.` | empty |
-| `{{COVERAGE_PLAN_CLAUSE}}` | `; expected coverage impact` | empty |
-| `{{COVERAGE_STAGE_CLAUSE}}` | `, coverage ≥ N%` | empty |
 | `{{COVERAGE_PR_TEMPLATE_LINE}}` | `- Coverage: __% lines` | empty |
 | `{{COVERAGE_GAUNTLET_WORD}}` | `/coverage` | empty |
 | `{{GAUNTLET_STEPS}}` / `{{COVERAGE_EXTRACT}}` | stack file blocks as-is | drop the `run cov …` line; `{{COVERAGE_EXTRACT}}` = `cov=` (status line prints `cov=-`) |
