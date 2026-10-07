@@ -34,7 +34,7 @@ and then writes:
 |---|---|
 | `AGENTS.md` | Spec-driven rules, TDD order, build commands, conventions, scope boundaries. The file agents read first. |
 | `AGENTS.workflow.md` | The gates, task board, stage-by-stage implementation, review, PR, merge, resume. Orchestrator-only, pulled one heading at a time. |
-| `.github/PULL_REQUEST_TEMPLATE.md` | Why / What changed / Approach / Verification — the same four sections the gate 4 PR body uses (GitHub remotes only). |
+| `.github/PULL_REQUEST_TEMPLATE.md` | Why / What changed / Approach / Verification — the gate 4 PR body's sections, less its `## Plan` stage checklist (GitHub remotes only). |
 | `CLAUDE.md` | Thin router into `AGENTS.md`. |
 | `.github/copilot-instructions.md` | Same router, for GitHub Copilot. |
 | `PRD.md` | Why the project exists — goals, non-goals, users. |

@@ -182,6 +182,7 @@ Gates unchanged under parallelism — verification, review, spec reconcile happe
 - Stage messages cheap, squashed later. Squash message carries requirement IDs + why.
 - Test obligations per requirement and ID-citation placement: `AGENTS.md` `## TDD — fixed order, every stage` (the implementer's and reviewer's own reading).
 - Not done until the Verification method has run and its outcome is reported. Waiving it requires asking.
+- Card → `done` ticks that stage in `pr.md`'s `## Plan` checklist (`- [ ] s<n> — <line>` → `- [x] s<n> — <line> (<short sha>)`); a card leaving `done` (review, *PR feedback*) unticks it and drops the sha. With the draft PR open, each change goes out at once — {{PR_BODY_LINE}} Ticks made before the PR opens (`s0`, a parallel run's first wave) go out with it. A plan revision that adds or drops a stage adds or drops its line the same way.
 
 ### PR feedback
 
@@ -226,7 +227,7 @@ Orchestrator runs `gauntlet.sh` on the branch, forwards both status lines, shows
 ### Gate 4 — pull request. Stop for approval.
 
 - Gauntlet + gate 3 clean, *PR feedback* at `threads=0`, then **ask whether to mark the PR ready** — user may want a manual run first; don't pre-empt it.
-- `spec-author` rewrites `artifacts/<slug>/pr.md` in **full form** (content rules in its file; `.github/PULL_REQUEST_TEMPLATE.md` carries the same four sections for human PRs). User approves; orchestrator{{CLOSES_CLAUSE}} pushes, replaces the draft PR's title and body from that file and marks it ready — the PR the first push opened, never a new one. Log `pr=ready` on the parent card. {{PR_READY_LINE}}
+- `spec-author` rewrites `artifacts/<slug>/pr.md` in **full form** (content rules in its file; `.github/PULL_REQUEST_TEMPLATE.md` carries the same sections, less `## Plan`, for human PRs). User approves; orchestrator{{CLOSES_CLAUSE}} pushes, replaces the draft PR's title and body from that file and marks it ready — the PR the first push opened, never a new one. Log `pr=ready` on the parent card. {{PR_READY_LINE}}
 - CI fails → `bash .claude/scripts/failed-workflow.sh <branch>`, never raw `gh run view`/pipeline API calls.
 
 ### Merge
@@ -258,6 +259,7 @@ No worktree on the card → died during gate 1 dialog or gate 2 planning, nothin
 | `gauntlet=pass` | `gauntlet.sh` at that sha | card overstated state |
 | `pr=<n>` | `pr-feedback.sh fetch <n> …` — its status line's `state=`/`draft=` | closed/merged: run is over; missing: draft never opened, the next push opens it |
 | stage `done` | `git branch --contains` vs feature branch | never merged; downstream plans a lie |
+| PR `## Plan` ticks | ticked boxes in the PR body vs stage cards in `done/` | tick never pushed: re-tick from the cards, update the PR body |
 
 Report differences first. Agree → resume. Disagree → stop and report: card behind git is a forgotten move, correctable; card claiming what git can't show is never trusted into being true.
 
