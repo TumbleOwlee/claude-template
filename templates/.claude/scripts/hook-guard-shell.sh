@@ -12,6 +12,7 @@
 #     commit to it — the safety net for an agent that missed the worktree)
 #   - `git push` whose destination is `main`, explicit or (on bare `git
 #     push`) implied by the current branch already being `main`
+# Both git checks honour `git -C <dir>` and a preceding `cd <dir>` segment.
 #
 # Reads a PreToolUse hook payload on stdin, writes a deny-decision JSON
 # object on stdout when it blocks, nothing when it doesn't.
@@ -42,6 +43,32 @@ old_ifs=$IFS
 IFS='
 '
 for seg in $segments; do
+  # A `cd` segment moves the directory later segments resolve against, but only to a
+  # directory that exists: a failed `cd` leaves the shell where it was. Splitting on
+  # `;`/`&` is quote-blind, so a `cd` inside a quoted string is still taken as one.
+  if printf '%s' "$seg" | grep -q '^[[:space:]]*cd\([[:space:]]\|$\)'; then
+    args=$(printf '%s' "$seg" | sed 's/^[[:space:]]*cd[[:space:]]*//; s/[[:space:]]*$//')
+    while :; do
+      case "$args" in
+        --*) args=$(printf '%s' "${args#--}" | sed 's/^[[:space:]]*//'); break ;;
+        -?*) args=$(printf '%s' "$args" | sed 's/^-[^[:space:]]*[[:space:]]*//') ;;
+        *) break ;;
+      esac
+    done
+    case "$args" in
+      \"*) target=$(printf '%s' "$args" | sed -n 's/^"\([^"]*\)".*/\1/p') ;;
+      \'*) target=$(printf '%s' "$args" | sed -n "s/^'\([^']*\)'.*/\1/p") ;;
+      *) target=$(printf '%s' "$args" | sed 's/[[:space:]].*//') ;;
+    esac
+    case "$target" in
+      '') ;;
+      /*) ;;
+      '~'*) target="$HOME${target#\~}" ;;
+      *) target="$cwd/$target" ;;
+    esac
+    [ -n "$target" ] && [ -d "$target" ] && cwd="$target"
+    continue
+  fi
   case "$seg" in
     *cat\ *)
       rest=$(printf '%s' "$seg" | sed -n 's/^[[:space:]]*cat[[:space:]]\{1,\}//p')
@@ -50,6 +77,7 @@ for seg in $segments; do
         case "$tok" in
           -*) continue ;;
         esac
+        case "$tok" in /*) ;; *) tok="$cwd/$tok" ;; esac
         [ -f "$tok" ] || continue
         case "$tok" in
           *.md)
@@ -115,7 +143,7 @@ for seg in $segments; do
   [ -z "$offender" ] || break
 
   case "$seg" in
-    *git\ commit*)
+    *git\ commit*|*git\ -C\ *\ commit*)
       case "$seg" in
         *--dry-run*) ;;  # doesn't create a commit
         *)
@@ -123,6 +151,7 @@ for seg in $segments; do
           case "$seg" in
             *-C\ *) dir=$(printf '%s' "$seg" | sed -n 's/.*-C[[:space:]]*\([^[:space:]]*\).*/\1/p') ;;
           esac
+          case "$dir" in /*) ;; *) dir="$cwd/$dir" ;; esac
           branch=$(git -C "$dir" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
           if [ "$branch" = "$PROTECTED_BRANCH" ]; then
             offender="$seg"
@@ -135,11 +164,12 @@ for seg in $segments; do
   [ -z "$offender" ] || break
 
   case "$seg" in
-    *git\ push*)
+    *git\ push*|*git\ -C\ *\ push*)
       dir="$cwd"
       case "$seg" in
         *-C\ *) dir=$(printf '%s' "$seg" | sed -n 's/.*-C[[:space:]]*\([^[:space:]]*\).*/\1/p') ;;
       esac
+      case "$dir" in /*) ;; *) dir="$cwd/$dir" ;; esac
       case "$seg" in
         *" $PROTECTED_BRANCH"|*":$PROTECTED_BRANCH")
           offender="$seg"
