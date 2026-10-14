@@ -7,20 +7,21 @@ description: PO-facing entrypoint — derive spec text from a requirement via di
 
 **Concise, compact, facts only.**
 
-`AGENTS.workflow.md` is authority for gate 1 and 1b — the headings in the table below, followed exactly. Conflict → `AGENTS.workflow.md` wins.
+`AGENTS.workflow.md` is authority for gate 1 and the tracking issue — the headings in the table below, followed exactly. Conflict → `AGENTS.workflow.md` wins.
 
-Single-session, no resume: skip gate 1's **Board** bullet and every "record … on the parent card" step — no `open/<slug>.md`, no task card. `spec-author` still needs a scratch `artifacts/<slug>/` (deleted once the ticket exists). The ticket is the only surviving artifact; approved spec text lives in its self-contained body, not `docs/specs/`. Orchestrator relays and files (`### Agent hand-off`); drafts nothing.
+Single-session, no resume: skip gate 1's **Board** bullet, its lane question (always the full-lane approval), and every "record … on the parent card" step. `spec-author` still needs a scratch `artifacts/<slug>/` (deleted once the ticket exists). The ticket is the only surviving artifact (*Tracking issue*); approved spec text never lands in `docs/specs/` here. The parent-card fields `issue-body.sh` reads are absent here; its status line reads `Spec rev N` alone. Orchestrator relays and files; drafts nothing.
 
 ## Where each step lives
 
-One section at a time: `sh .claude/scripts/extract-section.sh '<heading>' AGENTS.workflow.md`.
+Headings of `AGENTS.workflow.md`, one pull each (`AGENTS.md` `## Conventions — reading`).
 
 | Step | Heading |
 |---|---|
 | Orchestrator role — read once | `### Principles` |
 | Agent hand-off | `### Agent hand-off` |
-| Gate 1 — spec diff, dialogue only, no board | `### Gate 1 — spec diff. Stop for approval.` |
-| Gate 1b — tracking issue | `### Gate 1b — tracking issue. Stop for approval.` |
+| Relayed question | `### Relayed question` |
+| Gate 1 — spec diff, dialogue only, no board | `### Gate 1 — spec diff` |
+| Tracking issue — runs right after gate 1 approval here (no plan); `spec-author` writes `issue.md`, the orchestrator assembles the body with `issue-body.sh` (no plan decisions, no stage count), shows it, files it on approval | `### Tracking issue` |
 
 ## Stop condition
 
