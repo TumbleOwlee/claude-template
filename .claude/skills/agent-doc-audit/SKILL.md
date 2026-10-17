@@ -11,7 +11,7 @@ Read-only. Never split or edit — propose, user decides (a split churns every c
 
 ## 1. Scope: agent-facing files
 
-`AGENTS.md`, `AGENTS.workflow.md`, `.claude/agents/*.md`, `.claude/skills/*/SKILL.md`, `docs/specs/**/*.md`, any file a skill/agent instruction names with "Read". Skip human-facing docs (`PRD.md`, `ARCHITECTURE.md`, `CONTRIBUTING.md`, `README.md`) unless an agent's instructions cite one.
+`AGENTS.md`, `AGENTS.workflow.md`, `.claude/agents/*.md`, `.claude/agent-parts/*.md`, `.claude/skills/*/SKILL.md`, `docs/specs/**/*.md`, any file a skill/agent instruction names with "Read". Skip human-facing docs (`PRD.md`, `ARCHITECTURE.md`, `CONTRIBUTING.md`, `README.md`) unless an agent's instructions cite one.
 
 ## 2. Build the read-map
 

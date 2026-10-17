@@ -137,6 +137,12 @@ jobs:
           echo "total coverage: ${pct}%"
           awk -v p="$pct" -v f={{COVERAGE_FLOOR}} 'BEGIN { exit (p+0 >= f+0) ? 0 : 1 }' \
             || { echo "coverage ${pct}% is below the {{COVERAGE_FLOOR}}% floor"; exit 1; }
+  # Fixture tests for the agent-workflow scripts in .claude/scripts/.
+  scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh .claude/scripts/tests/run.sh
 ```
 
 ## `bitbucket-pipelines` → `bitbucket-pipelines.yml`
@@ -171,6 +177,11 @@ pipelines:
             pct="$(go tool cover -func=cover.out | tail -1 | awk '{print $3}' | tr -d '%')"
             awk -v p="$pct" -v f={{COVERAGE_FLOOR}} 'BEGIN { exit (p+0 >= f+0) ? 0 : 1 }' \
               || { echo "coverage ${pct}% is below the {{COVERAGE_FLOOR}}% floor"; exit 1; }
+    # Fixture tests for the agent-workflow scripts in .claude/scripts/.
+    - step:
+        name: scripts
+        script:
+          - sh .claude/scripts/tests/run.sh
 ```
 
 ## `lefthook` → `.lefthook.yml`

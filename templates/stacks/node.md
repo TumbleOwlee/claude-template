@@ -128,6 +128,12 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm vitest run --coverage.enabled --coverage.thresholds.lines={{COVERAGE_FLOOR}}
+  # Fixture tests for the agent-workflow scripts in .claude/scripts/.
+  scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh .claude/scripts/tests/run.sh
 ```
 
 ## `bitbucket-pipelines` → `bitbucket-pipelines.yml`
@@ -162,6 +168,11 @@ pipelines:
           - corepack enable
           - pnpm install --frozen-lockfile
           - pnpm vitest run --coverage.enabled --coverage.thresholds.lines={{COVERAGE_FLOOR}}
+    # Fixture tests for the agent-workflow scripts in .claude/scripts/.
+    - step:
+        name: scripts
+        script:
+          - sh .claude/scripts/tests/run.sh
 ```
 
 ## `lefthook` → `.lefthook.yml`

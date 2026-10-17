@@ -125,6 +125,12 @@ jobs:
       - run: cmake --build --preset coverage
       - run: ctest --preset coverage --output-on-failure
       - run: gcovr --root . --fail-under-line {{COVERAGE_FLOOR}}
+  # Fixture tests for the agent-workflow scripts in .claude/scripts/.
+  scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh .claude/scripts/tests/run.sh
 ```
 
 ## `bitbucket-pipelines` → `bitbucket-pipelines.yml`
@@ -162,6 +168,12 @@ pipelines:
           - cmake --build --preset coverage
           - ctest --preset coverage --output-on-failure
           - gcovr --root . --fail-under-line {{COVERAGE_FLOOR}}
+    # Fixture tests for the agent-workflow scripts in .claude/scripts/.
+    - step:
+        name: scripts
+        script:
+          - apt-get update && apt-get install -y git
+          - sh .claude/scripts/tests/run.sh
 ```
 
 ## `lefthook` → `.lefthook.yml`

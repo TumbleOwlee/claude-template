@@ -128,6 +128,12 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - uses: taiki-e/install-action@cargo-llvm-cov
       - run: cargo llvm-cov --all-features --fail-under-lines {{COVERAGE_FLOOR}}
+  # Fixture tests for the agent-workflow scripts in .claude/scripts/.
+  scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh .claude/scripts/tests/run.sh
 ```
 
 ## `bitbucket-pipelines` → `bitbucket-pipelines.yml`
@@ -161,6 +167,11 @@ pipelines:
           - rustup component add llvm-tools-preview
           - cargo install cargo-llvm-cov --locked
           - cargo llvm-cov --all-features --fail-under-lines {{COVERAGE_FLOOR}}
+    # Fixture tests for the agent-workflow scripts in .claude/scripts/.
+    - step:
+        name: scripts
+        script:
+          - sh .claude/scripts/tests/run.sh
 ```
 
 ## `lefthook` → `.lefthook.yml`

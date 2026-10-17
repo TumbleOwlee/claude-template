@@ -7,17 +7,17 @@ description: Independent second-developer review of an open PR against its ticke
 
 **Concise, compact, facts only.**
 
-Criteria and output shape are `spec-reviewer.md`'s (`## Four axes, reported separately`, `## Output`); this skill supplies gate 3's *inputs* for a reviewer outside the implementing session. Conflict → `AGENTS.workflow.md` wins.
+Criteria and output shape are `spec-reviewer.md`'s (`## Axes, reported separately`, `## Spec changes`, `## Output`); this skill supplies gate 3's *inputs* for a reviewer outside the implementing session. Conflict → `AGENTS.workflow.md` wins.
 
 ## Gather inputs — no shared session
 
-- **Ticket** — the tracking issue (`issue-view.sh`, `AGENTS.md` `## Conventions — tracker`). Ticket is self-contained: its body's `## Spec (rev N)` is the full current normative text, rewritten on every "Reconcile the spec" revision; comments are only the changelog. This *is* the approved spec — `artifacts/<slug>/spec-diff.md` may not exist on this machine or may be gone.
+- **Ticket** — the tracking issue (`issue-view.sh`, `AGENTS.md` `## Conventions — tracker`). Ticket is self-contained: the issue's `## Requirements` (local IDs) and `## Scenarios` are the spec as filed, its comments the changes kept since; the PR body (`pr-view.sh`) maps local to fixed IDs (`## Requirements`, Issue column) and holds `## Architecture` and `## Decisions`. Changes classified as detail are only on the branch, in `docs/specs/`. `artifacts/<slug>/spec-diff.md` may not exist on this machine or may be gone.
 - **Branch/PR** — from the ticket's linked PR, or ask the user for PR number/branch.
 - **Base ref** — PR's target branch (usually `main`).
 
 ## Run the review
 
-Create a scratch `artifacts/<slug>/` and write the ticket's normative text into its `spec-diff.md` (one `## <ID> — <kind>` section per list item of the body's `## Spec`, same shape as gate 1) so the reviewer reads it the way it reads every spec diff; `review.md` and `review.verdict.md` land there too. Spawn `spec-reviewer` (`.claude/agents/spec-reviewer.md`) with: scope `branch` (not a wave), the base ref, the artifact dir, the checkout path. No `plan.md` exists on this side — say so: no stage ids, every finding's stage column is `—`, spec fidelity is checked against `spec-diff.md` alone. Give it nothing more, never the issue/PR number. It answers with a status line only (`### Agent hand-off`).
+Create a scratch `artifacts/<slug>/` and write the ticket's normative text into its `spec-diff.md` (one `## S<n> — <title>` section per scenario, one `## <ID> — <kind>` section per row of the PR's `## Requirements` table, the approved changes from the comments applied, same shape as gate 1) and the PR's `## Architecture` into `architecture.md` (the table → `## Components`, `Public surface:` → `## Public surface`; the PR has no interfaces) with its `## Decisions` so the reviewer reads them the way it reads every run's; `review.md` and `review.verdict.md` land there too. Spawn `spec-reviewer` (`.claude/agents/spec-reviewer.md`) with: scope `branch`, the base ref, the artifact dir, the checkout path. No `plan.md` and no cards exist on this side — say so: no stage ids, every finding's stage column is `—`, no cards (`spec-reviewer.md` `## Spec changes`); the ticket's spec with its approved comments applied (`spec-diff.md`) is the approved baseline. Architecture conformance covers `## Components` (Role cells name key members and variants), `## Public surface` and the PR's decisions; signatures are checked against the diff. Give it nothing more, never the issue/PR number. It answers with a status line only (`### Agent hand-off`).
 
 A fresh session may review inline with the same axes and rigor; a session that implemented any of it spawns.
 

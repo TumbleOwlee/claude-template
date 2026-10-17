@@ -14,9 +14,10 @@ Router for AI coding agents. Read first.
 - Before editing an area: pull the headings the task touches from its `requirements.md` and their `edge-cases.md` counterparts (`## Conventions — reading`); the whole file only for a cross-cutting change. `edge-cases.md` = deliberate ugliness; check before "fixing."
 - Behavior change with no spec change = incomplete.
 - `main` never holds unfinished spec: a requirement on `main` describes code that exists and is tested. A branch may hold a spec commit ahead of its code; squash merge keeps that off `main`.
+- A run's spec settles with its code (`AGENTS.workflow.md` *Spec changes*). Draft entries carry local IDs — `S<n>` scenarios, `R<n>`, `E<n>`, the next free number each time (a slice run of an epic starts at the slice number × 100: `R301` in slice 3); a dropped local ID is retired, never reused in the run; the planner assigns fixed IDs at gate 2. After `s0` the implementer updates `docs/specs/` inside the stage commit and `spec-reviewer` classifies every change (`## Spec changes` in its file).
 - Pre-existing spec/code disagreement outside your task: stop, raise separately. Folding it in widens approved work, skips its own review.
 - Specs carry no `file:line`. Locate code with search tools.
-- Requirement and edge-case IDs (`-R-`, `-E-`) stable, append-only (sole exception: `docs/specs/README.md` rule 2). Cite in commits and PRs.
+- Requirement and edge-case IDs (`-R-`, `-E-`) stable, append-only once on `main` (sole exception: `docs/specs/README.md` rule 2). A fixed ID added on a branch may be dropped before merge; its number is never reused within that run. Cite in commits and PRs.
 
 ## TDD — fixed order, every stage
 
@@ -34,9 +35,9 @@ Router for AI coding agents. Read first.
 
 Triggers on **behavior change, any size**: new public function, changed default, new error variant, any observable semantics. Size sets stage count, never gate existence. Non-behavior change (refactor, rename, perf with identical semantics, test-only, docs, tooling): gate 1 skipped, rest runs. Trivial edit (one file, no semantics, no test/CI/build effect — typo, comment, doc wording): no gates, branch + PR.
 
-Gate/task-board mechanics (gate 1 through gate 4, lanes, stage-by-stage implementation, review, PR, after merge, resume): [`AGENTS.workflow.md`](./AGENTS.workflow.md). Pull one section at a time with `extract-section.sh`.
+Gate/task-board mechanics (gate 1 brief, architecture, gate 2 plan, lanes, epics, stage-by-stage implementation, review, PR, clean up, resume): [`AGENTS.workflow.md`](./AGENTS.workflow.md). Pull one section at a time with `extract-section.sh`.
 
-A plan stage's `files` list is a contract: the stage touches exactly the files it names — tooling, test helpers, config, scripts, a flaky-test fix, a drive-by rename included.
+A plan stage's `files` list is a contract: the stage touches exactly the files it names — tooling, test helpers, config, scripts, a flaky-test fix, a drive-by rename included; the `docs/specs/` files its logged spec changes touch count as named.
 
 ## Where to look for task X
 
@@ -59,7 +60,7 @@ Narrow the loop while iterating:
 {{NARROW_COMMANDS}}
 ```
 
-Full set before done. `lefthook` enforces fast checks pre-commit; CI runs the full set on every push and PR.
+Full set before done — in a spec-driven run the orchestrator's `gauntlet.sh`; the implementer runs only the narrowed loop above for the packages it changed. `lefthook` enforces fast checks pre-commit; CI runs the full set on every push and PR.
 
 {{RTK_SECTION}}
 

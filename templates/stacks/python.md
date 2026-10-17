@@ -112,6 +112,12 @@ jobs:
       - uses: astral-sh/setup-uv@v5
       - run: uv sync --all-extras --dev
       - run: uv run pytest --cov=src --cov-fail-under={{COVERAGE_FLOOR}}
+  # Fixture tests for the agent-workflow scripts in .claude/scripts/.
+  scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh .claude/scripts/tests/run.sh
 ```
 
 ## `bitbucket-pipelines` → `bitbucket-pipelines.yml`
@@ -146,6 +152,11 @@ pipelines:
           - pip install uv
           - uv sync --all-extras --dev
           - uv run pytest --cov=src --cov-fail-under={{COVERAGE_FLOOR}}
+    # Fixture tests for the agent-workflow scripts in .claude/scripts/.
+    - step:
+        name: scripts
+        script:
+          - sh .claude/scripts/tests/run.sh
 ```
 
 ## `lefthook` → `.lefthook.yml`
